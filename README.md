@@ -25,7 +25,7 @@ Download and install Julia (*version 1.6+*) from [the official website](https://
 4. In the terminal, type the following to install dependencies and run the code.
 
 ```bash
-julia --project=@. 'import Pkg; Pkg.instantiate(); include("fig1.jl")'
+julia --project=@. 'import Pkg; Pkg.instantiate(); include("fig2.jl")'
 ```
 
 ### Trouble-shooting
