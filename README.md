@@ -17,23 +17,15 @@ pandoc -s model_desc.md -o  model_desc.docx
 
 Download and install Julia (*version 1.6+*) from [the official website](https://julialang.org/downloads/). Choose "add Julia to system PATH" during installation.
 
-### Environment Setup
+### Running the code
 
 1. Download this repositroy via the green button.
 2. Extract the downloaded archive, the `zip` file. You will see the project folder `MitochondrialDynamics`.
 3. Choose `Open with terminal` in the folder's right-click context menu.
-4. In the terminal, type the following to install dependencies
+4. In the terminal, type the following to install dependencies and run the code.
 
 ```bash
-julia --project=@. 'import Pkg; Pkg.instantiate()'
-```
-
-### Running the code
-
-In the terminal, type the following to generate the figures. For example, to generate Figure 2:
-
-```bash
-julia --project=@. fig2.jl
+julia --project=@. 'import Pkg; Pkg.instantiate(); include("fig1.jl")'
 ```
 
 ### Trouble-shooting
