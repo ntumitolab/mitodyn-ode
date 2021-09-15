@@ -1,0 +1,8 @@
+[deps]
+DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+FromFile = "ff7dd447-1dcb-4ce3-b8ac-22a812192de7"
+LabelledArrays = "2ee39098-c373-598a-b85f-a56591580800"
+OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
+Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
+PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
+Setfield = "efcf1570-3423-57d1-acb7-fd33fddbac46"
