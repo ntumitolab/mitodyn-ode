@@ -156,3 +156,6 @@ figures/
 
 # Local VS Code settings
 .vscode/
+
+# Generated figures
+*.pdf
