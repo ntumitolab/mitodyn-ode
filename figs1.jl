@@ -105,4 +105,4 @@ end
 
 fig1s = plot_fig1s(sol1s, tend, figsize=(15,10))
 
-fig1s.savefig("figures/S1_Fig1.pdf")
+fig1s.savefig("S1_Fig1.pdf")

@@ -127,4 +127,4 @@ end
 
 fig3 = plot_fig3()
 
-fig3.savefig("figures/Fig3.pdf")
+fig3.savefig("Fig3.pdf")

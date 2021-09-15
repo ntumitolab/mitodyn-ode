@@ -193,4 +193,4 @@ end
 
 fig2s = plot_fig2s(sol, solDM, tend, figsize=(12,8))
 
-fig2s.savefig("figures/S1_Fig2.pdf")
+fig2s.savefig("S1_Fig2.pdf")

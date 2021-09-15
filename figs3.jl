@@ -173,7 +173,7 @@ end
 
 fig71 = plot_fig71(sol, solDM, tend, figsize=(20, 16))
 
-fig71.savefig("figures/S1Fig3-1.pdf")
+fig71.savefig("S1Fig3-1.pdf")
 
 # Fig 7-2
 
@@ -291,4 +291,4 @@ end
 
 fig72 = plot_fig72(sol, solDM, tend, figsize=(20, 16))
 
-fig72.savefig("figures/S1Fig3-2.pdf")
+fig72.savefig("S1Fig3-2.pdf")

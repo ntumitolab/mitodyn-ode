@@ -108,4 +108,4 @@ end
 
 fig6 = plot_fig6(sim, simDM, glc, param,  figsize=(16,8))
 
-fig6.savefig("figures/Fig6.pdf")
+fig6.savefig("Fig6.pdf")

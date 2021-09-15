@@ -106,4 +106,4 @@ end
 
 fig2 = plot_fig2(sols, glc, size=(12, 8))
 
-fig2.savefig("figures/Fig2.pdf")
+fig2.savefig("Fig2.pdf")

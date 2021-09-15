@@ -96,4 +96,4 @@ end
 
 fig7 = plot_fig7(param0, paramHL, paramF1, paramETC, paramDM)
 
-fig7.savefig("figures/Fig8.pdf")
+fig7.savefig("Fig7.pdf")

@@ -141,4 +141,4 @@ end
 
 fig5 = plot_fig5(sol)
 
-fig5.savefig("figures/Fig5.pdf")
+fig5.savefig("Fig5.pdf")
