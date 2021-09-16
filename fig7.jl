@@ -1,16 +1,16 @@
-# Figure 8 : Summary figure.
+# Figure 7 : Summary figure.
 
 using DifferentialEquations
 using LabelledArrays
 using Parameters
+using Setfield
 using FromFile
 @from "Model/Model.jl" using Model
 @from "Model/utils.jl" import second, μM, mV, mM, Hz
-using Setfield
 
 # Plotting
-using PyPlot
-rcParams = PyPlot.PyDict(PyPlot.matplotlib."rcParams")
+import PyPlot as plt
+rcParams = plt.PyDict(plt.matplotlib."rcParams")
 rcParams["font.size"] = 14
 rcParams["font.sans-serif"] = "Arial"
 rcParams["font.family"] = "sans-serif"

@@ -1,15 +1,3 @@
-"""
-# Fig 5 : Caclium waves
-
-Response to calcium oscillations
-
-```math
-[Ca]_c = B + A (5xe^{1-5x})^4 \quad , \text{where} \ \ x = \frac{t}{T} - \left \lfloor{\frac{t}{T}}\right \rfloor
-```
-
-where `B` is the basal cytosolic calcium level, `A` is the amplitude, and `T` is the period.
-"""
-
 using DifferentialEquations
 using LabelledArrays
 using Parameters

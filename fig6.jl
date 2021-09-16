@@ -7,7 +7,7 @@ using Setfield
 
 using FromFile
 @from "Model/Model.jl" using Model
-@from "Model/utils.jl" import second, μM, mV, mM, Hz
+@from "Model/utils.jl" import second, μM, mV, mM, Hz, minute
 
 
 # Plotting
