@@ -346,11 +346,6 @@ git-tree-sha1 = "b5e930ac60b613ef3406da6d4f42c35d8dc51419"
 uuid = "f6369f11-7733-5829-9624-2563aa707210"
 version = "0.10.19"
 
-[[deps.FromFile]]
-git-tree-sha1 = "f4fce099f9e14cd12d91e29fd105ef891fb55297"
-uuid = "ff7dd447-1dcb-4ce3-b8ac-22a812192de7"
-version = "0.1.1"
-
 [[deps.FunctionWrappers]]
 git-tree-sha1 = "241552bc2209f0fa068b6415b1942cc0aa486bcc"
 uuid = "069b7b12-0de2-55c6-9aab-29f3d0a68a2e"
