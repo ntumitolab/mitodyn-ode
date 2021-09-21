@@ -1,3 +1,4 @@
+module Utils
 # Units
 const second = float(1)    # second
 const minute = 60second    # minute
@@ -80,3 +81,5 @@ pow_s(x, n) = flipsign( abs(x)^n, x)
 Signed Hill function
 """
 hill_s(x, k, n) = hill(pow_s(x, n), pow_s(k, n))
+
+end # module

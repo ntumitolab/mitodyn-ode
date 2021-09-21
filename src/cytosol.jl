@@ -2,8 +2,7 @@
 # Adapted from Fridlyand, 2010
 using Parameters
 using Setfield
-using FromFile
-@from "utils.jl" import hill, mM, μM, ms, minute, Hz
+import .Utils: hill, mM, μM, ms, minute, Hz
 
 """
 Glucokinase (GK)

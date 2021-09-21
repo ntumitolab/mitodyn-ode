@@ -1,8 +1,7 @@
 # Mitochondria compartment descriptions
 using Parameters
 using Setfield
-using FromFile
-@from "utils.jl" import exprel, hill, hillr, iVT, Hz, mM, μM, mV
+import .Utils: exprel, hill, hillr, iVT, Hz, mM, μM, mV
 
 "Pyruvaye dehydrogenase (PDH)"
 @with_kw struct PDH{R}

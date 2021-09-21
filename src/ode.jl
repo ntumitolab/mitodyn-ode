@@ -1,9 +1,9 @@
 using Parameters
 using Setfield
 using LabelledArrays
-using FromFile
-@from "utils.jl" import mM, μM, minute, Hz, mV, hill
+import .Utils: mM, μM, minute, Hz, mV, hill
 
+# Constants
 const C_MIT = 1.812μM/mV        # Mitochondrial membrane capacitance
 const F_M = 3E-4                # Frasction of free Ca in mitochondria
 const F_I = 0.01                # Fraction of free Ca in cytosol

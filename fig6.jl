@@ -4,11 +4,8 @@ using DifferentialEquations
 using LabelledArrays
 using Parameters
 using Setfield
-
-using FromFile
-@from "Model/Model.jl" using Model
-@from "Model/utils.jl" import second, μM, mV, mM, Hz, minute
-
+using MitochondrialDynamics
+import MitochondrialDynamics.Utils: second, μM, mV, mM, Hz, minute
 
 # Plotting
 import PyPlot as plt

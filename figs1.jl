@@ -2,9 +2,8 @@
 using DifferentialEquations
 using LabelledArrays
 using Parameters
-using FromFile
-@from "Model/Model.jl" using Model
-@from "Model/utils.jl" import second, μM, mV, mM, Hz
+using MitochondrialDynamics
+import MitochondrialDynamics.Utils: second, μM, mV, mM, Hz
 
 # Plotting
 import PyPlot as plt
@@ -59,8 +58,8 @@ function plot_fig1s(sol1s, tend; figsize=(15,15))
     ΔΨ = sol1s.(ts, idxs=8)
     x2 = sol1s.(ts, idxs=9)
     x3 = sol1s.(ts, idxs=10)
-    x1 = Model.getx1.(x2, x3)
-    degree = Model.avgdeg.(x2, x3, x1)
+    x1 = getx1.(x2, x3)
+    degree = avgdeg.(x2, x3, x1)
 
     # convert unit to μM
     for arr in (g3p, pyr, nadh_c, nadh_m, atp_c, adp_c, amp_c, ca_m, ca_c, ΔΨ)

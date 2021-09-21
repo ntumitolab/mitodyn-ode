@@ -2,9 +2,8 @@ using DifferentialEquations
 using LabelledArrays
 using Parameters
 using Setfield
-using FromFile
-@from "Model/Model.jl" using Model
-@from "Model/utils.jl" import second, μM, mV, mM, Hz
+using MitochondrialDynamics
+import MitochondrialDynamics.Utils: second, μM, mV, mM, Hz
 
 import PyPlot as plt
 rcParams = plt.PyDict(plt.matplotlib."rcParams")

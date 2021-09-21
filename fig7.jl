@@ -4,9 +4,8 @@ using DifferentialEquations
 using LabelledArrays
 using Parameters
 using Setfield
-using FromFile
-@from "Model/Model.jl" using Model
-@from "Model/utils.jl" import second, μM, mV, mM, Hz
+using MitochondrialDynamics
+import MitochondrialDynamics.Utils: second, μM, mV, mM, Hz
 
 # Plotting
 import PyPlot as plt
@@ -66,7 +65,7 @@ function plot_fig7(param0, paramHL, paramF1, paramETC, paramDM;
 
     xx = glc ./ 5
 
-    fig, ax = subplots(1, 2, figsize=figsize)
+    fig, ax = plt.subplots(1, 2, figsize=figsize)
     ax[1].plot(xx, y1.ff, "b-", label="Baseline")
     ax[1].plot(xx, yDM.ff, "r-", label="Diabetic")
     ax[1].plot(xx, yETC.ff, "g-", label="Rotenone")

@@ -1,10 +1,10 @@
-module Model
+module MitochondrialDynamics
 
 export MitoDynNode, setglc, model!, cacyto, ampcyto, avgdeg, getx1
 
 include("utils.jl")
 include("cytosol.jl")
 include("mitochondria.jl")
-include("mitodynnode.jl")
+include("ode.jl")
 
 end # module

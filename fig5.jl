@@ -1,13 +1,10 @@
 using DifferentialEquations
 using LabelledArrays
 using Parameters
-
-using FromFile
-@from "Model/Model.jl" using Model
-@from "Model/Model.jl" using Model: CaOsciSmooth
-@from "Model/utils.jl" import second, μM, mV, mM, Hz
-
 using Setfield
+using MitochondrialDynamics
+import MitochondrialDynamics: CaOsciSmooth
+import MitochondrialDynamics.Utils: second, μM, mV, mM, Hz
 
 # Plotting config
 import PyPlot as plt
