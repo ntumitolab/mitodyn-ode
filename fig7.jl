@@ -4,6 +4,8 @@ using DifferentialEquations
 using LabelledArrays
 using Parameters
 using Setfield
+using CSV
+using DataFrames
 using MitochondrialDynamics
 import MitochondrialDynamics.Utils: second, μM, mV, mM, Hz
 
@@ -14,7 +16,7 @@ rcParams["font.size"] = 14
 rcParams["font.sans-serif"] = "Arial"
 rcParams["font.family"] = "sans-serif"
 
-function fig8data(p, glc = range(3.0mM, 30.0mM, length=101))
+function get_data(p, glc = range(3.0mM, 30.0mM, length=101))
     us = map(glc) do g
         param = setglc(p, g)
         prob = SteadyStateProblem(model!, u0, param)
@@ -52,16 +54,7 @@ paramDM = let rPDH = 0.5, rETC = 0.75, rHL  = 1.4, rF1  = 0.5
     p = @set p.etc.VMAX *= rETC
 end
 
-
-function plot_fig7(param0, paramHL, paramF1, paramETC, paramDM;
-                   figsize=(12,6))
-
-    # Data
-    y1 = fig8data(param0, glc)
-    yHL = fig8data(paramHL, glc)
-    yF1 = fig8data(paramF1, glc)
-    yETC = fig8data(paramETC, glc)
-    yDM = fig8data(paramDM, glc)
+function plot_fig7(y1, yHL, yF1, yETC, yDM, glc; figsize=(12,6))
 
     xx = glc ./ 5
 
@@ -93,6 +86,20 @@ function plot_fig7(param0, paramHL, paramF1, paramETC, paramDM;
     return fig
 end
 
-fig7 = plot_fig7(param0, paramHL, paramF1, paramETC, paramDM)
+y1 = get_data(param0, glc)
+yHL = get_data(paramHL, glc)
+yF1 = get_data(paramF1, glc)
+yETC = get_data(paramETC, glc)
+yDM = get_data(paramDM, glc)
+
+fig7 = plot_fig7(y1, yHL, yF1, yETC, yDM, glc)
+
+df = DataFrame(glucose=glc, BaseLeak=y1.jHL, BaseATP=y1.jANT,
+                            HLLeak=yHL.jHL, HLATP=yHL.jANT,
+                            F1Leak=yF1.jHL, F1ATP=yF1.jANT,
+                            ETCLeak=yETC.jHL, ETCATP=yETC.jANT,
+                            DMLeak=yDM.jHL, DMATP=yDM.jANT,)
 
 fig7.savefig("Fig7.pdf")
+
+CSV.write("Fig7B.csv", df)
