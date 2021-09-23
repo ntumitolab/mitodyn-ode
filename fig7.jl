@@ -58,15 +58,16 @@ function plot_fig7(y1, yHL, yF1, yETC, yDM, glc; figsize=(12,6))
 
     xx = glc ./ 5
 
-    fig, ax = plt.subplots(1, 2, figsize=figsize)
+    fig, ax = plt.subplots(2, 1, figsize=figsize)
     ax[1].plot(xx, y1.ff, "b-", label="Baseline")
     ax[1].plot(xx, yDM.ff, "r-", label="Diabetic")
     ax[1].plot(xx, yETC.ff, "g-", label="Rotenone")
     ax[1].plot(xx, yF1.ff, "c-", label="Oligomycin")
     ax[1].plot(xx, yHL.ff, "k-", label="Uncoupler")
-    ax[1].legend(loc="upper right")
-    ax[1].set(xlabel="Glucose (X)", ylabel="Fusion / Fission rate")
+    ax[1].legend(loc="upper center")
+    ax[1].set(xlabel="Glucose (X)", ylabel="Fusion / Fission rate", xlim=(0.0, 6.0), ylim=(0.0, 2.5))
     ax[1].set_title("A", loc="left")
+    ax[1].axhline(y=1.0, color="black", linestyle="--")
 
     ax[2].plot(y1.jHL, y1.jANT, "b-",  label="Baseline")
     ax[2].plot(y1.jHL[1:5:end], y1.jANT[1:5:end], "bo")
@@ -79,9 +80,11 @@ function plot_fig7(y1, yHL, yF1, yETC, yDM, glc; figsize=(12,6))
     ax[2].plot(yHL.jHL, yHL.jANT, "k-", label="Uncoupler")
     ax[2].plot(yHL.jHL[1:5:end], yHL.jANT[1:5:end], "ko")
 
-    ax[2].set(xlabel="Proton leak rate (mM/s)", ylabel="ATP synthase rate (mM/s)")
+    ax[2].set(xlabel="Proton leak rate (mM/s)", ylabel="ATP synthase rate (mM/s)", xlim=(0.0, 0.45), ylim=(0.0,0.20))
+    ax[2].set_aspect(1)
     ax[2].set_title("B", loc="left")
-    ax[2].legend()
+    ax[2].legend(loc="lower right")
+    ax[2].axline((0.1, 0.1), slope=1.0, color="black", linestyle="--")
 
     return fig
 end
@@ -92,7 +95,7 @@ yF1 = get_data(paramF1, glc)
 yETC = get_data(paramETC, glc)
 yDM = get_data(paramDM, glc)
 
-fig7 = plot_fig7(y1, yHL, yF1, yETC, yDM, glc)
+fig7 = plot_fig7(y1, yHL, yF1, yETC, yDM, glc, figsize=(8, 12))
 
 df = DataFrame(glucose=glc, BaseLeak=y1.jHL, BaseATP=y1.jANT,
                             HLLeak=yHL.jHL, HLATP=yHL.jANT,
