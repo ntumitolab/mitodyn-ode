@@ -33,6 +33,7 @@ If that does not work, download this repositroy via the big green `Code` button 
 In the terminal, type the following commands to run the code to generate figures and data. Make sure the working directory (output of `pwd()`) is the project folder `MitochondrialDynamics`.
 
 ```bash
+pwd # Make sure it's the project directory, MitochondrialDynamics
 julia --color=yes allfigs.jl
 ```
 
