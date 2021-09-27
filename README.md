@@ -17,30 +17,40 @@ pandoc -s model_desc.md -o  model_desc.docx
 
 Download and install Julia (*version 1.6+*) from [the official website](https://julialang.org/downloads/). Choose "add Julia to system PATH" during installation.
 
-### Running the code
+### Download the code
 
-1. Download this repositroy via the green button.
-2. Extract the downloaded archive, the `zip` file. You will see the project folder `MitochondrialDynamics`.
-3. Choose `Open with terminal` in the folder's right-click context menu.
-4. In the terminal, type the following to install dependencies and run the code.
+Open the terminal (either Windows terminal, powershell, or bash) and enter the following command:
 
 ```bash
-julia --project=@. 'import Pkg; Pkg.instantiate(); include("fig2.jl")'
+git clone https://github.com/NTUMitoLab/MitochondrialDynamics.git
+cd MitochondrialDynamics
+```
+
+If that does not work, download this repositroy via the big green `Code` button => `download zip`. You will see the project folder `MitochondrialDynamics` in the extracted zip archive.
+
+### Running the code
+
+In the terminal, type the following commands to run the code to generate figures and data. Make sure the working directory (output of `pwd()`) is the project folder `MitochondrialDynamics`.
+
+```bash
+julia --color=yes allfigs.jl
 ```
 
 ### Trouble-shooting
 
 
-## How to convert pdf figures to tiff
+## Appendix: Convert pdf figures to tiff ones
 
-`poppler-utils` is needed for `pdftoppm`. In Windows, you can install it via the [conda package manager](https://www.anaconda.com/products/individual):
+*Might not work in Windows systems*
+
+`poppler-utils` is needed for `pdftoppm`. One can install it in the software repos or via `conda` package manager.
 
 ```bash
 conda install poppler -c conda-forge
 ```
 
-To convert a `pdf` file to a 300 DPI `tiff` file using `lzw` compression.
+The following command converts a `pdf` file to a 300 DPI `tiff` file using `lzw` compression.
 
 ```bash
-pdftoppm -tiff -tiffcompression lzw -r 300 in.pdf outname
+pdftoppm -tiff -tiffcompression lzw -r 300 Fig2.pdf
 ```
