@@ -34,7 +34,6 @@ In the diabetic parameter set. We adjusted
 using DifferentialEquations
 using LabelledArrays
 using Parameters
-using FromFile
 using MitochondrialDynamics
 import MitochondrialDynamics.Utils: second, μM, mV, mM, Hz
 
