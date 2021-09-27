@@ -95,9 +95,13 @@ yF1 = get_data(paramF1, glc)
 yETC = get_data(paramETC, glc)
 yDM = get_data(paramDM, glc)
 
+df1 = DataFrame(Glucose = glc, Baseline = y1.ff, Hleak = yHL.ff,
+                Oligomycin = yF1.ff, Rotenone = yETC.ff,
+                T2DM = yDM.ff)
+
 fig7 = plot_fig7(y1, yHL, yF1, yETC, yDM, glc, figsize=(8, 12))
 
-df = DataFrame(glucose=glc, BaseLeak=y1.jHL, BaseATP=y1.jANT,
+df2 = DataFrame(glucose=glc, BaseLeak=y1.jHL, BaseATP=y1.jANT,
                             HLLeak=yHL.jHL, HLATP=yHL.jANT,
                             F1Leak=yF1.jHL, F1ATP=yF1.jANT,
                             ETCLeak=yETC.jHL, ETCATP=yETC.jANT,
@@ -105,4 +109,5 @@ df = DataFrame(glucose=glc, BaseLeak=y1.jHL, BaseATP=y1.jANT,
 
 fig7.savefig("Fig7.pdf")
 
-CSV.write("Fig7B.csv", df)
+CSV.write("Fig7A.csv", df1)
+CSV.write("Fig7B.csv", df2)
