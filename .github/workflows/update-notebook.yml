@@ -1,0 +1,53 @@
+name: Auto update notebooks
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 0 1 * *"  # Every month
+
+jobs:
+  update-notebook:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup Julia
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: '1.7'
+      - name: Setup Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+
+      - name: Install Python dependencies
+        run:  pip install -r requirements.txt
+      - name: Cache Julia artifacts
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-all
+        with:
+          path: ~/.julia
+          key: ${{ runner.os }}-julia-${{ env.cache-name }}-${{ hashFiles('**/Manifest.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-julia-${{ env.cache-name }}-
+            ${{ runner.os }}-julia-
+      - name: Install IJulia
+        env:
+          PYTHON : python
+        shell: julia --color=yes --threads=auto {0}
+        run: |
+          using Pkg
+          Pkg.add("IJulia")
+          Pkg.build("IJulia")
+      - name: Update Julia dependencies
+        env:
+          PYTHON : python
+        shell: julia --color=yes --project=. --threads=auto {0}
+        run: |
+          import Pkg
+          Pkg.update()
+      - name: Execute notebooks
+        run: |
+          find . -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
