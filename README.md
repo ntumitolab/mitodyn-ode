@@ -15,7 +15,7 @@ pandoc -s model_desc.md -o  model_desc.docx
 
 ### Installing Julia
 
-Download and install Julia (*version 1.6+*) from [the official website](https://julialang.org/downloads/). Choose "add Julia to system PATH" during installation.
+Download and install Julia (*version 1.7+*) from [the official website](https://julialang.org/downloads/). Choose "add Julia to system PATH" during installation.
 
 ### Download the code
 
@@ -36,8 +36,6 @@ In the terminal, type the following commands to run the code to generate figures
 pwd # Make sure it's the project directory, MitochondrialDynamics
 julia --color=yes allfigs.jl
 ```
-
-### Trouble-shooting
 
 
 ## Appendix: Convert pdf figures to tiff ones
