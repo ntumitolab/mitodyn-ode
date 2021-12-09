@@ -1,0 +1,24 @@
+name: Check markdown links
+
+on:
+  workflow_dispatch:
+  # schedule:
+  #   - cron: "0 0 1 * *"  # Every month
+
+jobs:
+  linkcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache python
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-jb-
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Install Build Dependencies
+        run: pip install -r _jb/requirements.txt
+      - name: Check external links
+        run: jupyter-book build docs --builder linkcheck

@@ -1,0 +1,31 @@
+name: Build pages
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Cache Python dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-jb-${{ hashFiles('_jb/requirements.txt') }}
+        restore-keys: |
+            ${{ runner.os }}-jb-
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.9'
+    - name: Install Build Dependencies
+      run: pip install -r _jb/requirements.txt
+    - name: Build website
+      run: jupyter-book build docs
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3.8.0
+      if: github.ref == 'refs/heads/main'
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        force_orphan: true
+        publish_dir: docs/_build/html

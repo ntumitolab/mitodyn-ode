@@ -4,54 +4,41 @@
 
 Mathematical descriptions are in [model_desc.md](model_desc.md).
 
-You can export it to MS Word `.docx` file using [typora](https://typora.io) GUI or [pandoc](https://pandoc.org) in the CLI:
+## How to run the code in the cloud
 
+Click `run in binder` on the top of figure pages.
 
-```bash
-pandoc -s model_desc.md -o  model_desc.docx
-```
+## How to run the code locally
 
-## How to run the code
+### Install Git
 
-### Installing Julia
+Git source management tool can be downloaded and installed [here](https://git-scm.com/download/win) for the Windows version.
 
-Download and install Julia (*version 1.6+*) from [the official website](https://julialang.org/downloads/). Choose "add Julia to system PATH" during installation.
+### Install Julia
 
-### Download the code
+Download and install Julia (*version 1.7+*) from [the official website](https://julialang.org/downloads/). Choose "add Julia to system PATH" during installation.
 
-Open the terminal (either Windows terminal, powershell, or bash) and enter the following command:
+### Download the code and launch Julia
+
+Open Git Bash and enter the following commands:
 
 ```bash
 git clone https://github.com/NTUMitoLab/MitochondrialDynamics.git
 cd MitochondrialDynamics
+julia --project=.
 ```
 
 If that does not work, download this repositroy via the big green `Code` button => `download zip`. You will see the project folder `MitochondrialDynamics` in the extracted zip archive.
 
 ### Running the code
 
-In the terminal, type the following commands to run the code to generate figures and data. Make sure the working directory (output of `pwd()`) is the project folder `MitochondrialDynamics`.
+In the Julia terminal, type the following commands to run the code to generate figures and data. Make sure the working directory (output of `pwd()`) is the project folder `MitochondrialDynamics`.
 
-```bash
-pwd # Make sure it's the project directory, MitochondrialDynamics
-julia --color=yes allfigs.jl
-```
+```jl
+using Pkg
+Pkg.activate(".")
+Pkg.instantiate()
 
-### Trouble-shooting
-
-
-## Appendix: Convert pdf figures to tiff ones
-
-*Might not work in Windows systems*
-
-`poppler-utils` is needed for `pdftoppm`. One can install it in the software repos or via `conda` package manager.
-
-```bash
-conda install poppler -c conda-forge
-```
-
-The following command converts a `pdf` file to a 300 DPI `tiff` file using `lzw` compression.
-
-```bash
-pdftoppm -tiff -tiffcompression lzw -r 300 Fig2.pdf
+using IJulia
+IJulia.notebook(dir=pwd())
 ```
