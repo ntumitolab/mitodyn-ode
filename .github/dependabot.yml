@@ -5,17 +5,11 @@ updates:
     directory: '/'
     schedule:
       interval: 'weekly'
-    labels:
-      - "automerge"
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "weekly"
-    labels:
-      - "automerge"
   - package-ecosystem: "pip"
     directory: "/_jb"
     schedule:
       interval: "weekly"
-    labels:
-      - "automerge"
