@@ -15,14 +15,18 @@ stages:
 # If you want to also cache the installed packages, you have to install
 # them in a virtualenv and cache it as well.
 cache:
-  paths:
-    - .cache/pip
-    - jb-env/
+  - key:
+      files:
+        - _jb/requirements.txt
+    paths:
+      - .cache/pip
+      - jbenv/
 
 before_script:
-  - python -m venv jb-env
-  - source jb-env/bin/activate
-  - python -m pip install -r _jb/requirements.txt
+  - pip install -U pip wheel virtualenv
+  - virtualenv jbenv
+  - source jbenv/bin/activate
+  - pip install -r _jb/requirements.txt
   - jupyter-book build docs
 
 test:
