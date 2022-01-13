@@ -32,19 +32,19 @@ before_script:
 test:
   stage: test
   except:
-  - main
+    - main
   script:
-  - echo "Test completed."
+    - echo "Test completed."
 
 pages:
   stage: deploy
   only:
-  - main
+    - main
   script:
-  - mv docs/_build/html public
-  - apt-get update -qq && apt-get install gzip brotli -y
-  - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec gzip   -f -k {} \; || echo 'Gzip failed. Skipping...'
-  - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec brotli -f -k {} \; || echo 'Brotli failed. Skipping...'
+    - mv docs/_build/html public
+    - apt-get update -qq && apt-get install gzip brotli -qqy
+    - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec gzip   -f -k {} \; || echo 'Gzip failed. Skipping...'
+    - find public -type f -regex '.*\.\(htm\|html\|txt\|text\|js\|css\|svg\|xml\)$' -exec brotli -f -k {} \; || echo 'Brotli failed. Skipping...'
   artifacts:
     paths:
-    - public
+      - public
