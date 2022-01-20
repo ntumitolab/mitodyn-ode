@@ -1,8 +1,11 @@
 # Mitochondrial dynamics model
 
+- GitLab repo: <https://gitlab.com/NTUMito/wen-wei-tseng/MitochondrialDynamics>
+- GitHub mirror: <https://github.com/NTUMitoLab/MitochondrialDynamics>
+
 ## Model description
 
-Mathematical descriptions are in [model_desc.md](model_desc.md).
+Mathematical descriptions of this ode MODEL are in [model_desc.md](model_desc.md).
 
 ## How to run the code in the cloud
 
