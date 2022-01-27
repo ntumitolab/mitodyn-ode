@@ -11,6 +11,8 @@ stages:
 # GitLab CI: Auto dependency updates https://thacoon.com/posts/gitlab-ci-auto-dependency-update/
 update-julia-notebooks:
   stage: test
+  tags:
+    - md705
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
   image: julia:1.7
@@ -38,7 +40,7 @@ update-julia-notebooks:
     - python3 -m pip install -r requirements.txt
     - julia --color=yes --threads=auto -e 'import Pkg; Pkg.add(["IJulia", "PyPlot"]); Pkg.build(["IJulia", "PyPlot"]); import PyPlot'
     - julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.update()'
-    - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j1 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-1.7 --execute --inplace {}
+    - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j8 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-1.7 --execute --inplace {}
     - |
       lines=$(git status -s | wc -l)
       if [ $lines -gt 0 ];then
@@ -63,6 +65,8 @@ update-julia-notebooks:
 build-notebooks:
   stage: build
   image: debian:11-slim
+  tags:
+    - md705
   rules:
     - if: $CI_PIPELINE_SOURCE == "push"
   cache:
@@ -85,6 +89,8 @@ build-notebooks:
 pages:
   stage: deploy
   image: alpine:3.15
+  tags:
+    - md705
   needs: ["build-notebooks"]
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"
