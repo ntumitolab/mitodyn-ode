@@ -74,8 +74,8 @@ update-julia-notebooks:
 build-notebooks:
   stage: build
   image: python:3.10-slim
-  tags:
-    - md705
+  # tags:
+  #   - md705
   rules:
     - if: $CI_PIPELINE_SOURCE == "push"
   cache:
@@ -100,8 +100,8 @@ build-notebooks:
 pages:
   stage: deploy
   image: alpine:3.15
-  tags:
-    - md705
+  # tags:
+  #   - md705
   needs: ["build-notebooks"]
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE == "push"
