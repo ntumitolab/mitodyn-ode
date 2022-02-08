@@ -19,7 +19,7 @@ update-julia-notebooks:
   variables:
     JULIA_DEPOT_PATH: "${CI_PROJECT_DIR}/.julia"
     JL_MAJOR: "1.7"
-    JL_MINOR: "1"
+    JL_MINOR: "2"
     JL_ARCH: "x64"
     JULIA_PATH: "/usr/local"
     N_CORES: 8
@@ -30,11 +30,11 @@ update-julia-notebooks:
       paths:
         - venv/
         - .cache/pip
-    - key:
-        files:
-          - Project.toml
+    - key: julia-$JL_MAJOR
       paths:
         - .julia/artifacts
+        - .julia/compiled
+        - .julia/packages
 
   before_script:
     - pip install -U pip wheel virtualenv
