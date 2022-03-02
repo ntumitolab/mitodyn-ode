@@ -1,3 +1,4 @@
+# Model descriptions
 
 ## Difference from the original Fridlyand's model
 - We  added an dilution term for pyruvate and a ADP Michaelis constant in Glyceraldehyde 3-phosphate dehydrogenase to increase the robustness in the ODE systems.
@@ -12,25 +13,25 @@
 
 ## General parameters
 
-| Parameter      | Value         | Description                                                        |
-| -------------- | ------------- | ------------------------------------------------------------ |
-| $V_{i}$        | 0.53          | Relative cytoplasmic volume                                  |
-| $V_{m}$        | 0.06          | Relative mitochondrial volume                                |
-| $V_{mtx}$      | 0.0144        | Relative mitochondrial matrix volume (Adjustable)            |
-| $C_{mito}$     | 1.812 mM/V  | Mitochondrial membrane capacitance                           |
-| $F$            | 96484.6 C/mol | Faraday's constant                                           |
-| $\delta_{Ca}$  | 0.0003        | Fraction of free Ca in mitochondria                          |
-| $[Na^+]_c$ | 10 mM         | Cytoplasmic Na concentration                                 |
-| $[Na^+]_m$ | 5 mM          | Mitochondrial Na concentration                               |
-| $T_v$          | 26.73 mV      | Thermal voltage (RT/F) (@37°C)                                |
-| $\Sigma A_c$          | 4.5 mM        | Cellular adenine nucleotides concentration  (Adjustable)     |
-| $\Sigma N_m$       | 2.2 mM        | Free pyridine nucleotides concentration in<br/>mitochondrial matrix |
-| $\Sigma N_c$       | 2.0 mM        | Free pyridine nucleotides concentration in<br/>cytoplasm (Adjustable) |
-| $k_{gpd}$   | 0.01/s    | Consumption rate of G3P                            |
-| $k_{NADHm}$ | 0.1/s     | Consumption rate of mito NADH                      |
-| $k_{NADHc}$ | 0.1/s     | Consumption rate of cyto NADH                      |
-| $k_{ATP}$   | 0.04/s    | Basal consumption rate of ATP                      |
-| $k_{ATPCa}$ | 90/mM/s | Consumption rate of ATP activated by calcium       |
+| Parameter     | Value         | Description                                                           |
+| ------------- | ------------- | --------------------------------------------------------------------- |
+| $V_{i}$       | 0.53          | Relative cytoplasmic volume                                           |
+| $V_{m}$       | 0.06          | Relative mitochondrial volume                                         |
+| $V_{mtx}$     | 0.0144        | Relative mitochondrial matrix volume (Adjustable)                     |
+| $C_{mito}$    | 1.812 mM/V    | Mitochondrial membrane capacitance                                    |
+| $F$           | 96484.6 C/mol | Faraday's constant                                                    |
+| $\delta_{Ca}$ | 0.0003        | Fraction of free Ca in mitochondria                                   |
+| $[Na^+]_c$    | 10 mM         | Cytoplasmic Na concentration                                          |
+| $[Na^+]_m$    | 5 mM          | Mitochondrial Na concentration                                        |
+| $T_v$         | 26.73 mV      | Thermal voltage (RT/F) (@37°C)                                        |
+| $\Sigma A_c$  | 4.5 mM        | Cellular adenine nucleotides concentration  (Adjustable)              |
+| $\Sigma N_m$  | 2.2 mM        | Free pyridine nucleotides concentration in<br/>mitochondrial matrix   |
+| $\Sigma N_c$  | 2.0 mM        | Free pyridine nucleotides concentration in<br/>cytoplasm (Adjustable) |
+| $k_{gpd}$     | 0.01/s        | Consumption rate of G3P                                               |
+| $k_{NADHm}$   | 0.1/s         | Consumption rate of mito NADH                                         |
+| $k_{NADHc}$   | 0.1/s         | Consumption rate of cyto NADH                                         |
+| $k_{ATP}$     | 0.04/s        | Basal consumption rate of ATP                                         |
+| $k_{ATPCa}$   | 90/mM/s       | Consumption rate of ATP activated by calcium                          |
 
 
 
@@ -53,10 +54,10 @@ J_{ADK} &= k_f ([ADP]_c^2 - [ATP]_c [AMP]_c / K_{eq}^{AK})
 \end{aligned}
 $$
 
-| Parameter     | Value       | Description                          |
-| :------------ | ----------- | ------------------------------ |
+| Parameter     | Value     | Description                                                                                                                              |
+| :------------ | --------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | $k_f$         | 1000 mM/s | Forward (AMP-forming) rate constant of adenylate kinase. <br />The parameters was set arbitrary large for equilibrium of adenylate pool. |
-| $K_{eq}^{AK}$ | 0.931 | Equilibrium constant of adenylate kinase (AMP-forming). |
+| $K_{eq}^{AK}$ | 0.931     | Equilibrium constant of adenylate kinase (AMP-forming).                                                                                  |
 
 ## Glucokinase (GK)
 
@@ -64,12 +65,12 @@ $$
 J_{glu} = V_{m} \frac{[ATP]_c}{[ATP]_c + K_{ATP}} \frac{[Glc]^n}{[Glc]^n + K_{Glc}^{n}}
 $$
 
-| Parameter     | Value       | Description                          |
-| ------------- | ----------- | ------------------------------ |
-| $V_{m}$       | 0.011 mM/s | Max rate of glucokinase        |
-| $K_{ATP}$     | 0.5 mM | Michaelis constant for ATP     |
-| $K_{Glc}$     | 7 mM        | Michaelis constant for glucose |
-| n             | 1.7         | Cooperativity for glucose      |
+| Parameter | Value      | Description                    |
+| --------- | ---------- | ------------------------------ |
+| $V_{m}$   | 0.011 mM/s | Max rate of glucokinase        |
+| $K_{ATP}$ | 0.5 mM     | Michaelis constant for ATP     |
+| $K_{Glc}$ | 7 mM       | Michaelis constant for glucose |
+| n         | 1.7        | Cooperativity for glucose      |
 
 
 ## Glyceraldehyde 3-phosphate dehydrogenase (GPD)
@@ -78,11 +79,11 @@ $$
 J_{gpd} = V_m \frac{[G3P]}{[G3P] + K_{G3P}} \frac{[NAD^+]_c}{[NAD^+]_c + K_{NAD}[NADH]_c}
 $$
 
-| Parameter     | Value     | Description                                            |
-| ------------- | --------- | ------------------------------------------------ |
-| $V_{m}$       | 0.5 mM/s | Max rate of GPD (Adjustable)                     |
-| $K_{G3P}$ | 0.2 mM | Michaelis constant for G3P                       |
-| $K_{NAD}$ | 0.09      | Activation constant for cytosolic NAD/NADH ratio |
+| Parameter | Value    | Description                                      |
+| --------- | -------- | ------------------------------------------------ |
+| $V_{m}$   | 0.5 mM/s | Max rate of GPD (Adjustable)                     |
+| $K_{G3P}$ | 0.2 mM   | Michaelis constant for G3P                       |
+| $K_{NAD}$ | 0.09     | Activation constant for cytosolic NAD/NADH ratio |
 
 ## Lactate production by lactate dehydrogenase (LDH)
 
@@ -105,12 +106,12 @@ $$
 [Ca^{2+}]_c = [Ca^{2+}]_R + k_{A}^{Ca} \frac{([ATP]_c)^n}{([ATP]_c)^n + (K_{ATP} [ADP]_c)^n}
 $$
 
-| Parameter        | Value   | Description                                     |
-| ---------------- | ------- | ----------------------------------------- |
-| $[Ca^{2+}]_R$ | 90 nM | Resting cytoplasmic calcium concentration |
-| $k_{A}^{Ca}$     | 250 nM | Maximal activated calcium concentration   |
-| $K_{ATP}$        | 25      | Activation constant for ATP/ADP ratio     |
-| $n$              | 4       | Cooperativity for ATP/ADP ratio           |
+| Parameter     | Value  | Description                               |
+| ------------- | ------ | ----------------------------------------- |
+| $[Ca^{2+}]_R$ | 90 nM  | Resting cytoplasmic calcium concentration |
+| $k_{A}^{Ca}$  | 250 nM | Maximal activated calcium concentration   |
+| $K_{ATP}$     | 25     | Activation constant for ATP/ADP ratio     |
+| $n$           | 4      | Cooperativity for ATP/ADP ratio           |
 
 ## Oscillating calcium levels
 
@@ -130,7 +131,6 @@ $$
 | $A$           | 5        | Asymmetric factor                         |
 | $B$           | 4        | Steepness factor                          |
 | $T$           | 2 minute | Period of calcium oscillations.           |
-
 
 
 ## Pyruvate dehydrogenase (PDH)
@@ -161,13 +161,13 @@ J_{hr} &= V_m \frac{[NADH]_m}{[NADH]_m + K_{NADH}} \frac{1 + k_A \Delta \Psi_m}{
 \end{aligned}
 $$
 
-| Parameter    | Value    | Description                          |
-| ------------ | -------- | ------------------------------ |
-| $V_{m}$      | 22 mM/s | Max rate of ETC                |
-| $K_{NADH}$   | 3 mM     | Michaelis constant for NADH    |
-| $k_A$        | -4.92 /Volt | thermodynamic potential factor |
-| $k_B$        | -4.43 /Volt | thermodynamic potential factor |
-| $F_{O_2}$    | 1        | Oxygen availability            |
+| Parameter  | Value       | Description                    |
+| ---------- | ----------- | ------------------------------ |
+| $V_{m}$    | 22 mM/s     | Max rate of ETC                |
+| $K_{NADH}$ | 3 mM        | Michaelis constant for NADH    |
+| $k_A$      | -4.92 /Volt | thermodynamic potential factor |
+| $k_B$      | -4.43 /Volt | thermodynamic potential factor |
+| $F_{O_2}$  | 1           | Oxygen availability            |
 
 ## F1Fo ATPase (ATP synthase)
 
@@ -202,10 +202,10 @@ $$
 J_{hl}  = P_{H}\exp(k_{lp} \Delta \Psi_m)
 $$
 
-| Parameter | Value        | Description                          |
-| --------- | ------------ | ------------------------------ |
+| Parameter | Value       | Description                    |
+| --------- | ----------- | ------------------------------ |
 | $P_{H}$   | 0.0024 mM/s | leak coefficient               |
-| $k_{lp}$  | 30.5/V   | membrane potential coefficient |
+| $k_{lp}$  | 30.5/V      | membrane potential coefficient |
 
 ## NADH shuttles
 
@@ -213,11 +213,11 @@ $$
 J_{TNADH} = T_{NADH} \frac{[NADH]_c}{[NADH]_c + [NAD^+]_c K_c} \frac{[NAD^+]_m}{[NAD^+]_m + [NADH]_m K_m}
 $$
 
-| Parameter  | Value      | Description                                            |
-| ---------- | ---------- | ------------------------------------------------ |
+| Parameter  | Value     | Description                                      |
+| ---------- | --------- | ------------------------------------------------ |
 | $T_{NADH}$ | 0.05 mM/s | NADH transport rate                              |
-| $K_c$  | 0.002      | Affinity coefficients for cytoplasmic NADH/NAD   |
-| $K_m$  | 16.78      | Affinity coefficients for mitochondrial NAD/NADH |
+| $K_c$      | 0.002     | Affinity coefficients for cytoplasmic NADH/NAD   |
+| $K_m$      | 16.78     | Affinity coefficients for mitochondrial NAD/NADH |
 
 ## Mitochondrial calcium uniporter (MCU)
 
@@ -292,16 +292,16 @@ $$
 
 ## Initial conditions
 
-| State variable  | Value       | Description                  |
-| ----------      | ----------- | ---------------------------- |
-| $[G3P]$         | 2.8μM       | Glyceraldehyde-3-phosphate       |
-| $[Pyr]$         | 8.5μM       | Pyruvate |
-| $[NADH]_c$      | 1μM         | Cytosolic NADH |
-| $[NADH]_{m}$  | 60μM        | Mitochondrial NADH |
-| $[ATP]_c$    | 4mM   | Cytosolic ATP concentration |
-| $[ADP]_c$ | 0.5mM | Cytosolic ADP concentration |
-| $[Ca^{2+}]_{m}$ | 0.250μM  | Mitochondrial calcium concentration |
-| $\Delta\Psi_{m}$  | 100mV   | Mitochondrial membrane potential |
-| $X_2$        | 0.20     | Population of degree-2 mitochondrial nodes |
-| $X_3$        | 0.05      | Population of degree-3 mitochondrial nodes |
+| State variable   | Value   | Description                                |
+| ---------------- | ------- | ------------------------------------------ |
+| $[G3P]$          | 2.8μM   | Glyceraldehyde-3-phosphate                 |
+| $[Pyr]$          | 8.5μM   | Pyruvate                                   |
+| $[NADH]_c$       | 1μM     | Cytosolic NADH                             |
+| $[NADH]_{m}$     | 60μM    | Mitochondrial NADH                         |
+| $[ATP]_c$        | 4mM     | Cytosolic ATP concentration                |
+| $[ADP]_c$        | 0.5mM   | Cytosolic ADP concentration                |
+| $[Ca^{2+}]_{m}$  | 0.250μM | Mitochondrial calcium concentration        |
+| $\Delta\Psi_{m}$ | 100mV   | Mitochondrial membrane potential           |
+| $X_2$            | 0.20    | Population of degree-2 mitochondrial nodes |
+| $X_3$            | 0.05    | Population of degree-3 mitochondrial nodes |
 
