@@ -1,18 +1,16 @@
 # Mitochondrial dynamics model
 
-## Model description
-
-Mathematical descriptions of this ode MODEL are in [model_desc.md](model_desc.md).
+Website: <https://ntumitolab.github.io/MitochondrialDynamics/>
 
 ## How to run the code in the cloud
 
-Click `run in binder` on the top of figure pages.
+Click `run in binder` on the top of web pages.
 
 ## How to run the code locally
 
 ### Install Git
 
-Git source management tool can be downloaded and installed [here](https://git-scm.com/download/win) for the Windows version.
+Git can be downloaded and installed [here](https://git-scm.com/download/).
 
 ### Install Julia
 
@@ -25,7 +23,7 @@ Open Git Bash and enter the following commands:
 ```bash
 git clone https://github.com/NTUMitoLab/MitochondrialDynamics.git
 cd MitochondrialDynamics
-julia --project=.
+julia --project=@.
 ```
 
 If that does not work, download this repositroy via the big green `Code` button => `download zip`. You will see the project folder `MitochondrialDynamics` in the extracted zip archive.
@@ -36,6 +34,7 @@ In the Julia terminal, type the following commands to run the code to generate f
 
 ```jl
 using Pkg
+Pkg.add("IJulia")
 Pkg.activate(".")
 Pkg.instantiate()
 
