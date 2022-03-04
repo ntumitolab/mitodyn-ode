@@ -1,7 +1,10 @@
+authors = ["Wen-Wei Tseng <sosiristseng@gmail.com>"]
 name = "MitochondrialDynamics"
 uuid = "1a231dcf-63c2-466e-8f46-4027ba595b90"
-authors = ["Wen-Wei Tseng <sosiristseng@gmail.com>"]
 version = "0.2.0"
+
+[compat]
+julia = "1.7"
 
 [deps]
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
@@ -10,5 +13,5 @@ Parameters = "d96e819e-fc66-5662-9728-84c9c7592b0a"
 PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
 Setfield = "efcf1570-3423-57d1-acb7-fd33fddbac46"
 
-[compat]
-julia = "1.7"
+[extras]
+CPUSummary = "2a0fbf3d-bb9c-48f3-b0a9-814d99fd7ab9"
