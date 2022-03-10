@@ -1,7 +1,6 @@
 variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
   JULIA_DEPOT_PATH: "${CI_PROJECT_DIR}/.julia"
-  JULIA_NUM_THREADS: 8
   N_JOBS: 4
 
 stages:
@@ -12,7 +11,7 @@ stages:
 # GitLab CI: Auto dependency updates https://thacoon.com/posts/gitlab-ci-auto-dependency-update/
 # `GIT_PUSH_TOKEN` CI/CD variable = personal access token (PAT) with write access
 auto-update:
-  image: registry.gitlab.com/sosiristseng/docker-python-julia:latest
+  image: registry.gitlab.com/sosiristseng/docker-juliabook:latest
   tags:
     - md705
   stage: update
@@ -49,7 +48,7 @@ auto-update:
       fi
 
 build-website:
-  image: registry.gitlab.com/sosiristseng/docker-python-julia:latest
+  image: registry.gitlab.com/sosiristseng/docker-juliabook:latest
   tags:
     - md705
   stage: build
@@ -62,9 +61,9 @@ build-website:
         - .julia/compiled
         - .julia/packages
   script:
-    - julia --color=yes -e 'import Pkg; Pkg.add(["IJulia", "PyPlot"]); Pkg.build(["IJulia", "PyPlot"]); import PyPlot'
-    - julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate()'
-    - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j${N_JOBS} jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JL_MAJOR} --execute --inplace {}
+    - julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.instantiate()'
+    # Enable for parallel builds
+    # - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j${N_JOBS} jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-${JL_MAJOR} --execute --inplace {}
     - jupyter-book build docs
   artifacts:
     paths:
