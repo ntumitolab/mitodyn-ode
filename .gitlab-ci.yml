@@ -16,8 +16,8 @@ stages:
 # `GIT_PUSH_TOKEN` CI/CD variable = personal access token (PAT) with write access
 update-julia:
   image: julia:1.7
-  tags:
-    - md705
+  # tags:
+  #   - md705
   stage: update:julia
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
@@ -52,15 +52,13 @@ build-docker:
   image: docker:latest
   variables:
     IMG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  tags:
-    - md705
+  # tags:
+  #   - md705
   services:
     - docker:dind
   stage: build:docker
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: never
-    - if: $CI_COMMIT_TAG
       when: never
     - changes:
         - docker/Dockerfile
@@ -68,7 +66,6 @@ build-docker:
         - Project.toml
         - Manifest.toml
         - .gitlab-ci.yml
-
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker pull $CI_REGISTRY_IMAGE:latest || true
@@ -84,19 +81,9 @@ build-docker:
       --tag $IMG
       -f docker/Dockerfile
       .
-    # main -> latest; others -> branch name
-    - |
-      if [[ $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH ]]; then
-        echo "Latest tag for the default branch"
-        docker tag $IMG $CI_REGISTRY_IMAGE:latest
-      else
-        echo "Branch tag for the others"
-        docker tag $IMG $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-      fi
-    - docker push --all-tags $CI_REGISTRY_IMAGE
+    - docker push $IMG
 
-# Seperate git tags docker job so that the same image is not built twice.
-push-tags-docker:
+.push-docker:
   image: docker:latest
   services:
     - docker:dind
@@ -104,13 +91,33 @@ push-tags-docker:
   variables:
     GIT_STRATEGY: none
     IMG: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  rules:
-    - if: $CI_COMMIT_TAG
+    TAG: ""
   script:
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
     - docker pull $IMG
-    - docker tag $IMG $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
-    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_TAG
+    - docker tag $IMG $CI_REGISTRY_IMAGE:$TAG
+    - docker push $CI_REGISTRY_IMAGE:$TAG
+
+push-tag-docker:
+  extends: .push-docker
+  rules:
+    - if: $CI_COMMIT_TAG
+  variables:
+    TAG: $CI_COMMIT_TAG
+
+push-latest-docker:
+  extends: .push-docker
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  variables:
+    TAG: latest
+
+push-ref-docker:
+  extends: .push-docker
+  rules:
+    - if: $CI_MERGE_REQUEST_IID
+  variables:
+    TAG: $CI_COMMIT_REF_SLUG
 
 .build-notebooks:
   image: $CI_REGISTRY_IMAGE:latest
