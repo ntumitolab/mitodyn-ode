@@ -16,8 +16,8 @@ stages:
 # `GIT_PUSH_TOKEN` CI/CD variable = personal access token (PAT) with write access
 update-julia:
   image: julia:1.7
-  # tags:
-  #   - your_runner
+  tags:
+    - md705
   stage: update:julia
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
