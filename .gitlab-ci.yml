@@ -22,6 +22,7 @@ update-julia:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
   script:
+    - apt-get update -qq && apt-get install -y git
     - julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.update()'
     # Open a MR when there is a update, requires GIT_PUSH_TOKEN` CI/CD variable = personal access token (PAT) with write access
     - |
