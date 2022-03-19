@@ -21,6 +21,8 @@ update-julia:
   stage: update:julia
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
+  variables:
+    JULIA_PKG_PRECOMPILE_AUTO: 0
   script:
     - apt-get update -qq && apt-get install -y --no-install-recommends git
     - julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.update()'
