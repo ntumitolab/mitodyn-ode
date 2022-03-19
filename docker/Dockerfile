@@ -20,7 +20,8 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -U pip wheel setuptools && pip install --no-cache-dir -r requirements.txt
 
 # Build Julia environment
-COPY Project.toml Manifest.toml src/ ./
+COPY Project.toml Manifest.toml ./
+COPY src ./src
 RUN julia --threads=auto --color=yes -e 'import Pkg; Pkg.add("IJulia")' \
     && julia --threads=auto --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
 
