@@ -1,6 +1,6 @@
 # Mitochondrial dynamics model
 
-Website: <https://ntumitolab.github.io/MitochondrialDynamics/>
+Website: <https://ntumitolab.github.io/mitodyn-ode/>
 
 ## How to run the code in the cloud
 
