@@ -24,7 +24,7 @@ jobs:
       - name: Update Julia dependencies
         run: julia --color=yes --threads=auto --project=@. -e 'import Pkg; Pkg.update()'
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v3
+        uses: peter-evans/create-pull-request@v4
         with:
           token: ${{ secrets.PAT }}
           labels: |
