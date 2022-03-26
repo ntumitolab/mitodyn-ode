@@ -4,7 +4,7 @@ Pkg.add(["PackageCompiler", "IJulia"])
 
 using PackageCompiler
 PackageCompiler.create_sysimage(
-    ["Plots", "DifferentialEquations"];
+    ["DifferentialEquations"];
     project=".", sysimage_path="$(pwd())/sysimage.so")
 
 using IJulia
