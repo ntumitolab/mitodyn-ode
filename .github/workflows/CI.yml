@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     # Publish semver tags as releases.
-    tags: ["v*.*.*"]
+    tags: ["*.*"]
   pull_request:
     branches: [main]
 
@@ -36,8 +36,9 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=ref,event=branch
-            type=raw,value=latest,enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
+            type=ref,priority=600, event=pr
+            type=ref,priority=600, event=tag
+            type=raw,value=latest,priority=600, enable=${{ endsWith(github.ref, github.event.repository.default_branch) }}
             type=sha,enable=true,priority=100,prefix=,suffix=,format=long
           flavor: |
             latest=false
@@ -49,12 +50,11 @@ jobs:
           context: .
           file: ./docker/Dockerfile
           load: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ env.IMAGE_NAME }}:test
           cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
 
       - name: Push Docker Image
-        # if: github.event_name != 'pull_request'
+        if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -63,18 +63,19 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-to: type=inline
+
       - name: Cache Jupyter book outputs
-        uses: actions/cache@v3.0.0
+        uses: actions/cache@v3
         env:
-          cache-name: "jb"
+          cache-name: "jb-01"
         with:
-          path: docs/_build/.jupyter_cache/
-          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Manifest.toml', 'requirements.txt') }}-${{ hashFiles('docs/**/*.ipynb', 'docs/**/*.md') }}
+          path: docs/_build/
+          key: ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Manifest.toml', 'requirements.txt') }}-${{ hashFiles('docs/**/*.*') }}
           restore-keys: |
             ${{ runner.os }}-${{ env.cache-name }}-${{ hashFiles('Manifest.toml', 'requirements.txt') }}
 
       - name: Build Jupyter Books
-        run: docker run -v ${{ github.workspace }}:/work ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} jb build /work/docs
+        run: docker run -v ${{ github.workspace }}:/work ${{ env.IMAGE_NAME }}:test jb build /work/docs
 
       - name: Deploy Website
         uses: peaceiris/actions-gh-pages@v3.8.0
