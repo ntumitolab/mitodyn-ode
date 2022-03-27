@@ -15,7 +15,7 @@ sysimage_path = joinpath(@__DIR__, "v$(major).$(minor)-sys.so")
 PackageCompiler.create_sysimage(
     ["DifferentialEquations", "MitochondrialDynamics"];
     project=".",
-    ysimage_path=sysimage_path,
+    sysimage_path=sysimage_path,
     cpu_target=PackageCompiler.default_app_cpu_target()
 )
 
