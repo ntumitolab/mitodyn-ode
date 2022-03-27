@@ -10,7 +10,7 @@ minor = VERSION.minor
 
 sysimage_path = joinpath(@__DIR__, "v$(major).$(minor)-sys.so")
 
-@info sysimage_path
+@info "SysImage path: " sysimage_path
 
 PackageCompiler.create_sysimage(
     ["DifferentialEquations", "MitochondrialDynamics"];
@@ -21,7 +21,7 @@ PackageCompiler.create_sysimage(
 
 nthreads = Sys.CPU_THREADS
 
-@info nthreads
+@info "Using" nthreads "threads."
 
 using IJulia
 kernelpath = IJulia.installkernel("Julia-sys-$(nthreads)-threads",
@@ -29,7 +29,7 @@ kernelpath = IJulia.installkernel("Julia-sys-$(nthreads)-threads",
     specname="julia", env=Dict("JULIA_NUM_THREADS" => "$(nthreads)",)
 )
 
-@info kernelpath
+@info "IJulia kernal path: " kernelpath
 
 Pkg.rm("PackageCompiler")
 Pkg.gc()
