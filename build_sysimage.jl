@@ -1,8 +1,5 @@
 import Pkg
 
-# Do not install default kernel
-ENV["IJULIA_NODEFAULTKERNEL"] = 1
-
 Pkg.add(["PackageCompiler", "IJulia"])
 
 using PackageCompiler
