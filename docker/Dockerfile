@@ -18,9 +18,8 @@ COPY Project.toml Manifest.toml ./
 COPY src ./src
 RUN julia --threads=auto --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
 
-# Julia sysimage (optional)
-COPY build_sysimage.jl .
-RUN julia --threads=auto --color=yes build_sysimage.jl
+COPY build_kernel.jl .
+RUN julia --threads=auto --color=yes build_kernel.jl
 
 # Julia command
 # CMD ["julia"]
