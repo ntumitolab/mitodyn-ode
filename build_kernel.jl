@@ -13,7 +13,7 @@ sysimage_path = joinpath(@__DIR__, "sysimage.so")
 @info "SysImage path: " sysimage_path
 
 PackageCompiler.create_sysimage(
-    ;
+    ["DifferentialEquations"];
     project=".",
     sysimage_path=sysimage_path,
     cpu_target=PackageCompiler.default_app_cpu_target()
