@@ -8,12 +8,12 @@ using PackageCompiler
 major = VERSION.major
 minor = VERSION.minor
 
-sysimage_path = joinpath(@__DIR__, "v$(major).$(minor)-sys.so")
+sysimage_path = joinpath(@__DIR__, "sysimage.so")
 
 @info "SysImage path: " sysimage_path
 
 PackageCompiler.create_sysimage(
-    ["DifferentialEquations", "MitochondrialDynamics"];
+    ;
     project=".",
     sysimage_path=sysimage_path,
     cpu_target=PackageCompiler.default_app_cpu_target()
