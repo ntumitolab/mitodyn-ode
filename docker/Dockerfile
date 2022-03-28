@@ -25,4 +25,4 @@ RUN julia --threads=auto --color=yes build_kernel.jl
 # CMD ["julia"]
 
 # If using sysimage
-CMD ["julia", "-Jsysimage.so"]
+CMD ["julia", "-J", "sysimage.so"]
