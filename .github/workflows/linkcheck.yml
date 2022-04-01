@@ -1,7 +1,7 @@
 name: Check markdown links
 
 env:
-  PYTHON_VERSION: "3.9"
+  PYTHON_VERSION: "3.10"
 
 on:
   workflow_dispatch:
