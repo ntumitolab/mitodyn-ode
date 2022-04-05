@@ -3,11 +3,11 @@ import Pkg
 
 Pkg.add(["PackageCompiler", "IJulia"])
 
-using PackageCompiler
-
 sysimage_path = joinpath(@__DIR__, "sysimage.so")
 
 @info "SysImage path: " sysimage_path
+
+using PackageCompiler
 
 # Do not include too many packages because memory on CI machines is limited
 PackageCompiler.create_sysimage(
