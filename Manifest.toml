@@ -281,9 +281,9 @@ version = "0.8.4"
 
 [[deps.ForwardDiff]]
 deps = ["CommonSubexpressions", "DiffResults", "DiffRules", "LinearAlgebra", "LogExpFunctions", "NaNMath", "Preferences", "Printf", "Random", "SpecialFunctions", "StaticArrays"]
-git-tree-sha1 = "1bd6fc0c344fc0cbee1f42f8d2e7ec8253dda2d2"
+git-tree-sha1 = "40d1546a45abd63490569695a86a2d93c2021e54"
 uuid = "f6369f11-7733-5829-9624-2563aa707210"
-version = "0.10.25"
+version = "0.10.26"
 
 [[deps.FunctionWrappers]]
 git-tree-sha1 = "241552bc2209f0fa068b6415b1942cc0aa486bcc"
@@ -576,9 +576,9 @@ version = "0.12.3"
 
 [[deps.Parsers]]
 deps = ["Dates"]
-git-tree-sha1 = "621f4f3b4977325b9128d5fae7a8b4829a0c2222"
+git-tree-sha1 = "3b429f37de37f1fc603cc1de4a799dc7fbe4c0b6"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "2.2.4"
+version = "2.3.0"
 
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
@@ -786,9 +786,9 @@ version = "0.6.0"
 
 [[deps.StaticArrays]]
 deps = ["LinearAlgebra", "Random", "Statistics"]
-git-tree-sha1 = "4f6ec5d99a28e1a749559ef7dd518663c5eca3d5"
+git-tree-sha1 = "cd56bf18ed715e8b09f06ef8c6b781e6cdc49911"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.4.3"
+version = "1.4.4"
 
 [[deps.Statistics]]
 deps = ["LinearAlgebra", "SparseArrays"]
@@ -796,9 +796,9 @@ uuid = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[deps.StatsAPI]]
 deps = ["LinearAlgebra"]
-git-tree-sha1 = "8d7530a38dbd2c397be7ddd01a424e4f411dcc41"
+git-tree-sha1 = "c82aaa13b44ea00134f8c9c89819477bd3986ecd"
 uuid = "82ae8749-77ed-4fe6-ae5f-f523153014b0"
-version = "1.2.2"
+version = "1.3.0"
 
 [[deps.StatsBase]]
 deps = ["DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
