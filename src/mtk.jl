@@ -1,6 +1,6 @@
 using ModelingToolkit
 
-import .Utils: hill, mM, μM, ms, minute, Hz, mV
+import .Utils: hill, exprel, mM, μM, ms, minute, Hz, mV, iVT
 
 @variables t
 
@@ -71,7 +71,6 @@ function j_pdh(pyr, nad_m, nadh_m, ca_m, VMAX, K_PYR, K_NAD, U1, U2, K_CA)
     return jPDH
 end
 
-
 #=
 Electron trasnport chain (ETC)
 
@@ -87,15 +86,66 @@ NADH + O2 + 10H(mito) => NAD + 10H(cyto)
 #=
 F1Fo ATPase (ATP synthase) plus ANT
 
-Reaction: 3ADP + 8H(cyto) => 3ATP + 8H(mito)
+3ADP + 8H(cyto) => 3ATP + 8H(mito)
 =#
 @variables J_HF(t) J_ANT(t)
 @parameters VmaxF1 = 8mM * Hz KadpF1 = 20μM KvF1 = 131.4mV KcaF1 = 0.165μM FmgadpF1 = 0.055
 
+#=
+Mitochondrial calcium uniporter (MCU)
+
+Ca(cyto) <=> Ca(mito)
+=#
+@variables J_MCU(t)
+@parameters PcaMCU = 4Hz
+function j_uni(ca_m, ca_c, ΔΨ, P_CA)
+    zvfrt = 2 * iVT * ΔΨ
+    em1 = expm1(zvfrt)
+    return P_CA * exprel(zvfrt, em1) * (0.341 * ca_c * (1 + em1) - 0.200 * ca_m)
+end
+
+#=
+Mitochondrial sodium calcium exchanger (NCLX)
+
+Ca(mito) + 2Na(cyto) <=> Ca(cyto) + 2Na(mito)
+=#
+@variables J_NCLX(t)
+@parameters Na_c = 10mM Na_m = 5mM VmaxNCLX = 75μM * Hz KnaNCLX = 8.2mM KcaNCLX = 8μM
+function j_nclx(ca_m, ca_c, na_m, na_c, VMAX, K_CA, K_NA)
+    A = (na_c / K_NA)^2
+    P = (na_m / K_NA)^2
+    B = ca_m / K_CA
+    Q = ca_c / K_CA
+    AB = A * B
+    PQ = P * Q
+    return VMAX * (AB - PQ) / (1 + A + B + P + Q + AB + PQ)
+end
+
+#=
+NADH shuttle
+
+NADH(cyto) + NAD(mito) <=> NADH(mito) + NAD(cyto)
+=#
+@variables J_NADHT(t)
+@parameters VmaxNADHT = 50μM * Hz Ktn_c = 0.002 Ktn_m = 16.78
+
+# Fission-fusion rates
+@variables x[1:3](t) x13ratio(t) degavg(t) v[1:2](t)
+@parameters Kfiss1 = inv(10minute) Kfuse1 = Kfiss1 Kfiss2 = 1.5Kfiss1 Kfuse2 = 0.5Kfuse1
+
+# Baseline consumption rates
+@parameters kNADHc = 0.1Hz kNADHm = 0.1Hz kATP = 0.04Hz kATPCa = 90Hz / mM kG3P = 0.01Hz kPyr = 0.01Hz
+
+# Conservation relationships
+@parameters ΣAc = 4.5mM Σn_c = 2mM Σn_m = 2.2mM
+
 function make_model(;
     name,
+    simplify=true,
     calciumEq=Ca_c ~ RestingCa + ActivatedCa * hill(ATP_c / KatpCac, ADP_c, NCac))
+    D = Differential(t)
     eqs = [
+        # Reactions
         J_GK ~ VmaxGK * hill(ATP_c, KatpGK) * hill(glc, KglcGK),
         J_GPD ~ VmaxGPD * hill(ADP_c, KadpGPD) * hill(NAD_c / KnadGPD, NADH_c) * hill(G3P, Kg3pGPD),
         J_LDH ~ VmaxLDH * hill(Pyr, KpyrLDH) * hill(NADH_c / KnadhLDH, NAD_c),
@@ -108,7 +158,41 @@ function make_model(;
         J_O2 ~ 0.1 * J_HR,
         J_HL ~ pHleak * exp(kvHleak * ΔΨm),
         J_HF ~ VmaxF1 * hill(FmgadpF1 * ADP_c, KadpF1, 2) * hill(ΔΨm, KvF1, 8) * (1 - exp(-Ca_m / KcaF1)),
-        J_ANT ~ J_HF / 3
+        J_ANT ~ J_HF / 3,
+        J_MCU ~ j_uni(Ca_m, Ca_c, ΔΨm, PcaMCU),
+        J_NCLX ~ j_nclx(Ca_m, Ca_c, Na_m, Na_c, VmaxNCLX, KcaNCLX, KnaNCLX),
+        J_NADHT ~ VmaxNADHT * hill(NADH_c / Ktn_c, NAD_c) * hill(NAD_m / Ktn_m, NADH_m),
+        v[1] ~ Kfuse1 * x[1] * x[1] - Kfiss1 * x[2],
+        v[2] ~ Kfuse2 * x[1] * x[2] - Kfiss2 * x[3],
+        # Conservation relationships
+        ΣAc ~ ATP_c + ADP_c + AMP_c,
+        Σn_c ~ NADH_c + NAD_c,
+        Σn_m ~ NADH_m + NAD_m,
+        1 ~ x[1] + x[2] + x[3],
+        # Observables
+        x13ratio ~ x[1] / x[3],
+        degavg ~ x[1] + 2x[2] + 3x[3],
+        # State variables
+        D(NADH_m) ~ iVmtx * (J_DH + J_NADHT - J_O2) - kNADHm * NADH_m,
+        # D(NAD_m) ~ # Conserved
+        D(NADH_c) ~ iVi * (J_GPD - J_NADHT - J_LDH) - kNADHc * NADH_c,
+        # D(NAD_c) ~ # Conserved
+        D(Ca_m) ~ iVmtx * F_M * (J_MCU - J_NCLX),
+        D(G3P) ~ iVi * (2J_GK - J_GPD) - kG3P * G3P,
+        D(Pyr) ~ iVimtx * (J_GPD - J_PDH - J_LDH) - kPyr * Pyr,
+        D(ATP_c) ~ iVi * (-2J_GK + 2J_GPD + J_ANT + J_ADK) - ATP_c * (kATP + kATPCa * Ca_c),
+        D(AMP_c) ~ iVi * J_ADK,
+        # D(ADP_c) ~ # Conserved
+        # D(x[1]) ~ # Conserved
+        D(x[2]) ~ v[1] - v[2],
+        D(x[3]) ~ v[2],
     ]
     push!(eqs, calciumEq)
+    sys = ODESystem(eqs, t; name)
+
+    if simplify
+        sys = structural_simplify(sys)
+    end
+
+    return sys
 end
