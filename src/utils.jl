@@ -1,4 +1,5 @@
 module Utils
+
 # Units
 const second = float(1)    # second
 const minute = 60second    # minute
