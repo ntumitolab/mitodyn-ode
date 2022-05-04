@@ -1,6 +1,6 @@
 using ModelingToolkit
 
-import .Utils: hill, mM, μM, ms, minute, Hz
+import .Utils: hill, mM, μM, ms, minute, Hz, mV
 
 @variables t
 
@@ -51,7 +51,7 @@ Adenylate kinase:
 @parameters kfAK = 1000Hz / mM kEqAK = 0.931
 
 # Activity of AMPK
-@variables AMPK(t)
+@variables AMPKactivity(t)
 @parameters kAMPK = 0.07
 
 #=
@@ -100,7 +100,7 @@ function make_model(;
         J_GPD ~ VmaxGPD * hill(ADP_c, KadpGPD) * hill(NAD_c / KnadGPD, NADH_c) * hill(G3P, Kg3pGPD),
         J_LDH ~ VmaxLDH * hill(Pyr, KpyrLDH) * hill(NADH_c / KnadhLDH, NAD_c),
         J_AK ~ kfAK * (ADP_c * ADP_c - ATP_c * AMP_c / kEqAK),
-        AMPK ~ hill(AMP_c / ATP_c, kAMPK),
+        AMPKactivity ~ hill(AMP_c / ATP_c, kAMPK),
         J_PDH ~ j_pdh(Pyr, NAD_m, NADH_m, Ca_m, VmaxPDH, KpyrPDH, KnadPDH, U1PDH, U2PDH, KcaPDH),
         J_ETC ~ J_PDH,
         J_DH ~ 4.6 * J_ETC,
