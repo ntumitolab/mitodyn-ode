@@ -1,6 +1,6 @@
 using ModelingToolkit
 
-import .Utils: hill, exprel, mM, μM, ms, minute, Hz, mV, iVT
+import .Utils: hill, hillr, exprel, mM, μM, ms, minute, Hz, mV, iVT, iVmtx, iCmt, iVi, iVimtx, F_M
 
 @variables t
 
@@ -10,7 +10,7 @@ Glucokinase (GK) Reactions:
 - Glc + ATP => G6P (+ ADP)
 - G6P + ATP => FBP (+ ADP) =>> 2G3P (+ ADP)
 =#
-@variables glc(t) ATP_c(t) J_GK(t)
+@variables Glc(t) ATP_c(t) J_GK(t)
 @parameters VmaxGK = 0.011mM * Hz KatpGK = 0.5mM KglcGK = 7mM NGK = 1.7
 
 #=
@@ -47,7 +47,7 @@ Adenylate kinase:
 
 2ADP <=> ATP + AMP
 =#
-@variables J_AK(t) AMP_c(t)
+@variables J_ADK(t) AMP_c(t)
 @parameters kfAK = 1000Hz / mM kEqAK = 0.931
 
 # Activity of AMPK
@@ -130,7 +130,7 @@ NADH(cyto) + NAD(mito) <=> NADH(mito) + NAD(cyto)
 @parameters VmaxNADHT = 50μM * Hz Ktn_c = 0.002 Ktn_m = 16.78
 
 # Fission-fusion rates
-@variables x[1:3](t) x13ratio(t) degavg(t) v[1:2](t)
+@variables x[1:3](t) x13r(t) degavg(t) v[1:2](t)
 @parameters Kfiss1 = inv(10minute) Kfuse1 = Kfiss1 Kfiss2 = 1.5Kfiss1 Kfuse2 = 0.5Kfuse1
 
 # Baseline consumption rates
@@ -142,14 +142,15 @@ NADH(cyto) + NAD(mito) <=> NADH(mito) + NAD(cyto)
 function make_model(;
     name,
     simplify=true,
-    calciumEq=Ca_c ~ RestingCa + ActivatedCa * hill(ATP_c / KatpCac, ADP_c, NCac))
+    calciumEq=Ca_c ~ RestingCa + ActivatedCa * hill(ATP_c / KatpCac, ADP_c, NCac),
+    glcEq=Glc ~ 5.0mM)
     D = Differential(t)
     eqs = [
         # Reactions
-        J_GK ~ VmaxGK * hill(ATP_c, KatpGK) * hill(glc, KglcGK),
+        J_GK ~ VmaxGK * hill(ATP_c, KatpGK) * hill(Glc, KglcGK),
         J_GPD ~ VmaxGPD * hill(ADP_c, KadpGPD) * hill(NAD_c / KnadGPD, NADH_c) * hill(G3P, Kg3pGPD),
         J_LDH ~ VmaxLDH * hill(Pyr, KpyrLDH) * hill(NADH_c / KnadhLDH, NAD_c),
-        J_AK ~ kfAK * (ADP_c * ADP_c - ATP_c * AMP_c / kEqAK),
+        J_ADK ~ kfAK * (ADP_c * ADP_c - ATP_c * AMP_c / kEqAK),
         AMPKactivity ~ hill(AMP_c / ATP_c, kAMPK),
         J_PDH ~ j_pdh(Pyr, NAD_m, NADH_m, Ca_m, VmaxPDH, KpyrPDH, KnadPDH, U1PDH, U2PDH, KcaPDH),
         J_ETC ~ J_PDH,
@@ -170,7 +171,7 @@ function make_model(;
         Σn_m ~ NADH_m + NAD_m,
         1 ~ x[1] + x[2] + x[3],
         # Observables
-        x13ratio ~ x[1] / x[3],
+        x13r ~ x[1] / x[3],
         degavg ~ x[1] + 2x[2] + 3x[3],
         # State variables
         D(NADH_m) ~ iVmtx * (J_DH + J_NADHT - J_O2) - kNADHm * NADH_m,
@@ -178,6 +179,7 @@ function make_model(;
         D(NADH_c) ~ iVi * (J_GPD - J_NADHT - J_LDH) - kNADHc * NADH_c,
         # D(NAD_c) ~ # Conserved
         D(Ca_m) ~ iVmtx * F_M * (J_MCU - J_NCLX),
+        D(ΔΨm) ~ iCmt * (J_HR - J_HF - J_HL - J_ANT - 2J_MCU),
         D(G3P) ~ iVi * (2J_GK - J_GPD) - kG3P * G3P,
         D(Pyr) ~ iVimtx * (J_GPD - J_PDH - J_LDH) - kPyr * Pyr,
         D(ATP_c) ~ iVi * (-2J_GK + 2J_GPD + J_ANT + J_ADK) - ATP_c * (kATP + kATPCa * Ca_c),
@@ -188,6 +190,7 @@ function make_model(;
         D(x[3]) ~ v[2],
     ]
     push!(eqs, calciumEq)
+    push!(eqs, glcEq)
     sys = ODESystem(eqs, t; name)
 
     if simplify
