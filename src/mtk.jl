@@ -1,5 +1,3 @@
-using ModelingToolkit
-
 import .Utils: hill, hillr, exprel, mM, μM, ms, minute, Hz, mV, iVT, iVmtx, iCmt, iVi, iVimtx, F_M
 
 @variables t
@@ -11,7 +9,7 @@ Glucokinase (GK) Reactions:
 - G6P + ATP => FBP (+ ADP) =>> 2G3P (+ ADP)
 =#
 @variables Glc(t) ATP_c(t) J_GK(t)
-@parameters VmaxGK = 0.011mM * Hz KatpGK = 0.5mM KglcGK = 7mM NGK = 1.7
+@parameters VmaxGK = 0.011mM * Hz KatpGK = 0.5mM KglcGK = 7mM NGK = 1.7 GlcConst = 5mM
 
 #=
 Glyceraldehydes 3-phosphate dehydrogenase (GPD), lumped with pyruvate kinase (PK)
@@ -33,14 +31,6 @@ Pyr + NADH => Lactate + NAD
 # Cytosolic calcium
 @variables Ca_c(t)
 @parameters RestingCa = 0.09μM ActivatedCa = 0.25μM NCac = 4 KatpCac = 25.0
-
-function oscillating_cac(t; ca_r=0.09μM, ka_ca=0.25μM, period=2minute, assym=5, steepness=4)
-    tau = t / period
-    x = assym * (tau - floor(tau))
-    ca_r + ka_ca * (x * exp(1 - x))^steepness
-end
-
-@register_symbolic oscillating_cac(t)
 
 #=
 Adenylate kinase:
@@ -139,11 +129,24 @@ NADH(cyto) + NAD(mito) <=> NADH(mito) + NAD(cyto)
 # Conservation relationships
 @parameters ΣAc = 4.5mM Σn_c = 2mM Σn_m = 2.2mM
 
+const DEFAULT_U0 = Dict(
+    G3P => 2.8μM,
+    Pyr => 8.5μM,
+    NADH_c => 1μM,
+    NADH_m => 60μM,
+    ATP_c => 4000μM,
+    AMP_c => 0μM,
+    Ca_m => 0.250μM,
+    ΔΨm => 100mV,
+    x[2] => 0.25,
+    x[3] => 0.05
+)
+
 function make_model(;
     name,
     simplify=true,
-    calciumEq=Ca_c ~ RestingCa + ActivatedCa * hill(ATP_c / KatpCac, ADP_c, NCac),
-    glcEq=Glc ~ 5.0mM)
+    cacrhs=RestingCa + ActivatedCa * hill(ATP_c / KatpCac, ADP_c, NCac),
+    glcrhs=GlcConst)
     D = Differential(t)
     eqs = [
         # Reactions
@@ -163,16 +166,18 @@ function make_model(;
         J_MCU ~ j_uni(Ca_m, Ca_c, ΔΨm, PcaMCU),
         J_NCLX ~ j_nclx(Ca_m, Ca_c, Na_m, Na_c, VmaxNCLX, KcaNCLX, KnaNCLX),
         J_NADHT ~ VmaxNADHT * hill(NADH_c / Ktn_c, NAD_c) * hill(NAD_m / Ktn_m, NADH_m),
-        v[1] ~ Kfuse1 * x[1] * x[1] - Kfiss1 * x[2],
-        v[2] ~ Kfuse2 * x[1] * x[2] - Kfiss2 * x[3],
+        v[1] ~ Kfuse1 * J_ANT / J_HL * x[1] * x[1] - Kfiss1 * x[2],
+        v[2] ~ Kfuse2 * J_ANT / J_HL * x[1] * x[2] - Kfiss2 * x[3],
+        Glc ~ glcrhs,
+        Ca_c ~ cacrhs,
         # Conservation relationships
         ΣAc ~ ATP_c + ADP_c + AMP_c,
         Σn_c ~ NADH_c + NAD_c,
         Σn_m ~ NADH_m + NAD_m,
-        1 ~ x[1] + x[2] + x[3],
+        1 ~ x[1] + 2x[2] + 3x[3],
         # Observables
         x13r ~ x[1] / x[3],
-        degavg ~ x[1] + 2x[2] + 3x[3],
+        degavg ~ (x[1] + 2x[2] + 3x[3]) / (x[1] + x[2] + x[3]),
         # State variables
         D(NADH_m) ~ iVmtx * (J_DH + J_NADHT - J_O2) - kNADHm * NADH_m,
         # D(NAD_m) ~ # Conserved
@@ -189,9 +194,7 @@ function make_model(;
         D(x[2]) ~ v[1] - v[2],
         D(x[3]) ~ v[2],
     ]
-    push!(eqs, calciumEq)
-    push!(eqs, glcEq)
-    sys = ODESystem(eqs, t; name)
+    sys = ODESystem(eqs, t; name, defaults=DEFAULT_U0)
 
     if simplify
         sys = structural_simplify(sys)

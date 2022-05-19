@@ -1,6 +1,8 @@
 module MitochondrialDynamics
 
-export make_model
+using ModelingToolkit
+
+export make_model, DEFAULT_U0
 
 include("utils.jl")
 include("mtk.jl")
