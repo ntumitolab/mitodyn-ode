@@ -1,10 +1,13 @@
 module MitochondrialDynamics
 
-export MitoDynNode, setglc, model!, cacyto, ampcyto, avgdeg, getx1
+using ModelingToolkit
+
+export make_model, DEFAULT_U0
 
 include("utils.jl")
-include("cytosol.jl")
-include("mitochondria.jl")
-include("ode.jl")
+include("mtk.jl")
+# include("cytosol.jl")
+# include("mitochondria.jl")
+# include("ode.jl")
 
 end # module
