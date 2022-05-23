@@ -49,7 +49,7 @@ Pyruvaye dehydrogenase (PDH) as well as electron transport chain (ETC)
 
 Pyr + 4.6NAD => CO2 + 4.6NADH
 =#
-@variables J_PDH(t) J_DH(t) J_ETC(t) NAD_m(t) NADH_m(t) Ca_m(t)
+@variables J_PDH(t) J_DH(t) J_ETC(t) NAD_m(t) NADH_m(t) Ca_m(t) rPDH(t)
 @parameters VmaxPDH = 300μM * Hz KpyrPDH = 47.5μM KnadPDH = 81.0 U1PDH = 1.5 U2PDH = 1.1 KcaPDH = 0.05μM
 
 function j_pdh(pyr, nad_m, nadh_m, ca_m, VMAX, K_PYR, K_NAD, U1, U2, K_CA)
@@ -57,7 +57,7 @@ function j_pdh(pyr, nad_m, nadh_m, ca_m, VMAX, K_PYR, K_NAD, U1, U2, K_CA)
     fpCa = hillr(U2 * (1 + U1 * c))
     fNAD = hill(nad_m, nadh_m * K_NAD)
     fPyr = hill(pyr, K_PYR)
-    jPDH = VMAX * fPyr * fNAD * fpCa
+    jPDH = VMAX * rPDH * fPyr * fNAD * fpCa
     return jPDH
 end
 
@@ -66,11 +66,11 @@ Electron trasnport chain (ETC)
 
 NADH + O2 + 10H(mito) => NAD + 10H(cyto)
 =#
-@variables J_HR(t) J_O2(t) ΔΨm(t)
+@variables J_HR(t) J_O2(t) ΔΨm(t) rETC(t)
 @parameters VmaxETC = 22mM * Hz KnadhETC = 3mM KaETC = -4.92E-3 / mV KbETC = -4.43E-3 / mV
 
 # Proton leak
-@variables J_HL(t)
+@variables J_HL(t) rHL(t)
 @parameters pHleak = 2.4μM * Hz kvHleak = 0.0305 / mV
 
 #=
@@ -78,7 +78,7 @@ F1Fo ATPase (ATP synthase) plus ANT
 
 3ADP + 8H(cyto) => 3ATP + 8H(mito)
 =#
-@variables J_HF(t) J_ANT(t)
+@variables J_HF(t) J_ANT(t) rF1(t)
 @parameters VmaxF1 = 8mM * Hz KadpF1 = 20μM KvF1 = 131.4mV KcaF1 = 0.165μM FmgadpF1 = 0.055
 
 #=
@@ -146,7 +146,12 @@ function make_model(;
     name,
     simplify=true,
     cacrhs=RestingCa + ActivatedCa * hill(ATP_c / KatpCac, ADP_c, NCac),
-    glcrhs=GlcConst)
+    glcrhs=GlcConst,
+    rpdh=1,
+    retc=1,
+    rf1=1,
+    rhleak=1
+)
     D = Differential(t)
     eqs = [
         # Reactions
@@ -158,10 +163,10 @@ function make_model(;
         J_PDH ~ j_pdh(Pyr, NAD_m, NADH_m, Ca_m, VmaxPDH, KpyrPDH, KnadPDH, U1PDH, U2PDH, KcaPDH),
         J_ETC ~ J_PDH,
         J_DH ~ 4.6 * J_ETC,
-        J_HR ~ VmaxETC * hill(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm),
+        J_HR ~ VmaxETC * rETC * hill(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm),
         J_O2 ~ 0.1 * J_HR,
-        J_HL ~ pHleak * exp(kvHleak * ΔΨm),
-        J_HF ~ VmaxF1 * hill(FmgadpF1 * ADP_c, KadpF1, 2) * hill(ΔΨm, KvF1, 8) * (1 - exp(-Ca_m / KcaF1)),
+        J_HL ~ pHleak * rhleak * exp(kvHleak * ΔΨm),
+        J_HF ~ VmaxF1 * rF1 * hill(FmgadpF1 * ADP_c, KadpF1, 2) * hill(ΔΨm, KvF1, 8) * (1 - exp(-Ca_m / KcaF1)),
         J_ANT ~ J_HF / 3,
         J_MCU ~ j_uni(Ca_m, Ca_c, ΔΨm, PcaMCU),
         J_NCLX ~ j_nclx(Ca_m, Ca_c, Na_m, Na_c, VmaxNCLX, KcaNCLX, KnaNCLX),
@@ -170,6 +175,10 @@ function make_model(;
         v[2] ~ Kfuse2 * J_ANT / J_HL * x[1] * x[2] - Kfiss2 * x[3],
         Glc ~ glcrhs,
         Ca_c ~ cacrhs,
+        rPDH ~ rpdh,
+        rETC ~ retc,
+        rF1 ~ rf1,
+        rHL ~ rhleak,
         # Conservation relationships
         ΣAc ~ ATP_c + ADP_c + AMP_c,
         Σn_c ~ NADH_c + NAD_c,
