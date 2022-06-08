@@ -71,9 +71,9 @@ build-notebooks:
         - $CI_PROJECT_PATH/.julia/registries
   before_script:
     - julia --project=@. -e 'using Pkg; Pkg.instantiate()'
-    - julia -e 'using Pkg; Pkg.add("IJulia"); Pkg.build("IJulia")'
+    - julia --project=@. build.jl
     # Uncomment if you want parallel notebook execution
-    # - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j2 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --ExecutePreprocessor.kernel_name=julia-1.7 --execute --inplace {}
+    - find docs -type f -name "*.ipynb" -print0 | parallel -0 -j1 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}
     - jupyter-book build docs --warningiserror --keep-going -v
   script:
     - "Test build completed."
