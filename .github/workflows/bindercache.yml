@@ -1,6 +1,8 @@
 # https://github.com/jupyterhub/repo2docker-action
 name: Binder
-on: [push]
+on:
+  push:
+    branches: [main]
 
 jobs:
   Create-MyBinderOrg-Cache:
