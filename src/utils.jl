@@ -45,12 +45,6 @@ const iCmt = inv(C_MIT)
 ### Commonly-used functions
 ##################################
 
-"Return `1+x` with the same type as x"
-p_one(x) = one(x) + x
-
-"Return `1-x` with the same type as x"
-one_m(x) = one(x) - x
-
 """
 Regular Hill function
 """
@@ -72,21 +66,19 @@ expit(x) = hillr(exp(-x))
 """
     exprel(x, em1 = expm1(x))
 
-Returns `x / (exp(x)-1)` accurately when x is near zero.
-See scipy example https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.exprel.html
-Note the fraction is the inverse of `scipy.exprel()`
+Returns `x / (exp(x)-1)`
 """
 exprel(x, em1=expm1(x)) = x / em1
 
 """
 Signed sqare root
 """
-sqrt_s(x) = flipsign(sqrt(abs(x)), x)
+sqrt_s(x) = sign(x) * sqrt(abs(x))
 
 """
 Signed power
 """
-pow_s(x, n) = flipsign(abs(x)^n, x)
+pow_s(x, n) = sign(x) * (abs(x)^n)
 
 """
 Signed Hill function
