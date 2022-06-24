@@ -47,7 +47,7 @@ jobs:
           - fig2
           - fig3
           - fig5
-          - "fig6-fig7"
+          - "fig6-7"
           - figs1
           - figs2
           - figs3
