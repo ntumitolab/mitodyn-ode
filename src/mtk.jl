@@ -155,7 +155,7 @@ function make_model(;
     D = Differential(t)
     eqs = [
         # Reactions
-        J_GK ~ VmaxGK * hill(ATP_c, KatpGK) * hill(Glc, KglcGK),
+        J_GK ~ VmaxGK * hill(ATP_c, KatpGK) * hill(Glc, KglcGK, NGK),
         J_GPD ~ VmaxGPD * hill(ADP_c, KadpGPD) * hill(NAD_c / KnadGPD, NADH_c) * hill(G3P, Kg3pGPD),
         J_LDH ~ VmaxLDH * hill(Pyr, KpyrLDH) * hill(NADH_c / KnadhLDH, NAD_c),
         J_ADK ~ kfAK * (ADP_c * ADP_c - ATP_c * AMP_c / kEqAK),
