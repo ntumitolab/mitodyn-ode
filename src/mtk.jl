@@ -165,7 +165,7 @@ function make_model(;
         J_DH ~ 4.6 * J_ETC,
         J_HR ~ VmaxETC * rETC * hill(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm),
         J_O2 ~ 0.1 * J_HR,
-        J_HL ~ pHleak * rhleak * exp(kvHleak * ΔΨm),
+        J_HL ~ pHleak * rHL * exp(kvHleak * ΔΨm),
         J_HF ~ VmaxF1 * rF1 * hill(FmgadpF1 * ADP_c, KadpF1, 2) * hill(ΔΨm, KvF1, 8) * (1 - exp(-Ca_m / KcaF1)),
         J_ANT ~ J_HF / 3,
         J_MCU ~ j_uni(Ca_m, Ca_c, ΔΨm, PcaMCU),
