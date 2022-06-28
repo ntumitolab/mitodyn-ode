@@ -159,7 +159,6 @@ function make_model(;
         J_GPD ~ VmaxGPD * hill(ADP_c, KadpGPD) * hill(NAD_c / KnadGPD, NADH_c) * hill(G3P, Kg3pGPD),
         J_LDH ~ VmaxLDH * hill(Pyr, KpyrLDH) * hill(NADH_c / KnadhLDH, NAD_c),
         J_ADK ~ kfAK * (ADP_c * ADP_c - ATP_c * AMP_c / kEqAK),
-        AMPKactivity ~ hill(AMP_c / ATP_c, kAMPK),
         J_PDH ~ rPDH * j_pdh(Pyr, NAD_m, NADH_m, Ca_m, VmaxPDH, KpyrPDH, KnadPDH, U1PDH, U2PDH, KcaPDH),
         J_ETC ~ J_PDH,
         J_DH ~ 4.6 * J_ETC,
@@ -187,6 +186,7 @@ function make_model(;
         # Observables
         x13r ~ x[1] / x[3],
         degavg ~ (x[1] + 2x[2] + 3x[3]) / (x[1] + x[2] + x[3]),
+        AMPKactivity ~ hill(AMP_c / ATP_c, kAMPK),
         # State variables
         D(NADH_m) ~ iVmtx * (J_DH + J_NADHT - J_O2) - kNADHm * NADH_m,
         # D(NAD_m) ~ # Conserved
