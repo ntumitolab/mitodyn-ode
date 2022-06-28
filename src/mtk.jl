@@ -57,7 +57,7 @@ function j_pdh(pyr, nad_m, nadh_m, ca_m, VMAX, K_PYR, K_NAD, U1, U2, K_CA)
     fpCa = hillr(U2 * (1 + U1 * c))
     fNAD = hill(nad_m, nadh_m * K_NAD)
     fPyr = hill(pyr, K_PYR)
-    jPDH = VMAX * rPDH * fPyr * fNAD * fpCa
+    jPDH = VMAX * fPyr * fNAD * fpCa
     return jPDH
 end
 
@@ -160,7 +160,7 @@ function make_model(;
         J_LDH ~ VmaxLDH * hill(Pyr, KpyrLDH) * hill(NADH_c / KnadhLDH, NAD_c),
         J_ADK ~ kfAK * (ADP_c * ADP_c - ATP_c * AMP_c / kEqAK),
         AMPKactivity ~ hill(AMP_c / ATP_c, kAMPK),
-        J_PDH ~ j_pdh(Pyr, NAD_m, NADH_m, Ca_m, VmaxPDH, KpyrPDH, KnadPDH, U1PDH, U2PDH, KcaPDH),
+        J_PDH ~ rPDH * j_pdh(Pyr, NAD_m, NADH_m, Ca_m, VmaxPDH, KpyrPDH, KnadPDH, U1PDH, U2PDH, KcaPDH),
         J_ETC ~ J_PDH,
         J_DH ~ 4.6 * J_ETC,
         J_HR ~ VmaxETC * rETC * hill(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm),
