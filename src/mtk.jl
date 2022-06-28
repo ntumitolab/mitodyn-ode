@@ -3,21 +3,30 @@ import .Utils: hill, hillr, exprel, mM, μM, ms, minute, Hz, mV, iVT, iVmtx, iCm
 @variables t
 
 #=
+Adenylate kinase:
+
+2ADP <=> ATP + AMP
+=#
+@variables J_ADK(t) ATP_c(t) ADP_c(t) AMP_c(t)
+@parameters kfAK = 1000Hz / mM kEqAK = 0.931
+
+
+#=
 Glucokinase (GK) Reactions:
 
 - Glc + ATP => G6P (+ ADP)
 - G6P + ATP => FBP (+ ADP) =>> 2G3P (+ ADP)
 =#
-@variables Glc(t) ATP_c(t) J_GK(t)
+@variables Glc(t) J_GK(t)
 @parameters VmaxGK = 0.011mM * Hz KatpGK = 0.5mM KglcGK = 7mM NGK = 1.7 GlcConst = 5mM
 
 #=
-Glyceraldehydes 3-phosphate dehydrogenase (GPD), lumped with pyruvate kinase (PK)
+Glyceraldehydes 3-phosphate dehydrogenase (GPD), lumped with pyruvate kinase (PK) to represent lower half of glycolysis
 
 G3P + NAD + 2ADP => Pyr + NADH + 2ATP
 =#
-@variables J_GPD(t) G3P(t) NAD_c(t) NADH_c(t) ADP_c(t)
-@parameters VmaxGPD = 0.5mM * Hz Kg3pGPD = 0.2mM KnadGPD = 0.09 KadpGPD = 0.020mM
+@variables J_GPD(t) G3P(t) NAD_c(t) NADH_c(t)
+@parameters VmaxGPD = 0.5mM * Hz Kg3pGPD = 0.2mM KnadGPD = 0.09 KadpGPD = 20μM
 
 #=
 Lactate dehydrogenase (LDH)
@@ -32,13 +41,6 @@ Pyr + NADH => Lactate + NAD
 @variables Ca_c(t)
 @parameters RestingCa = 0.09μM ActivatedCa = 0.25μM NCac = 4 KatpCac = 25.0
 
-#=
-Adenylate kinase:
-
-2ADP <=> ATP + AMP
-=#
-@variables J_ADK(t) AMP_c(t)
-@parameters kfAK = 1000Hz / mM kEqAK = 0.931
 
 # Activity of AMPK
 @variables AMPKactivity(t)
@@ -49,7 +51,7 @@ Pyruvaye dehydrogenase (PDH) as well as electron transport chain (ETC)
 
 Pyr + 4.6NAD => CO2 + 4.6NADH
 =#
-@variables J_PDH(t) J_DH(t) J_CAC(t) NAD_m(t) NADH_m(t) Ca_m(t) rPDH(t)
+@variables J_PDH(t) J_DH(t) J_CAC(t) J_FFA(t) NAD_m(t) NADH_m(t) Ca_m(t) rPDH(t)
 @parameters VmaxPDH = 300μM * Hz KpyrPDH = 47.5μM KnadPDH = 81.0 U1PDH = 1.5 U2PDH = 1.1 KcaPDH = 0.05μM
 
 function j_pdh(pyr, nad_m, nadh_m, ca_m, VMAX, K_PYR, K_NAD, U1, U2, K_CA)
@@ -150,7 +152,8 @@ function make_model(;
     rpdh=1,
     retc=1,
     rf1=1,
-    rhleak=1
+    rhleak=1,
+    ffarhs=0
 )
     D = Differential(t)
     eqs = [
@@ -160,7 +163,7 @@ function make_model(;
         J_LDH ~ VmaxLDH * hill(Pyr, KpyrLDH) * hill(NADH_c / KnadhLDH, NAD_c),
         J_ADK ~ kfAK * (ADP_c * ADP_c - ATP_c * AMP_c / kEqAK),
         J_PDH ~ rPDH * j_pdh(Pyr, NAD_m, NADH_m, Ca_m, VmaxPDH, KpyrPDH, KnadPDH, U1PDH, U2PDH, KcaPDH),
-        J_CAC ~ J_PDH,
+        J_CAC ~ J_PDH + J_FFA,
         J_DH ~ 4.6 * J_CAC,
         J_HR ~ VmaxETC * rETC * hill(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm),
         J_O2 ~ 0.1 * J_HR,
@@ -178,6 +181,7 @@ function make_model(;
         rETC ~ retc,
         rF1 ~ rf1,
         rHL ~ rhleak,
+        J_FFA ~ ffarhs,
         # Conservation relationships
         ΣAc ~ ATP_c + ADP_c + AMP_c,
         Σn_c ~ NADH_c + NAD_c,
