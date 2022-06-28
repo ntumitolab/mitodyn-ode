@@ -49,7 +49,7 @@ Pyruvaye dehydrogenase (PDH) as well as electron transport chain (ETC)
 
 Pyr + 4.6NAD => CO2 + 4.6NADH
 =#
-@variables J_PDH(t) J_DH(t) J_ETC(t) NAD_m(t) NADH_m(t) Ca_m(t) rPDH(t)
+@variables J_PDH(t) J_DH(t) J_CAC(t) NAD_m(t) NADH_m(t) Ca_m(t) rPDH(t)
 @parameters VmaxPDH = 300μM * Hz KpyrPDH = 47.5μM KnadPDH = 81.0 U1PDH = 1.5 U2PDH = 1.1 KcaPDH = 0.05μM
 
 function j_pdh(pyr, nad_m, nadh_m, ca_m, VMAX, K_PYR, K_NAD, U1, U2, K_CA)
@@ -160,8 +160,8 @@ function make_model(;
         J_LDH ~ VmaxLDH * hill(Pyr, KpyrLDH) * hill(NADH_c / KnadhLDH, NAD_c),
         J_ADK ~ kfAK * (ADP_c * ADP_c - ATP_c * AMP_c / kEqAK),
         J_PDH ~ rPDH * j_pdh(Pyr, NAD_m, NADH_m, Ca_m, VmaxPDH, KpyrPDH, KnadPDH, U1PDH, U2PDH, KcaPDH),
-        J_ETC ~ J_PDH,
-        J_DH ~ 4.6 * J_ETC,
+        J_CAC ~ J_PDH,
+        J_DH ~ 4.6 * J_CAC,
         J_HR ~ VmaxETC * rETC * hill(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm),
         J_O2 ~ 0.1 * J_HR,
         J_HL ~ pHleak * rHL * exp(kvHleak * ΔΨm),
