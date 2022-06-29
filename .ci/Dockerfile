@@ -14,7 +14,7 @@ COPY src/ src
 RUN julia --threads=auto --color=yes --project=@. -e 'import Pkg; Pkg.instantiate()'
 
 # Julia command
-CMD ["julia"]
+CMD ["jupyter-book"]
 
 # If using sysimage
 # CMD ["julia", "-Jsysimage.so"]
