@@ -15,6 +15,3 @@ RUN julia --threads=auto --color=yes --project=@. -e 'import Pkg; Pkg.instantiat
 
 # Julia command
 CMD ["jupyter-book"]
-
-# If using sysimage
-# CMD ["julia", "-Jsysimage.so"]
