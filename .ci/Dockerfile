@@ -13,5 +13,4 @@ COPY Project.toml Manifest.toml ./
 COPY src/ src
 RUN julia --threads=auto --color=yes --project=@. -e 'import Pkg; Pkg.instantiate()'
 
-# Julia command
 CMD ["jupyter-book"]
