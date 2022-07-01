@@ -4,8 +4,7 @@
 format: jb-book
 root: index
 chapters:
-  - file: fig2
-  - file: fig3
+  - file: fig2-3
   - file: fig5
   - file: fig6-7
   - file: figs1
