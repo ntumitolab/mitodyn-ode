@@ -36,8 +36,7 @@ jobs:
       matrix:
         notebook:
           - index
-          - fig2
-          - fig3
+          - 'fig2-3'
           - fig5
           - 'fig6-7'
           - figs1
