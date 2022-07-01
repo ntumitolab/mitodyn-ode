@@ -4,11 +4,11 @@ jupyter_book_task:
   auto_cancellation: true
   container:
     dockerfile: .ci/Dockerfile
-    cpu: 6
-    memory: 24G
+    cpu: 8
+    memory: 32G
     use_in_memory_disk: true
   notebook_script: |
-    find docs/ -type f -name "*.ipynb" -print0 | parallel -0 -j6 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}
+    find docs/ -type f -name "*.ipynb" -print0 | parallel -0 -j8 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {}
   build_script: |
     jupyter-book build docs --warningiserror --keep-going -v
   pages_script: |
