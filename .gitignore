@@ -166,3 +166,4 @@ LocalPreferences.toml
 # Generated files
 *.pdf
 *.csv
+*.tif
