@@ -10,7 +10,6 @@ Adenylate kinase:
 @variables J_ADK(t) ATP_c(t) ADP_c(t) AMP_c(t)
 @parameters kfAK = 1000Hz / mM kEqAK = 0.931
 
-
 #=
 Glucokinase (GK) Reactions:
 
