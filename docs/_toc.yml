@@ -4,10 +4,8 @@
 format: jb-book
 root: index
 chapters:
+  - file: model_desc
   - file: fig2-3
   - file: fig5_caoscillation
   - file: fig6-7
-  - file: figs1
-  - file: figs2
-  - file: figs3
-  - file: model_desc
+  - file: figs
