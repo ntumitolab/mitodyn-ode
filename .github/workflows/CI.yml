@@ -37,7 +37,7 @@ jobs:
         notebook:
           - index
           - 'fig2-3'
-          - fig5
+          - fig5_caoscillation
           - 'fig6-7'
           - figs1
           - figs2
