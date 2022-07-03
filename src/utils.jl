@@ -58,7 +58,9 @@ hillr(x, k=one(x)) = hill(k, x)
 hillr(x, k, n) = hill(k, x, n)
 
 """
-Logistic sigmoid function.
+    expit(x)
+
+Logistic sigmoid function. `expit(x) = 1 / (1 + exp(-x))`
 See scipy example https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.expit.html
 """
 expit(x) = hillr(exp(-x))
