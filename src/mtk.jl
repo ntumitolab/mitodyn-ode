@@ -194,7 +194,7 @@ function make_model(;
         D(x[3]) ~ v[2],
     ]
     sys = ODESystem(eqs, t; name,
-        defaults=Dict(
+        defaults=[
             G3P => 2.8μM,
             Pyr => 8.5μM,
             NADH_c => 1μM,
@@ -205,7 +205,8 @@ function make_model(;
             ΔΨm => 100mV,
             x[2] => 0.25,
             x[3] => 0.05
-        ))
+        ]
+    )
 
     if simplify
         sys = structural_simplify(sys)
