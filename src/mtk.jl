@@ -139,7 +139,8 @@ function make_model(;
     retc=1,
     rf1=1,
     rhleak=1,
-    ffarhs=0
+    j_ffa=0,
+    gk_atp_stoich::Int=2
 )
     D = Differential(t)
     eqs = [
@@ -149,7 +150,7 @@ function make_model(;
         J_LDH ~ VmaxLDH * hill(Pyr, KpyrLDH) * hill(NADH_c / KnadhLDH, NAD_c),
         J_ADK ~ kfAK * (ADP_c * ADP_c - ATP_c * AMP_c / kEqAK),
         J_PDH ~ rPDH * j_pdh(Pyr, NAD_m, NADH_m, Ca_m, VmaxPDH, KpyrPDH, KnadPDH, U1PDH, U2PDH, KcaPDH),
-        J_CAC ~ J_PDH + J_FFA,
+        J_CAC ~ J_PDH + j_ffa,
         J_DH ~ 4.6 * J_CAC,
         J_HR ~ VmaxETC * rETC * hill(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm),
         J_O2 ~ 0.1 * J_HR,
@@ -167,7 +168,6 @@ function make_model(;
         rETC ~ retc,
         rF1 ~ rf1,
         rHL ~ rhleak,
-        J_FFA ~ ffarhs,
         # Conservation relationships
         ΣAc ~ ATP_c + ADP_c + AMP_c,
         Σn_c ~ NADH_c + NAD_c,
@@ -186,7 +186,7 @@ function make_model(;
         D(ΔΨm) ~ iCmt * (J_HR - J_HF - J_HL - J_ANT - 2J_MCU),
         D(G3P) ~ iVi * (2J_GK - J_GPD) - kG3P * G3P,
         D(Pyr) ~ iVimtx * (J_GPD - J_PDH - J_LDH) - kPyr * Pyr,
-        D(ATP_c) ~ iVi * (-2J_GK + 2J_GPD + J_ANT + J_ADK) - ATP_c * (kATP + kATPCa * Ca_c),
+        D(ATP_c) ~ iVi * (-gk_atp_stoich * J_GK + 2J_GPD + J_ANT + J_ADK) - ATP_c * (kATP + kATPCa * Ca_c),
         D(AMP_c) ~ iVi * J_ADK,
         # D(ADP_c) ~ # Conserved
         # D(x[1]) ~ # Conserved
@@ -195,16 +195,16 @@ function make_model(;
     ]
     sys = ODESystem(eqs, t; name,
         defaults=[
-            G3P => 2.8μM,
-            Pyr => 8.5μM,
+            G3P => 2.9μM,
+            Pyr => 8.7μM,
             NADH_c => 1μM,
-            NADH_m => 60μM,
-            ATP_c => 4000μM,
-            AMP_c => 0μM,
-            Ca_m => 0.250μM,
-            ΔΨm => 100mV,
-            x[2] => 0.25,
-            x[3] => 0.05
+            NADH_m => 57μM,
+            ATP_c => 3595μM,
+            AMP_c => 148μM,
+            Ca_m => 0.200μM,
+            ΔΨm => 92mV,
+            x[2] => 0.24,
+            x[3] => 0.06
         ]
     )
 
