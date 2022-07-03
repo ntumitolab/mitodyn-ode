@@ -115,7 +115,7 @@ end
 #=
 NADH shuttle
 
-NADH(cyto) + NAD(mito) <=> NADH(mito) + NAD(cyto)
+NADH(cyto) + NAD(mito) => NADH(mito) + NAD(cyto)
 =#
 @variables J_NADHT(t)
 @parameters VmaxNADHT = 50μM * Hz Ktn_c = 0.002 Ktn_m = 16.78
@@ -129,19 +129,6 @@ NADH(cyto) + NAD(mito) <=> NADH(mito) + NAD(cyto)
 
 # Conservation relationships
 @parameters ΣAc = 4.5mM Σn_c = 2mM Σn_m = 2.2mM
-
-const DEFAULT_U0 = Dict(
-    G3P => 2.8μM,
-    Pyr => 8.5μM,
-    NADH_c => 1μM,
-    NADH_m => 60μM,
-    ATP_c => 4000μM,
-    AMP_c => 0μM,
-    Ca_m => 0.250μM,
-    ΔΨm => 100mV,
-    x[2] => 0.25,
-    x[3] => 0.05
-)
 
 function make_model(;
     name,
@@ -206,7 +193,19 @@ function make_model(;
         D(x[2]) ~ v[1] - v[2],
         D(x[3]) ~ v[2],
     ]
-    sys = ODESystem(eqs, t; name, defaults=DEFAULT_U0)
+    sys = ODESystem(eqs, t; name,
+        defaults=Dict(
+            G3P => 2.8μM,
+            Pyr => 8.5μM,
+            NADH_c => 1μM,
+            NADH_m => 60μM,
+            ATP_c => 4000μM,
+            AMP_c => 0μM,
+            Ca_m => 0.250μM,
+            ΔΨm => 100mV,
+            x[2] => 0.25,
+            x[3] => 0.05
+        ))
 
     if simplify
         sys = structural_simplify(sys)
