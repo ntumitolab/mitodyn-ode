@@ -36,10 +36,11 @@ jobs:
       matrix:
         notebook:
           - index
-          - 'fig2-3'
+          - fig2_3
           - fig5_caoscillation
-          - 'fig6-7'
+          - fig6_7
           - figs
+          - ffa_gal
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -66,7 +67,7 @@ jobs:
     needs: [execute, docker]
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/sosiristseng/docker-juliabook:latest
+      image: ghcr.io/sosiristseng/docker-jupyterbook:0.13.0.1
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -79,14 +80,14 @@ jobs:
         run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
       - name: Build website
         run: jupyter-book build docs/ -v
-      - name: Deploy Website
-        uses: peaceiris/actions-gh-pages@v3.8.0
-        if: github.ref == 'refs/heads/main'
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          force_orphan: true
-          publish_dir: docs/_build/html
-          full_commit_message: ${{ github.event.head_commit.message }}
+      # - name: Deploy Website
+      #   uses: peaceiris/actions-gh-pages@v3.8.0
+      #   if: github.ref == 'refs/heads/main'
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     force_orphan: true
+      #     publish_dir: docs/_build/html
+      #     full_commit_message: ${{ github.event.head_commit.message }}
 
   docker-push:
     needs: [execute, docker]

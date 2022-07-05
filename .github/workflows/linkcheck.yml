@@ -9,7 +9,7 @@ jobs:
   linkcheck:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/sosiristseng/docker-juliabook:latest
+      image: ghcr.io/sosiristseng/docker-jupyterbook:0.13.0.1
     steps:
       - uses: actions/checkout@v3
       - name: Check Links
