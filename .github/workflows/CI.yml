@@ -36,10 +36,11 @@ jobs:
       matrix:
         notebook:
           - index
-          - 'fig2-3'
+          - fig2_3
           - fig5_caoscillation
-          - 'fig6-7'
+          - fig6_7
           - figs
+          - ffa_gal
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
