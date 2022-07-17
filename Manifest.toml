@@ -282,9 +282,9 @@ version = "0.4.0"
 
 [[deps.DiffEqBase]]
 deps = ["ArrayInterfaceCore", "ChainRulesCore", "DataStructures", "Distributions", "DocStringExtensions", "FastBroadcast", "ForwardDiff", "FunctionWrappers", "LinearAlgebra", "Logging", "MuladdMacro", "NonlinearSolve", "Parameters", "Printf", "RecursiveArrayTools", "Reexport", "Requires", "SciMLBase", "Setfield", "SparseArrays", "StaticArrays", "Statistics", "ZygoteRules"]
-git-tree-sha1 = "da9b5a3f2372682d5de7e08ce01ec008b79f81f8"
+git-tree-sha1 = "fe5cd1be16c46ae71f07623dc217ccdbe22830e7"
 uuid = "2b5f629d-d688-5b77-993f-72d75c75574e"
-version = "6.93.0"
+version = "6.94.0"
 
 [[deps.DiffEqCallbacks]]
 deps = ["DataStructures", "DiffEqBase", "ForwardDiff", "LinearAlgebra", "NLsolve", "Parameters", "RecipesBase", "RecursiveArrayTools", "SciMLBase", "StaticArrays"]
@@ -626,9 +626,9 @@ uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[deps.LinearSolve]]
 deps = ["ArrayInterfaceCore", "DocStringExtensions", "FastLapackInterface", "GPUArraysCore", "IterativeSolvers", "KLU", "Krylov", "KrylovKit", "LinearAlgebra", "RecursiveFactorization", "Reexport", "SciMLBase", "Setfield", "SparseArrays", "SuiteSparse", "UnPack"]
-git-tree-sha1 = "158517cfc0422f475ac93c2ba02cddea91c79c1d"
+git-tree-sha1 = "5011ab36cb55f2c849487f0a3edffba602c705c1"
 uuid = "7ed4a6bd-45f5-4d41-b270-4a48e9bafcae"
-version = "1.21.0"
+version = "1.22.1"
 
 [[deps.LogExpFunctions]]
 deps = ["ChainRulesCore", "ChangesOfVariables", "DocStringExtensions", "InverseFunctions", "IrrationalConstants", "LinearAlgebra"]
@@ -1049,9 +1049,9 @@ version = "1.4.0"
 
 [[deps.StatsBase]]
 deps = ["DataAPI", "DataStructures", "LinearAlgebra", "LogExpFunctions", "Missings", "Printf", "Random", "SortingAlgorithms", "SparseArrays", "Statistics", "StatsAPI"]
-git-tree-sha1 = "48598584bacbebf7d30e20880438ed1d24b7c7d6"
+git-tree-sha1 = "472d044a1c8df2b062b23f222573ad6837a615ba"
 uuid = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
-version = "0.33.18"
+version = "0.33.19"
 
 [[deps.StatsFuns]]
 deps = ["ChainRulesCore", "HypergeometricFunctions", "InverseFunctions", "IrrationalConstants", "LogExpFunctions", "Reexport", "Rmath", "SpecialFunctions"]
