@@ -121,7 +121,7 @@ NADH(cyto) + NAD(mito) => NADH(mito) + NAD(cyto)
 @parameters VmaxNADHT = 50μM * Hz Ktn_c = 0.002 Ktn_m = 16.78
 
 # Fission-fusion rates
-@variables x[1:3](t) x13r(t) degavg(t) v[1:2](t)
+@variables (x(t))[1:3] x13r(t) degavg(t) (v(t))[1:2]
 @parameters Kfiss1 = inv(10minute) Kfuse1 = Kfiss1 Kfiss2 = 1.5Kfiss1 Kfuse2 = 0.5Kfuse1
 
 # Baseline consumption rates
