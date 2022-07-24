@@ -1,6 +1,7 @@
 jupyter_book_task:
   env:
     GH_TOKEN: ENCRYPTED[!4e97045f3d90ba1ee046e291414b73f3ad3b5151f8259e93e7773dce32c2346606e82e67544eadc765ba8113ae9ac2b6!]
+    JULIA_NUM_THREADS: '4'
   auto_cancellation: true
   container:
     dockerfile: .ci/Dockerfile
