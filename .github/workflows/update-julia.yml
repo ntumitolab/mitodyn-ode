@@ -9,7 +9,7 @@ jobs:
   update-notebook:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/sosiristseng/docker-juliabook:1.7.3.12
+      image: ghcr.io/sosiristseng/docker-juliabook:1.8.0rc3
       env:
         JULIA_PKG_PRECOMPILE_AUTO: 0
         JULIA_NUM_THREADS: 2
