@@ -20,7 +20,7 @@ COPY --from=julia:1.8.0-rc3 ${JULIA_PATH} /usr/local/
 
 # Julia environment
 COPY Project.toml Manifest.toml ./
-# COPY src/ src # If you have this
+COPY src/ src
 RUN julia --threads=auto --color=yes --project=@. -e 'import Pkg; Pkg.instantiate()'
 
 CMD ["jupyter-book"]
