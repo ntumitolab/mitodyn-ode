@@ -87,6 +87,9 @@ jobs:
         run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
       - name: Build website
         run: docker run -v ${{ github.workspace }}:/work ${{ env.IMAGE_NAME }}:test jb build /work/docs/ -v
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v1
       - name: Upload page artifact
         uses: actions/upload-pages-artifact@v1
         with:
