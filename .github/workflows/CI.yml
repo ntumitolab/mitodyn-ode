@@ -94,7 +94,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           force_orphan: true
           publish_dir: docs/_build/html
-          full_commit_message: ${{ github.event.head_commit.message }
+          full_commit_message: ${{ github.event.head_commit.message }}
 
   docker-push:
     needs: [execute, docker]
