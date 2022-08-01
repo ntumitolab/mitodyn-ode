@@ -1,0 +1,1250 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Model descriptions &#8212; Mitochondrial Dynamics</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="canonical" href="https://ntumitolab.github.io/mitodyn-ode/model_desc.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Figure 2 and 3" href="fig2_3.html" />
+    <link rel="prev" title="Glucose stimulation and Mitochondrial dynamics" href="index.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="index.html">
+      
+      
+      
+      <h1 class="site-logo" id="site-title">Mitochondrial Dynamics</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <ul class="current nav bd-sidenav">
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Model descriptions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="fig2_3.html">
+   Figure 2 and 3
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="fig5_caoscillation.html">
+   Figure 5
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="fig6_7.html">
+   Figure 6 and 7
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="figs.html">
+   Supplmentary figures
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="ffa_gal.html">
+   Free fatty acid and galactose treatment
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+<a href="https://github.com/ntumitolab/mitodyn-ode"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="bottom"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="_sources/model_desc.md"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.md</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#difference-from-the-original-fridlyand-s-model">
+   Difference from the original Fridlyand’s model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#current-limitations">
+   Current Limitations
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#general-parameters">
+   General parameters
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#conservation-relationships">
+   Conservation relationships
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#adenylate-kinase">
+   Adenylate kinase
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#glucokinase-gk">
+   Glucokinase (GK)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#glyceraldehyde-3-phosphate-dehydrogenase-gpd">
+   Glyceraldehyde 3-phosphate dehydrogenase (GPD)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lactate-production-by-lactate-dehydrogenase-ldh">
+   Lactate production by lactate dehydrogenase (LDH)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#steady-state-cytosolic-calcium-levels">
+   Steady-state cytosolic calcium levels
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#oscillating-calcium-levels">
+   Oscillating calcium levels
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pyruvate-dehydrogenase-pdh">
+   Pyruvate dehydrogenase (PDH)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#electron-transport-chain-etc">
+   Electron transport chain (ETC)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#f1fo-atpase-atp-synthase">
+   F1Fo ATPase (ATP synthase)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#proton-leak">
+   Proton leak
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#nadh-shuttles">
+   NADH shuttles
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#mitochondrial-calcium-uniporter-mcu">
+   Mitochondrial calcium uniporter (MCU)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#mitochondrial-sodium-calcium-exchanger-nclx">
+   Mitochondrial Sodium-Calcium exchanger (NCLX)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#mitochondrial-dynamics">
+   Mitochondrial Dynamics
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#ordinary-differential-equations">
+   Ordinary differential equations
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#initial-conditions">
+   Initial conditions
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Model descriptions</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#difference-from-the-original-fridlyand-s-model">
+   Difference from the original Fridlyand’s model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#current-limitations">
+   Current Limitations
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#general-parameters">
+   General parameters
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#conservation-relationships">
+   Conservation relationships
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#adenylate-kinase">
+   Adenylate kinase
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#glucokinase-gk">
+   Glucokinase (GK)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#glyceraldehyde-3-phosphate-dehydrogenase-gpd">
+   Glyceraldehyde 3-phosphate dehydrogenase (GPD)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#lactate-production-by-lactate-dehydrogenase-ldh">
+   Lactate production by lactate dehydrogenase (LDH)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#steady-state-cytosolic-calcium-levels">
+   Steady-state cytosolic calcium levels
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#oscillating-calcium-levels">
+   Oscillating calcium levels
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#pyruvate-dehydrogenase-pdh">
+   Pyruvate dehydrogenase (PDH)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#electron-transport-chain-etc">
+   Electron transport chain (ETC)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#f1fo-atpase-atp-synthase">
+   F1Fo ATPase (ATP synthase)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#proton-leak">
+   Proton leak
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#nadh-shuttles">
+   NADH shuttles
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#mitochondrial-calcium-uniporter-mcu">
+   Mitochondrial calcium uniporter (MCU)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#mitochondrial-sodium-calcium-exchanger-nclx">
+   Mitochondrial Sodium-Calcium exchanger (NCLX)
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#mitochondrial-dynamics">
+   Mitochondrial Dynamics
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#ordinary-differential-equations">
+   Ordinary differential equations
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#initial-conditions">
+   Initial conditions
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section class="tex2jax_ignore mathjax_ignore" id="model-descriptions">
+<h1>Model descriptions<a class="headerlink" href="#model-descriptions" title="Permalink to this headline">#</a></h1>
+<section id="difference-from-the-original-fridlyand-s-model">
+<h2>Difference from the original Fridlyand’s model<a class="headerlink" href="#difference-from-the-original-fridlyand-s-model" title="Permalink to this headline">#</a></h2>
+<ul class="simple">
+<li><p>We  added an dilution term for pyruvate and a ADP Michaelis constant in Glyceraldehyde 3-phosphate dehydrogenase to increase the robustness in the ODE systems.</p></li>
+<li><p>We added adenylate kinase (Adk) equilibrium for the ATP-ADP-AMP pool to address the high energy phosphate distribution in the cytosol. Also, the adenylate pool size was bumped up to keep the steady state ATP/ADP ratio the same as before (~5) at the resting glucose level of 5mM.</p></li>
+<li><p>We altered the mathematical expressions of mitochondrial sodium calcium exchanger (NCLX). The  specific concentrations of sodium and calcium were on the exponent in the original model. We moved the specific concentrations down to multipliers was inconsistent with the original model of Nguyen et al.</p></li>
+<li><p>The mitochondrial fission rate is fixed to once per 10 minutes, and the fusion rate depends on the proton leak flux and the ATP synthase flux.</p></li>
+</ul>
+</section>
+<section id="current-limitations">
+<h2>Current Limitations<a class="headerlink" href="#current-limitations" title="Permalink to this headline">#</a></h2>
+<ul class="simple">
+<li><p>Glycolysis, ETC, ATP synthesis, and cytosolic calcium dynamics were expressed in an empirical fashion rather than fully mechanistic. No signal transduction nor complex calcium dynamics.</p></li>
+<li><p>There is no role for reactive oxygen species (ROS),  potential signals for bioenergetics and mitochondrial dynamics.</p></li>
+<li><p>Mitochondrial content was assumed conserved and homogenous.</p></li>
+</ul>
+</section>
+<section id="general-parameters">
+<h2>General parameters<a class="headerlink" href="#general-parameters" title="Permalink to this headline">#</a></h2>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(V_{i}\)</span></p></td>
+<td><p>0.53</p></td>
+<td><p>Relative cytoplasmic volume</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(V_{m}\)</span></p></td>
+<td><p>0.06</p></td>
+<td><p>Relative mitochondrial volume</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(V_{mtx}\)</span></p></td>
+<td><p>0.0144</p></td>
+<td><p>Relative mitochondrial matrix volume (Adjustable)</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(C_{mito}\)</span></p></td>
+<td><p>1.812 mM/V</p></td>
+<td><p>Mitochondrial membrane capacitance</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(F\)</span></p></td>
+<td><p>96484.6 C/mol</p></td>
+<td><p>Faraday’s constant</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\delta_{Ca}\)</span></p></td>
+<td><p>0.0003</p></td>
+<td><p>Fraction of free Ca in mitochondria</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\([Na^+]_c\)</span></p></td>
+<td><p>10 mM</p></td>
+<td><p>Cytoplasmic Na concentration</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\([Na^+]_m\)</span></p></td>
+<td><p>5 mM</p></td>
+<td><p>Mitochondrial Na concentration</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(T_v\)</span></p></td>
+<td><p>26.73 mV</p></td>
+<td><p>Thermal voltage (RT/F) (&#64;37°C)</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\Sigma A_c\)</span></p></td>
+<td><p>4.5 mM</p></td>
+<td><p>Cellular adenine nucleotides concentration  (Adjustable)</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\Sigma N_m\)</span></p></td>
+<td><p>2.2 mM</p></td>
+<td><p>Free pyridine nucleotides concentration in<br/>mitochondrial matrix</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\Sigma N_c\)</span></p></td>
+<td><p>2.0 mM</p></td>
+<td><p>Free pyridine nucleotides concentration in<br/>cytoplasm (Adjustable)</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(k_{gpd}\)</span></p></td>
+<td><p>0.01/s</p></td>
+<td><p>Consumption rate of G3P</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(k_{NADHm}\)</span></p></td>
+<td><p>0.1/s</p></td>
+<td><p>Consumption rate of mito NADH</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(k_{NADHc}\)</span></p></td>
+<td><p>0.1/s</p></td>
+<td><p>Consumption rate of cyto NADH</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(k_{ATP}\)</span></p></td>
+<td><p>0.04/s</p></td>
+<td><p>Basal consumption rate of ATP</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(k_{ATPCa}\)</span></p></td>
+<td><p>90/mM/s</p></td>
+<td><p>Consumption rate of ATP activated by calcium</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="conservation-relationships">
+<h2>Conservation relationships<a class="headerlink" href="#conservation-relationships" title="Permalink to this headline">#</a></h2>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\Sigma N_{m} &amp;= [NAD^+]_m + [NADH]_m         \\
+\Sigma N_{c} &amp;= [NAD^+]_c + [NADH]_c         \\
+\Sigma A_{c} &amp;= [ATP]_c + [ADP]_c + [AMP]_c  \\
+1 &amp;= X_1 + 2X_2 + 3X_3
+\end{aligned}
+\end{split}\]</div>
+</section>
+<section id="adenylate-kinase">
+<h2>Adenylate kinase<a class="headerlink" href="#adenylate-kinase" title="Permalink to this headline">#</a></h2>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+J_{ADK} &amp;= k_f ([ADP]_c^2 - [ATP]_c [AMP]_c / K_{eq}^{AK})
+\end{aligned}
+\]</div>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="text-align:left head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td class="text-align:left"><p><span class="math notranslate nohighlight">\(k_f\)</span></p></td>
+<td><p>1000 mM/s</p></td>
+<td><p>Forward (AMP-forming) rate constant of adenylate kinase. <br />The parameters was set arbitrary large for equilibrium of adenylate pool.</p></td>
+</tr>
+<tr class="row-odd"><td class="text-align:left"><p><span class="math notranslate nohighlight">\(K_{eq}^{AK}\)</span></p></td>
+<td><p>0.931</p></td>
+<td><p>Equilibrium constant of adenylate kinase (AMP-forming).</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="glucokinase-gk">
+<h2>Glucokinase (GK)<a class="headerlink" href="#glucokinase-gk" title="Permalink to this headline">#</a></h2>
+<div class="math notranslate nohighlight">
+\[
+J_{glu} = V_{m} \frac{[ATP]_c}{[ATP]_c + K_{ATP}} \frac{[Glc]^n}{[Glc]^n + K_{Glc}^{n}}
+\]</div>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(V_{m}\)</span></p></td>
+<td><p>0.011 mM/s</p></td>
+<td><p>Max rate of glucokinase</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(K_{ATP}\)</span></p></td>
+<td><p>0.5 mM</p></td>
+<td><p>Michaelis constant for ATP</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(K_{Glc}\)</span></p></td>
+<td><p>7 mM</p></td>
+<td><p>Michaelis constant for glucose</p></td>
+</tr>
+<tr class="row-odd"><td><p>n</p></td>
+<td><p>1.7</p></td>
+<td><p>Cooperativity for glucose</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="glyceraldehyde-3-phosphate-dehydrogenase-gpd">
+<h2>Glyceraldehyde 3-phosphate dehydrogenase (GPD)<a class="headerlink" href="#glyceraldehyde-3-phosphate-dehydrogenase-gpd" title="Permalink to this headline">#</a></h2>
+<div class="math notranslate nohighlight">
+\[
+J_{gpd} = V_m \frac{[G3P]}{[G3P] + K_{G3P}} \frac{[NAD^+]_c}{[NAD^+]_c + K_{NAD}[NADH]_c}
+\]</div>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(V_{m}\)</span></p></td>
+<td><p>0.5 mM/s</p></td>
+<td><p>Max rate of GPD (Adjustable)</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(K_{G3P}\)</span></p></td>
+<td><p>0.2 mM</p></td>
+<td><p>Michaelis constant for G3P</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(K_{NAD}\)</span></p></td>
+<td><p>0.09</p></td>
+<td><p>Activation constant for cytosolic NAD/NADH ratio</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="lactate-production-by-lactate-dehydrogenase-ldh">
+<h2>Lactate production by lactate dehydrogenase (LDH)<a class="headerlink" href="#lactate-production-by-lactate-dehydrogenase-ldh" title="Permalink to this headline">#</a></h2>
+<p>The rate of lactate output is approximately 5% of the rate of glucose consumption when the glucose level is 8 mM.</p>
+<div class="math notranslate nohighlight">
+\[
+J_{LDH} = V_m \frac{[Pyr]}{[Pyr] + K_{Pyr}} \frac{[NADH]_c}{[NADH]_c + K_{NADH} [NAD^+]_c}
+\]</div>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(V_{m}\)</span></p></td>
+<td><p>1.2 mM/s</p></td>
+<td><p>Max rate of LDH (Adjustable)</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(K_{Pyr}\)</span></p></td>
+<td><p>0.0475 mM</p></td>
+<td><p>Michaelis constant for pyruvate</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(K_{NADH}\)</span></p></td>
+<td><p>1</p></td>
+<td><p>Activation constant for cytosolic NADH/NAD ratio</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="steady-state-cytosolic-calcium-levels">
+<h2>Steady-state cytosolic calcium levels<a class="headerlink" href="#steady-state-cytosolic-calcium-levels" title="Permalink to this headline">#</a></h2>
+<div class="math notranslate nohighlight">
+\[
+[Ca^{2+}]_c = [Ca^{2+}]_R + k_{A}^{Ca} \frac{([ATP]_c)^n}{([ATP]_c)^n + (K_{ATP} [ADP]_c)^n}
+\]</div>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\([Ca^{2+}]_R\)</span></p></td>
+<td><p>90 nM</p></td>
+<td><p>Resting cytoplasmic calcium concentration</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(k_{A}^{Ca}\)</span></p></td>
+<td><p>250 nM</p></td>
+<td><p>Maximal activated calcium concentration</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(K_{ATP}\)</span></p></td>
+<td><p>25</p></td>
+<td><p>Activation constant for ATP/ADP ratio</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(n\)</span></p></td>
+<td><p>4</p></td>
+<td><p>Cooperativity for ATP/ADP ratio</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="oscillating-calcium-levels">
+<h2>Oscillating calcium levels<a class="headerlink" href="#oscillating-calcium-levels" title="Permalink to this headline">#</a></h2>
+<p>Use in simulations for Fig. 4 : oscillating calcium on mitochondrial bioenergetics and dynamics only.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+[Ca^{2+}]_c &amp;= [Ca^{2+}]_R + k_{A}^{Ca}(Axe^{1-Ax})^B \\
+x           &amp;= \frac{t}{T} - \lfloor \frac{t}{T} \rfloor
+\end{aligned}
+\end{split}\]</div>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\([Ca^{2+}]_R\)</span></p></td>
+<td><p>90 nM</p></td>
+<td><p>Resting cytoplasmic calcium concentration</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(k_{A}^{Ca}\)</span></p></td>
+<td><p>250 nM</p></td>
+<td><p>Maximal activated calcium concentration</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(A\)</span></p></td>
+<td><p>5</p></td>
+<td><p>Asymmetric factor</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(B\)</span></p></td>
+<td><p>4</p></td>
+<td><p>Steepness factor</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(T\)</span></p></td>
+<td><p>2 minute</p></td>
+<td><p>Period of calcium oscillations.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="pyruvate-dehydrogenase-pdh">
+<h2>Pyruvate dehydrogenase (PDH)<a class="headerlink" href="#pyruvate-dehydrogenase-pdh" title="Permalink to this headline">#</a></h2>
+<p>We assume that pyruvate diffuses freely and fast across the inner mitochondrial membrane (IMM). Therefore, pyruvate is the same concentration in the cytosol and in the mitochondrial matrix.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+J_{PDH} &amp;= V_m \frac{ [Pyr] }{ [Pyr] + K_{Pyr}} \frac{[NAD^+]_m}{[NAD^+]_m + K_{NAD}} \frac{(1 + C)^2}{(1 + C)^2 (1 + u_2) + u_2 u_1} \\
+C &amp;= [Ca^{2+}]_m / K_{Ca}
+\end{aligned}
+\end{split}\]</div>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(V_{m}\)</span></p></td>
+<td><p>0.3 mM/s</p></td>
+<td><p>Max rate of PDH</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(K_{Pyr}\)</span></p></td>
+<td><p>0.0475 mM</p></td>
+<td><p>Michaelis constant for pyruvate</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(K_{NAD}\)</span></p></td>
+<td><p>81</p></td>
+<td><p>Activation constant for mitochondrial NAD/NADH ratio</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(K_{Ca}\)</span></p></td>
+<td><p>50 nM</p></td>
+<td><p>Activation constant for mitochondrial Ca</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(u_1\)</span></p></td>
+<td><p>1.5</p></td>
+<td><p>Factor for calcium activation</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(u_2\)</span></p></td>
+<td><p>1.1</p></td>
+<td><p>Factor for calcium activation</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="electron-transport-chain-etc">
+<h2>Electron transport chain (ETC)<a class="headerlink" href="#electron-transport-chain-etc" title="Permalink to this headline">#</a></h2>
+<div class="math notranslate nohighlight">
+\[
+\begin{aligned}
+J_{hr} &amp;= V_m \frac{[NADH]_m}{[NADH]_m + K_{NADH}} \frac{1 + k_A \Delta \Psi_m}{1 + k_B \Delta \Psi_m} F_{O_2}
+\end{aligned}
+\]</div>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(V_{m}\)</span></p></td>
+<td><p>22 mM/s</p></td>
+<td><p>Max rate of ETC</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(K_{NADH}\)</span></p></td>
+<td><p>3 mM</p></td>
+<td><p>Michaelis constant for NADH</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(k_A\)</span></p></td>
+<td><p>-4.92 /Volt</p></td>
+<td><p>thermodynamic potential factor</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(k_B\)</span></p></td>
+<td><p>-4.43 /Volt</p></td>
+<td><p>thermodynamic potential factor</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(F_{O_2}\)</span></p></td>
+<td><p>1</p></td>
+<td><p>Oxygen availability</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="f1fo-atpase-atp-synthase">
+<h2>F1Fo ATPase (ATP synthase)<a class="headerlink" href="#f1fo-atpase-atp-synthase" title="Permalink to this headline">#</a></h2>
+<p>ATP synthase was lumped with ANT and depended on cytosolic ADP.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+J_{hf} &amp;= V_m f_{ADP} f_{\Psi} f_{Ca} \\
+J_{ANT} &amp;= J_{hf} / H_{ATP} \\
+f_{ADP} &amp;= \frac{[MgADP]_c^{n_A}}{[MgADP]_c^{n_A} + K_{ADP}^{n_A}}   \\
+f_{\Psi} &amp;= \frac{\Delta\Psi_m^{n_\Psi}}{\Delta\Psi_m^{n_\Psi} + K_{\Psi}^{n_\Psi}}   \\
+f_{Ca} &amp;=  1 - \exp(-[Ca^{2+}]_m / K_{Ca} )    \\
+\text{[MgADP]}_c &amp;= 0.055[ADP]_c
+\end{aligned}
+\end{split}\]</div>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(V_{m}\)</span></p></td>
+<td><p>8 mM/s</p></td>
+<td><p>Max rate of ATP synthase (Adjustable)</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(K_{ADP}\)</span></p></td>
+<td><p>20 μM</p></td>
+<td><p>Apparent Michaelis constant for cytosolic MgADP</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(n_A\)</span></p></td>
+<td><p>2</p></td>
+<td><p>Cooperativity for MgADP</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(n_\Psi\)</span></p></td>
+<td><p>8</p></td>
+<td><p>Cooperativity for mitochondrial potential</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(K_{\Psi}\)</span></p></td>
+<td><p>131.4 mV</p></td>
+<td><p>Mid-activity constant for mitochondrial potential</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(K_{Ca}\)</span></p></td>
+<td><p>0.165 μM</p></td>
+<td><p>Activation constant for mitochondrial calcium</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(H_{ATP}\)</span></p></td>
+<td><p>3</p></td>
+<td><p>H:ATP ratio</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="proton-leak">
+<h2>Proton leak<a class="headerlink" href="#proton-leak" title="Permalink to this headline">#</a></h2>
+<p>The basal leak approaches ~20% of the electron transport rate at <span class="math notranslate nohighlight">\(\Delta\Psi_m\)</span> of 160 mV.</p>
+<div class="math notranslate nohighlight">
+\[
+J_{hl}  = P_{H}\exp(k_{lp} \Delta \Psi_m)
+\]</div>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(P_{H}\)</span></p></td>
+<td><p>0.0024 mM/s</p></td>
+<td><p>leak coefficient</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(k_{lp}\)</span></p></td>
+<td><p>30.5/V</p></td>
+<td><p>membrane potential coefficient</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="nadh-shuttles">
+<h2>NADH shuttles<a class="headerlink" href="#nadh-shuttles" title="Permalink to this headline">#</a></h2>
+<div class="math notranslate nohighlight">
+\[
+J_{TNADH} = T_{NADH} \frac{[NADH]_c}{[NADH]_c + [NAD^+]_c K_c} \frac{[NAD^+]_m}{[NAD^+]_m + [NADH]_m K_m}
+\]</div>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(T_{NADH}\)</span></p></td>
+<td><p>0.05 mM/s</p></td>
+<td><p>NADH transport rate</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(K_c\)</span></p></td>
+<td><p>0.002</p></td>
+<td><p>Affinity coefficients for cytoplasmic NADH/NAD</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(K_m\)</span></p></td>
+<td><p>16.78</p></td>
+<td><p>Affinity coefficients for mitochondrial NAD/NADH</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="mitochondrial-calcium-uniporter-mcu">
+<h2>Mitochondrial calcium uniporter (MCU)<a class="headerlink" href="#mitochondrial-calcium-uniporter-mcu" title="Permalink to this headline">#</a></h2>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+J_{uni} &amp;= P_{Ca} \frac{\delta}{e^{\delta} - 1} (e^{\delta} \alpha_i [Ca^{2+}]_c - \alpha_m [Ca^{2+}]_m)  \\
+\delta &amp;= Z_{Ca}\Delta\Psi_m / V_T
+\end{aligned}
+\end{split}\]</div>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(P_{Ca}\)</span></p></td>
+<td><p>4 / s</p></td>
+<td><p>Permeability of calcium</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(Z_{Ca}\)</span></p></td>
+<td><p>2</p></td>
+<td><p>Valence of calcium</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(\alpha_i\)</span></p></td>
+<td><p>0.341</p></td>
+<td><p>Activity of cytoplasmic calcium</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\alpha_m\)</span></p></td>
+<td><p>0.2</p></td>
+<td><p>Activity of mitochondrial calcium</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="mitochondrial-sodium-calcium-exchanger-nclx">
+<h2>Mitochondrial Sodium-Calcium exchanger (NCLX)<a class="headerlink" href="#mitochondrial-sodium-calcium-exchanger-nclx" title="Permalink to this headline">#</a></h2>
+<p>We used the electron-neutral descriptor of NCLX since this model generated smooth and monotonous increment of mitochondrial calcium levels upon increasing glucose levels.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+J_{NCLX} &amp;= V_{m} (AB - PQ ) / D \\
+D &amp;= 1 + A + B + P + Q + AB + PQ \\
+A &amp;= ([Na^+]_c / K_{Na})^2  \\
+B &amp;= [Ca^{2+}]_m / K_{Ca}  \\
+P &amp;= ([Na^+]_m / K_{Na})^2  \\
+Q &amp;= [Ca^{2+}]_c / K_{Ca}  \\
+\end{aligned}
+\end{split}\]</div>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(V_m\)</span></p></td>
+<td><p>0.075 mM/s</p></td>
+<td><p>Max rate of NCLX</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(K_{Ca}\)</span></p></td>
+<td><p>8 μM</p></td>
+<td><p>Dissociation constant of Ca</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(K_{Na}\)</span></p></td>
+<td><p>8.2 mM</p></td>
+<td><p>Dissociation constant of Na</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="mitochondrial-dynamics">
+<h2>Mitochondrial Dynamics<a class="headerlink" href="#mitochondrial-dynamics" title="Permalink to this headline">#</a></h2>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{align}
+k_{fuse, 1} &amp;= k_{0}^{fuse} \frac{ J_{ANT} }{ J_{HL} } \\
+k_{fiss, 1} &amp;= k_{0}^{fiss}                            \\
+k_{fuse, 2} &amp;= 0.1k_{fuse, 1}                          \\
+k_{fiss, 2} &amp;= 1.5k_{fiss, 1}                          \\
+\end{align}
+\end{split}\]</div>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(k_0^{fuss}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\frac{1}{600}\)</span> Hz</p></td>
+<td><p>The basal fusion rate</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(k_0^{fiss}\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\frac{1}{600}\)</span> Hz</p></td>
+<td><p>The basal fission rate</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="ordinary-differential-equations">
+<h2>Ordinary differential equations<a class="headerlink" href="#ordinary-differential-equations" title="Permalink to this headline">#</a></h2>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\begin{aligned}
+\frac{d}{dt}[G3P] &amp;= \frac{1}{V_i}(2J_{glu} - J_{GPD}) - k_{g3p}[G3P] \\
+\frac{d}{dt}[Pyr] &amp;= \frac{1}{V_i + V_{mtx}}(J_{GPD} - J_{LDH} - J_{PDH}) - k_{pyr}[Pyr]   \\
+\frac{d}{dt}[NADH]_c &amp;= \frac{1}{V_i}(J_{GPD} - J_{LDH} - J_{NADHT}) - k_{nadhc}[NADH]_c   \\
+\frac{d}{dt}[NADH]_m &amp;= \frac{1}{V_{mtx}}(J_{NADHT} + 4.6J_{PDH} - 0.1J_{hr}) - k_{nadhm}[NADH]_m \\
+\frac{d}{dt}\Delta\Psi_m &amp;= \frac{1}{C_{mito}} (J_{hr} - J_{hf} - J_{ANT} - J_{hl} - 2J_{uni}) \\
+\frac{d}{dt}[Ca^{2+}]_m &amp;= \frac{f_m}{V_{mtx}} (J_{uni} - J_{NCLX}) \\
+\frac{d}{dt}[ATP]_c &amp;= \frac{1}{V_i} (J_{ANT} - 2J_{Glu} + 2J_{GPD} + J_{AdK}) - (k_{ATP} + k_{CaATP}[Ca^{2+}]_c)[ATP]_c \\
+\frac{d}{dt}[ADP]_c &amp;= -\frac{d}{dt}[ATP]_c - \frac{J_{AdK}}{V_i}  \\
+\frac{d}{dt} X_2 &amp;= k_{fuse, 1} X_1^2 - (k_{fiss, 1} + k_{fuse, 2}X_1) X_2 + k_{fiss, 2}X_3 \\
+\frac{d}{dt} X_3 &amp;= k_{fuse, 2}X_1X_2- k_{fiss, 2}X_3
+\end{aligned}
+\end{split}\]</div>
+</section>
+<section id="initial-conditions">
+<h2>Initial conditions<a class="headerlink" href="#initial-conditions" title="Permalink to this headline">#</a></h2>
+<table class="colwidths-auto table">
+<thead>
+<tr class="row-odd"><th class="head"><p>State variable</p></th>
+<th class="head"><p>Value</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\([G3P]\)</span></p></td>
+<td><p>2.8μM</p></td>
+<td><p>Glyceraldehyde-3-phosphate</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\([Pyr]\)</span></p></td>
+<td><p>8.5μM</p></td>
+<td><p>Pyruvate</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\([NADH]_c\)</span></p></td>
+<td><p>1μM</p></td>
+<td><p>Cytosolic NADH</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\([NADH]_{m}\)</span></p></td>
+<td><p>60μM</p></td>
+<td><p>Mitochondrial NADH</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\([ATP]_c\)</span></p></td>
+<td><p>4mM</p></td>
+<td><p>Cytosolic ATP concentration</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\([ADP]_c\)</span></p></td>
+<td><p>0.5mM</p></td>
+<td><p>Cytosolic ADP concentration</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\([Ca^{2+}]_{m}\)</span></p></td>
+<td><p>0.250μM</p></td>
+<td><p>Mitochondrial calcium concentration</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(\Delta\Psi_{m}\)</span></p></td>
+<td><p>100mV</p></td>
+<td><p>Mitochondrial membrane potential</p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(X_2\)</span></p></td>
+<td><p>0.20</p></td>
+<td><p>Population of degree-2 mitochondrial nodes</p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(X_3\)</span></p></td>
+<td><p>0.05</p></td>
+<td><p>Population of degree-3 mitochondrial nodes</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "python"
+        },
+        kernelOptions: {
+            kernelName: "python3",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'python3'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="index.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Glucose stimulation and Mitochondrial dynamics</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="fig2_3.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Figure 2 and 3</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Wen-Wei Tseng<br/>
+  
+      &copy; Copyright 2021.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

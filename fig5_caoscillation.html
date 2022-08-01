@@ -1,0 +1,586 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Figure 5 &#8212; Mitochondrial Dynamics</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <link rel="stylesheet" type="text/css" href="_static/mystnb.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-thebe.css" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.b7bb847fb20b106c3d81b95245e65545.min.css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <script>let toggleHintShow = 'Click to show';</script>
+    <script>let toggleHintHide = 'Click to hide';</script>
+    <script>let toggleOpenOnPrint = 'true';</script>
+    <script src="_static/togglebutton.js"></script>
+    <script>var togglebuttonSelector = '.toggle, .admonition.dropdown, .tag_hide_input div.cell_input, .tag_hide-input div.cell_input, .tag_hide_output div.cell_output, .tag_hide-output div.cell_output, .tag_hide_cell.cell, .tag_hide-cell.cell';</script>
+    <script src="_static/design-tabs.js"></script>
+    <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"
+const thebe_selector = ".thebe,.cell"
+const thebe_selector_input = "pre"
+const thebe_selector_output = ".output, .cell_output"
+</script>
+    <script async="async" src="_static/sphinx-thebe.js"></script>
+    <link rel="canonical" href="https://ntumitolab.github.io/mitodyn-ode/fig5_caoscillation.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Figure 6 and 7" href="fig6_7.html" />
+    <link rel="prev" title="Figure 2 and 3" href="fig2_3.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="index.html">
+      
+      
+      
+      <h1 class="site-logo" id="site-title">Mitochondrial Dynamics</h1>
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search this book..." aria-label="Search this book..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="model_desc.html">
+   Model descriptions
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="fig2_3.html">
+   Figure 2 and 3
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Figure 5
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="fig6_7.html">
+   Figure 6 and 7
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="figs.html">
+   Supplmentary figures
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="ffa_gal.html">
+   Free fatty acid and galactose treatment
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+            <div class="navbar_extra_footer">
+            Powered by <a href="https://jupyterbook.org">Jupyter Book</a>
+            </div>
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right">
+<div class="menu-dropdown menu-dropdown-launch-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Launch interactive content">
+      <i class="fas fa-rocket"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="https://mybinder.org/v2/gh/ntumitolab/mitodyn-ode/main?urlpath=tree/docs/fig5_caoscillation.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Launch on Binder"
+>
+  
+
+<span class="headerbtn__icon-container">
+  
+    <img src="_static/images/logo_binder.svg">
+  </span>
+<span class="headerbtn__text-container">Binder</span>
+</a>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+<button onclick="toggleFullScreen()"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="bottom"
+title="Fullscreen mode"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-expand"></i>
+  </span>
+
+</button>
+<a href="https://github.com/ntumitolab/mitodyn-ode"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="bottom"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="_sources/fig5_caoscillation.ipynb"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.ipynb</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Figure 5</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section class="tex2jax_ignore mathjax_ignore" id="figure-5">
+<h1>Figure 5<a class="headerlink" href="#figure-5" title="Permalink to this headline">#</a></h1>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">using</span><span class="w"> </span><span class="n">DifferentialEquations</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">ModelingToolkit</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">MitochondrialDynamics</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">MitochondrialDynamics</span><span class="o">:</span><span class="w"> </span><span class="n">GlcConst</span><span class="p">,</span><span class="w"> </span><span class="n">degavg</span><span class="p">,</span><span class="w"> </span><span class="n">ΔΨm</span><span class="p">,</span><span class="w"> </span><span class="n">Ca_c</span><span class="p">,</span><span class="w"> </span><span class="n">Ca_m</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">,</span><span class="w"> </span><span class="n">G3P</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">MitochondrialDynamics</span><span class="o">:</span><span class="w"> </span><span class="n">Pyr</span><span class="p">,</span><span class="w"> </span><span class="n">NADH_c</span><span class="p">,</span><span class="w"> </span><span class="n">NADH_m</span><span class="p">,</span><span class="w"> </span><span class="n">ATP_c</span><span class="p">,</span><span class="w"> </span><span class="n">ADP_c</span><span class="p">,</span><span class="w"> </span><span class="n">degavg</span><span class="w"></span>
+<span class="k">using</span><span class="w"> </span><span class="n">MitochondrialDynamics</span><span class="o">.</span><span class="n">Utils</span><span class="o">:</span><span class="w"> </span><span class="n">second</span><span class="p">,</span><span class="w"> </span><span class="n">μM</span><span class="p">,</span><span class="w"> </span><span class="n">mV</span><span class="p">,</span><span class="w"> </span><span class="n">mM</span><span class="p">,</span><span class="w"> </span><span class="n">Hz</span><span class="p">,</span><span class="w"> </span><span class="n">minute</span><span class="w"></span>
+<span class="k">import</span><span class="w"> </span><span class="n">PyPlot</span><span class="w"> </span><span class="n">as</span><span class="w"> </span><span class="n">plt</span><span class="w"></span>
+<span class="n">rcParams</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plt</span><span class="o">.</span><span class="n">PyDict</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">matplotlib</span><span class="o">.</span><span class="s">&quot;rcParams&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="n">rcParams</span><span class="p">[</span><span class="s">&quot;font.size&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">14</span><span class="w"></span>
+<span class="c"># rcParams[&quot;font.sans-serif&quot;] = &quot;Arial&quot;</span><span class="w"></span>
+<span class="c"># rcParams[&quot;font.family&quot;] = &quot;sans-serif&quot;</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stderr highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>┌ Info: Precompiling MitochondrialDynamics [1a231dcf-63c2-466e-8f46-4027ba595b90]
+└ @ Base loading.jl:1662
+</pre></div>
+</div>
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>14
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">tend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">2000.0</span><span class="w"></span>
+<span class="nd">@named</span><span class="w"> </span><span class="n">sys</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">make_model</span><span class="p">(;</span><span class="w"> </span><span class="n">glcrhs</span><span class="o">=</span><span class="mi">10</span><span class="n">mM</span><span class="p">)</span><span class="w"></span>
+<span class="n">sssol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">SteadyStateProblem</span><span class="p">(</span><span class="n">sys</span><span class="p">,</span><span class="w"> </span><span class="p">[]),</span><span class="w"> </span><span class="n">DynamicSS</span><span class="p">(</span><span class="n">Rodas5</span><span class="p">(),</span><span class="w"> </span><span class="n">tspan</span><span class="o">=</span><span class="n">tend</span><span class="p">))</span><span class="w"></span>
+<span class="n">caavg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sssol</span><span class="p">[</span><span class="n">Ca_c</span><span class="p">]</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>0.00026801443352651635
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">cac_wave</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ca_r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.09</span><span class="n">μM</span><span class="w"></span>
+<span class="w">    </span><span class="n">period</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="n">minute</span><span class="w"></span>
+<span class="w">    </span><span class="n">ka_ca</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">caavg</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">ca_r</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mf">1.5</span><span class="w"></span>
+<span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">((</span><span class="n">t</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">period</span><span class="p">)</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="mf">1.0</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ca_r</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">ka_ca</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">exp</span><span class="p">(</span><span class="mi">1</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">x</span><span class="p">))</span><span class="o">^</span><span class="mi">4</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+
+<span class="nd">@register_symbolic</span><span class="w"> </span><span class="n">cac_wave</span><span class="p">(</span><span class="n">t</span><span class="p">)</span><span class="w"></span>
+<span class="nd">@named</span><span class="w"> </span><span class="n">sysosci</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">make_model</span><span class="p">(;</span><span class="w"> </span><span class="n">cacrhs</span><span class="o">=</span><span class="n">cac_wave</span><span class="p">(</span><span class="n">t</span><span class="p">),</span><span class="w"> </span><span class="n">glcrhs</span><span class="o">=</span><span class="mi">10</span><span class="n">mM</span><span class="p">)</span><span class="w"></span>
+<span class="n">prob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ODEProblem</span><span class="p">(</span><span class="n">sysosci</span><span class="p">,</span><span class="w"> </span><span class="n">sssol</span><span class="o">.</span><span class="n">u</span><span class="p">,</span><span class="w"> </span><span class="n">tend</span><span class="p">)</span><span class="w"></span>
+<span class="n">sol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">solve</span><span class="p">(</span><span class="n">prob</span><span class="p">)</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>retcode: Success
+Interpolation: specialized 4th order &quot;free&quot; interpolation, specialized 2nd order &quot;free&quot; stiffness-aware interpolation
+t: 1585-element Vector{Float64}:
+    0.0
+    0.0006883351812923447
+    0.0009914665346983061
+    0.0012915136659450177
+    0.0016167151189920397
+    0.001966945059663325
+    0.0023338242028928054
+    0.0027048668394652683
+    0.0030712495242911112
+    0.0034304195341098203
+    0.0037841326546693933
+    0.0041355000147278
+    0.004487035940742874
+    ⋮
+ 1980.2575360038857
+ 1981.5167394553546
+ 1982.851542344532
+ 1984.2752141222743
+ 1985.804311629861
+ 1987.4599903898252
+ 1989.2699699691493
+ 1991.2716419628207
+ 1993.517193044593
+ 1996.083348853109
+ 1999.086722233861
+ 2000.0
+u: 1585-element Vector{Vector{Float64}}:
+ [0.10750877497620974, 0.003120150596859046, 0.0008438745128640356, 0.1249510810018473, 0.00600474144593352, 0.03519636435409779, 4.356898470231694, 0.004127073545763206, 0.22661077399440946, 0.040212957951005546]
+ [0.1075087824171056, 0.0031201501411461515, 0.000843838622158358, 0.12495287708553489, 0.006004741912782051, 0.035196363911793864, 4.356915773555995, 0.00409639210309375, 0.22661077399846682, 0.04021295784877427]
+ [0.10750879045565907, 0.0031201498688671323, 0.0008438228172318271, 0.12495367496546007, 0.006004742194756647, 0.035196363647961845, 4.356953090601327, 0.004112584810728616, 0.22661077398944307, 0.04021295779983789]
+ [0.10750880125117065, 0.003120149434065519, 0.0008438071735614236, 0.12495449010070876, 0.006004742643959565, 0.035196363226226705, 4.356979863744296, 0.004118471496169686, 0.22661077395426618, 0.04021295774189379]
+ [0.1075088161435188, 0.00312014880142914, 0.0008437902189155311, 0.12495539776907114, 0.0060047432975847935, 0.035196362612305826, 4.35700297396443, 0.004118966289403913, 0.2266107738905849, 0.040212957669836104]
+ [0.10750883589640295, 0.0031201479558281954, 0.0008437719599776571, 0.12495639937148072, 0.006004744172113882, 0.03519636179143006, 4.357026183526816, 0.004117841974345504, 0.22661077379596856, 0.040212957582803424]
+ [0.10750886071545694, 0.0031201468930036258, 0.0008437528337044746, 0.1249574743695309, 0.006004745272631442, 0.035196360759319145, 4.357049745082571, 0.004115936600828389, 0.22661077366873195, 0.04021295748144774]
+ [0.10750889010580132, 0.003120145636392063, 0.0008437334910637216, 0.12495858794849223, 0.006004746575486016, 0.03519635953858594, 4.3570731731784225, 0.004113633082771749, 0.22661077351110215, 0.04021295736845672]
+ [0.1075089233539601, 0.0031201442190090705, 0.0008437143920264949, 0.12495971308143997, 0.00600474804697375, 0.035196358161184035, 4.3570963512918865, 0.0041114263406735446, 0.22661077332724425, 0.040212957246668166]
+ [0.10750896001835246, 0.003120142661767065, 0.0008436956696318788, 0.12496084025135837, 0.006004749665808206, 0.03519635664734132, 4.357119506057677, 0.004109718367379044, 0.22661077312011937, 0.04021295711753915]
+ [0.10750900005790681, 0.0031201409666952746, 0.0008436772323235462, 0.12496197354600497, 0.006004751430221043, 0.03519635499894383, 4.35714274254652, 0.004108491403374809, 0.22661077289017942, 0.04021295698096882]
+ [0.107509043688162, 0.0031201391238269505, 0.0008436589179144176, 0.12496312222279934, 0.006004753350912132, 0.03519635320620798, 4.357165997919827, 0.004107466794908837, 0.2266107726361209, 0.04021295683601635]
+ [0.1075090911781002, 0.0031201371211941197, 0.0008436405953453381, 0.1249642943220748, 0.0060047554407255, 0.035196351257390415, 4.357189215216487, 0.004106413686647159, 0.22661077235624955, 0.04021295668168929]
+ ⋮
+ [0.11642319080763516, 0.0033024919835796286, 0.000552639573207778, 0.14847350628562156, 0.0064510744925421765, 0.03884046723570784, 4.409544515746668, 0.001664534543995748, 0.2057719162847502, 0.027385979209972988]
+ [0.11670081753851655, 0.003308165438826339, 0.0005359982863464059, 0.14889019118925942, 0.006456920829834755, 0.039018309922783836, 4.409959511758023, 0.001649421100449658, 0.20562749524774657, 0.02735106851868034]
+ [0.11696513752189767, 0.0033135418896650653, 0.0005191686413167777, 0.14927921030338157, 0.006461912186499356, 0.039192680990638475, 4.410308999734214, 0.0016367459086166329, 0.205471143809025, 0.02731319525458723]
+ [0.11721596595074144, 0.0033186147433430504, 0.000502183249160407, 0.1496414132490124, 0.006466019701115185, 0.03936367498126123, 4.4105924256095195, 0.0016265019178686039, 0.2053012774381326, 0.027271971569021305]
+ [0.11745300782175129, 0.0033233744473536984, 0.00048508110306995123, 0.1499774085805352, 0.006469207107715872, 0.03953135755829904, 4.410808496296046, 0.0016187135484818135, 0.20511588565130548, 0.027226904351630086]
+ [0.11767586511040751, 0.0033278085902671544, 0.00046790866019781103, 0.15028758550005142, 0.006471432169753247, 0.03969576812144646, 4.41095527736641, 0.0016134331155479712, 0.20491237297807383, 0.02717735598397964]
+ [0.11788403810274539, 0.003331901912161819, 0.00045072174619467225, 0.1505721207723278, 0.006472648599912209, 0.0398569157648543, 4.411030309551544, 0.0016107368999359415, 0.20468731989697417, 0.027122485264796457]
+ [0.11807692572101583, 0.003335636344364927, 0.00043358836549669584, 0.15083097810359794, 0.00647280900439736, 0.04001476826464399, 4.4110307846929775, 0.001610719370113478, 0.2044361053485941, 0.027061154043274967]
+ [0.11825382345795228, 0.0033389911215629957, 0.0004165931907622091, 0.15106389756290517, 0.006471869579491374, 0.04016922653182498, 4.41095383593109, 0.00161348352142158, 0.20415228701818372, 0.026991773788805372]
+ [0.11841396509654872, 0.003341943933010228, 0.00039983998621001993, 0.1512704351480606, 0.006469797185844927, 0.04032011611902095, 4.410796991280923, 0.0016191254199608544, 0.2038264240365341, 0.02691201411296601]
+ [0.11855639924399486, 0.0033444694549619246, 0.00038347507453151533, 0.15144977836038317, 0.006466583091488985, 0.04046698292484105, 4.4105591269700115, 0.00162770052714253, 0.20344425565046123, 0.026818350182455195]
+ [0.11859070840673401, 0.003345072710905129, 0.00037914067091707616, 0.151491005329167, 0.00646543235374022, 0.04050607745149714, 4.410473595881565, 0.001630792521475294, 0.20332805002404747, 0.02678984545587113]
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="k">function</span><span class="w"> </span><span class="n">plot_fig5</span><span class="p">(</span><span class="w"></span>
+<span class="w">    </span><span class="n">sol</span><span class="p">;</span><span class="w"></span>
+<span class="w">    </span><span class="n">tspan</span><span class="o">=</span><span class="p">(</span><span class="mf">1520.0</span><span class="p">,</span><span class="w"> </span><span class="mf">2000.0</span><span class="p">),</span><span class="w"></span>
+<span class="w">    </span><span class="n">npoints</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">12</span><span class="p">)</span><span class="w"></span>
+<span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kt">LinRange</span><span class="p">(</span><span class="n">tspan</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="w"> </span><span class="n">tspan</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span><span class="w"> </span><span class="n">npoints</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">tsm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ts</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="mi">60</span><span class="w"></span>
+<span class="w">    </span><span class="n">ca_c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sol</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span><span class="w"> </span><span class="n">idxs</span><span class="o">=</span><span class="n">Ca_c</span><span class="p">)</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+<span class="w">    </span><span class="n">ca_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sol</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span><span class="w"> </span><span class="n">idxs</span><span class="o">=</span><span class="n">Ca_m</span><span class="p">)</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+<span class="w">    </span><span class="n">g3p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sol</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span><span class="w"> </span><span class="n">idxs</span><span class="o">=</span><span class="n">G3P</span><span class="p">)</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+<span class="w">    </span><span class="n">pyr</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sol</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span><span class="w"> </span><span class="n">idxs</span><span class="o">=</span><span class="n">Pyr</span><span class="p">)</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+<span class="w">    </span><span class="n">nadh_c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sol</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span><span class="w"> </span><span class="n">idxs</span><span class="o">=</span><span class="n">NADH_c</span><span class="p">)</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+<span class="w">    </span><span class="n">nadh_m</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sol</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span><span class="w"> </span><span class="n">idxs</span><span class="o">=</span><span class="n">NADH_m</span><span class="p">)</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+<span class="w">    </span><span class="n">atp_c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sol</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span><span class="w"> </span><span class="n">idxs</span><span class="o">=</span><span class="n">ATP_c</span><span class="p">)</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+<span class="w">    </span><span class="n">adp_c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sol</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span><span class="w"> </span><span class="n">idxs</span><span class="o">=</span><span class="n">ADP_c</span><span class="p">)</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+<span class="w">    </span><span class="n">td</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">atp_c</span><span class="o">.</span><span class="n">u</span><span class="w"> </span><span class="o">./</span><span class="w"> </span><span class="n">adp_c</span><span class="w"></span>
+<span class="w">    </span><span class="n">dpsi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sol</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span><span class="w"> </span><span class="n">idxs</span><span class="o">=</span><span class="n">ΔΨm</span><span class="p">)</span><span class="w"> </span><span class="o">.*</span><span class="w"> </span><span class="mi">1000</span><span class="w"></span>
+<span class="w">    </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sol</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span><span class="w"> </span><span class="n">idxs</span><span class="o">=</span><span class="n">degavg</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">fig</span><span class="p">,</span><span class="w"> </span><span class="n">ax</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="n">figsize</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tsm</span><span class="p">,</span><span class="w"> </span><span class="n">ca_c</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;Ca(cyto)&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tsm</span><span class="p">,</span><span class="w"> </span><span class="n">ca_m</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;Ca(mito)&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;A&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">loc</span><span class="o">=</span><span class="s">&quot;left&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Conc. (μM)&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tsm</span><span class="p">,</span><span class="w"> </span><span class="n">g3p</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;G3P&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tsm</span><span class="p">,</span><span class="w"> </span><span class="n">nadh_c</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;NADH (cyto)&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;B&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">loc</span><span class="o">=</span><span class="s">&quot;left&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Conc. (μM)&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tsm</span><span class="p">,</span><span class="w"> </span><span class="n">pyr</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;Pyr&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tsm</span><span class="p">,</span><span class="w"> </span><span class="n">nadh_m</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;NADH (mito)&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;C&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">loc</span><span class="o">=</span><span class="s">&quot;left&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;Conc. (μM)&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tsm</span><span class="p">,</span><span class="w"> </span><span class="n">td</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;ATP:ADP&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;D&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">loc</span><span class="o">=</span><span class="s">&quot;left&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tsm</span><span class="p">,</span><span class="w"> </span><span class="n">dpsi</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;ΔΨm&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;E&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">loc</span><span class="o">=</span><span class="s">&quot;left&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">ylabel</span><span class="o">=</span><span class="s">&quot;mV&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tsm</span><span class="p">,</span><span class="w"> </span><span class="n">k</span><span class="p">,</span><span class="w"> </span><span class="n">label</span><span class="o">=</span><span class="s">&quot;&lt;k&gt;&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&quot;F&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">loc</span><span class="o">=</span><span class="s">&quot;left&quot;</span><span class="p">)</span><span class="w"></span>
+<span class="w">    </span><span class="n">ax</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s">&quot;Time (minute)&quot;</span><span class="p">)</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">ax</span><span class="w"></span>
+<span class="w">        </span><span class="n">a</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span><span class="w"></span>
+<span class="w">        </span><span class="n">a</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span><span class="w"></span>
+<span class="w">        </span><span class="n">a</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="n">tsm</span><span class="p">[</span><span class="k">begin</span><span class="p">],</span><span class="w"> </span><span class="n">tsm</span><span class="p">[</span><span class="k">end</span><span class="p">])</span><span class="w"></span>
+<span class="w">    </span><span class="k">end</span><span class="w"></span>
+
+<span class="w">    </span><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span><span class="w"></span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">fig</span><span class="w"></span>
+<span class="k">end</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>plot_fig5 (generic function with 1 method)
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="n">fig5</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">plot_fig5</span><span class="p">(</span><span class="n">sol</span><span class="p">);</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/fig5_caoscillation_5_0.png" src="_images/fig5_caoscillation_5_0.png" />
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-julia notranslate"><div class="highlight"><pre><span></span><span class="c"># Uncomment if pdf file is required</span><span class="w"></span>
+<span class="c"># fig5.savefig(&quot;Fig5.tif&quot;, dpi=300, format=&quot;tiff&quot;, pil_kwargs=Dict(&quot;compression&quot; =&gt; &quot;tiff_lzw&quot;))</span><span class="w"></span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
+
+    <script type="text/x-thebe-config">
+    {
+        requestKernel: true,
+        binderOptions: {
+            repo: "binder-examples/jupyter-stacks-datascience",
+            ref: "master",
+        },
+        codeMirrorConfig: {
+            theme: "abcdef",
+            mode: "julia-1.8"
+        },
+        kernelOptions: {
+            kernelName: "julia-1.8",
+            path: "./."
+        },
+        predefinedOutput: true
+    }
+    </script>
+    <script>kernelName = 'julia-1.8'</script>
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="fig2_3.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Figure 2 and 3</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="fig6_7.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Figure 6 and 7</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By Wen-Wei Tseng<br/>
+  
+      &copy; Copyright 2021.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>
