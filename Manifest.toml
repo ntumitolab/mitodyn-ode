@@ -2,7 +2,7 @@
 
 julia_version = "1.8.0-rc4"
 manifest_format = "2.0"
-project_hash = "cf0f03d8f34f17296bf14833e13e0110d4c9d605"
+project_hash = "41eedf949777992f2be4ea30fd42c71a5c316d81"
 
 [[deps.AbstractAlgebra]]
 deps = ["GroupsCore", "InteractiveUtils", "LinearAlgebra", "MacroTools", "Markdown", "Random", "RandomExtensions", "SparseArrays", "Test"]
@@ -88,9 +88,9 @@ version = "0.2.0"
 
 [[deps.BandedMatrices]]
 deps = ["ArrayLayouts", "FillArrays", "LinearAlgebra", "Random", "SparseArrays"]
-git-tree-sha1 = "b02c21dd08254dcee5611f50010243ab9060d20f"
+git-tree-sha1 = "d8da9afb97ad4a1a06650db11c8b72d9dd2f1ace"
 uuid = "aae01518-5342-5314-be14-df237901396f"
-version = "0.17.4"
+version = "0.17.5"
 
 [[deps.BangBang]]
 deps = ["Compat", "ConstructionBase", "Future", "InitialValues", "LinearAlgebra", "Requires", "Setfield", "Tables", "ZygoteRules"]
@@ -1071,9 +1071,9 @@ version = "0.7.6"
 
 [[deps.StaticArrays]]
 deps = ["LinearAlgebra", "Random", "StaticArraysCore", "Statistics"]
-git-tree-sha1 = "23368a3313d12a2326ad0035f0db0c0966f438ef"
+git-tree-sha1 = "2d4e51cfad63d2d34acde558027acbc66700349b"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.5.2"
+version = "1.5.3"
 
 [[deps.StaticArraysCore]]
 git-tree-sha1 = "66fe9eb253f910fe8cf161953880cfdaef01cdf0"
