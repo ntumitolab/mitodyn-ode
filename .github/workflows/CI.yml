@@ -28,7 +28,7 @@ jobs:
           context: .
           file: .ci/Dockerfile
           tags: ${{ env.IMAGE_NAME }}:test
-          outputs: type=cacheonly
+          outputs: type=docker,dest=/tmp/myimage.tar
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Cache Image
