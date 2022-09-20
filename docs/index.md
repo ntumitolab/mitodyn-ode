@@ -1,4 +1,4 @@
-# Model descriptions
+# Glucose stimulation and Mitochondrial dynamics
 
 ## Difference from the original Fridlyand's model
 - We  added an dilution term for pyruvate and a ADP Michaelis constant in Glyceraldehyde 3-phosphate dehydrogenase to increase the robustness in the ODE systems.
