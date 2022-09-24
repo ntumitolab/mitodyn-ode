@@ -27,8 +27,6 @@ jobs:
         id: cp310
         with:
           python-version: ${{ env.PYTHON_VER }}
-          cache: 'pip'
-          cache-dependency-path: '**/requirements.txt'
       - name: Install Python dependencies
         run: |
           pip install -U pip wheel setuptools
