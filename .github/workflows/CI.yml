@@ -1,4 +1,4 @@
-name: Build Docker Image and Jupyter Notebooks
+name: CI
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
