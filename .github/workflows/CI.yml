@@ -73,6 +73,8 @@ jobs:
   jupyter-book:
     needs: execute
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/sosiristseng/docker-jupyterbook:0.13.1
     # store success output flag for ci job
     outputs:
       success: ${{ steps.setoutput.outputs.success }}
