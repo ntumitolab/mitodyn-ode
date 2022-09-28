@@ -29,7 +29,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install -U pip wheel setuptools
-          pip install -r requirements.txt -r .ci/requirements.txt
+          pip install -r requirements.txt
       - name: Setup Julia ${{ env.JULIA_VER }}
         uses: julia-actions/setup-julia@v1
         with:
@@ -42,7 +42,8 @@ jobs:
           julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate()'
       - name: Run Notebooks
         run: |
-          parallel -j4 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {} ::: docs/*.ipynb
+          parallel --joblog /tmp/log -j4 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {} ::: docs/*.ipynb
+          cat /tmp/log
       - name: Build website
         run: jupyter-book build docs --warningiserror --keep-going -v
       - name: Setup Pages
