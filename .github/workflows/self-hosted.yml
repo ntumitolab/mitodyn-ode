@@ -1,4 +1,4 @@
-name: Build Jupyter Notebooks by self-hosted runner
+name: CI by self-hosted runner
 
 on:
   push:
