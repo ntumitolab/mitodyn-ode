@@ -131,7 +131,7 @@ function make_model(;
         J_PDH ~ rPDH * j_pdh(Pyr, NAD_m, NADH_m, Ca_m, VmaxPDH, KpyrPDH, KnadPDH, U1PDH, U2PDH, KcaPDH),
         J_CAC ~ J_PDH + j_ffa,
         J_DH ~ 4.6 * J_CAC,
-        J_HR ~ rETC * j_hl(dpsi, phl, kv)j_hr(NADH_m, ΔΨm, VmaxETC, KnadhETC, KaETC, KbETC),
+        J_HR ~ rETC * j_hr(NADH_m, ΔΨm, VmaxETC, KnadhETC, KaETC, KbETC),
         J_O2 ~ 0.1 * J_HR,
         J_HL ~  rHL * j_hl(ΔΨm, pHleak, kvHleak),
         J_HF ~ rF1 * j_hf(ADP_c, Ca_m, ΔΨm, VmaxF1, KadpF1, KvF1, KcaF1, FmgadpF1),
