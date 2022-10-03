@@ -1,4 +1,4 @@
-import .Utils: hill, hillr, exprel, mM, μM, ms, minute, Hz, mV, iVT, iVmtx, iCmt, iVi, iVimtx, F_M
+import .Utils: hill, hillr, exprel, mM, μM, ms, minute, Hz, kHz, mV, iVT, iVmtx, iCmt, iVi, iVimtx, F_M
 
 @variables t
 
@@ -8,7 +8,7 @@ Adenylate kinase:
 2ADP <=> ATP + AMP
 =#
 @variables J_ADK(t) ATP_c(t) ADP_c(t) AMP_c(t)
-@parameters kfAK = 1000Hz / mM kEqAK = 0.931
+@parameters kfAK = 1kHz / mM kEqAK = 0.931
 
 #=
 Glucokinase (GK) Reactions:
@@ -53,14 +53,6 @@ Pyr + 4.6NAD => CO2 + 4.6NADH
 @variables J_PDH(t) J_DH(t) J_CAC(t) J_FFA(t) NAD_m(t) NADH_m(t) Ca_m(t) rPDH(t)
 @parameters VmaxPDH = 300μM * Hz KpyrPDH = 47.5μM KnadPDH = 81.0 U1PDH = 1.5 U2PDH = 1.1 KcaPDH = 0.05μM
 
-function j_pdh(pyr, nad_m, nadh_m, ca_m, VMAX, K_PYR, K_NAD, U1, U2, K_CA)
-    c = (hillr(ca_m, K_CA))^2
-    fpCa = hillr(U2 * (1 + U1 * c))
-    fNAD = hill(nad_m, nadh_m * K_NAD)
-    fPyr = hill(pyr, K_PYR)
-    jPDH = VMAX * fPyr * fNAD * fpCa
-    return jPDH
-end
 
 #=
 Electron trasnport chain (ETC)
@@ -89,11 +81,7 @@ Ca(cyto) <=> Ca(mito)
 =#
 @variables J_MCU(t)
 @parameters PcaMCU = 4Hz
-function j_uni(ca_m, ca_c, ΔΨ, P_CA)
-    zvfrt = 2 * iVT * ΔΨ
-    em1 = expm1(zvfrt)
-    return P_CA * exprel(zvfrt, em1) * (0.341 * ca_c * (1 + em1) - 0.200 * ca_m)
-end
+
 
 #=
 Mitochondrial sodium calcium exchanger (NCLX)
@@ -102,15 +90,6 @@ Ca(mito) + 2Na(cyto) <=> Ca(cyto) + 2Na(mito)
 =#
 @variables J_NCLX(t)
 @parameters Na_c = 10mM Na_m = 5mM VmaxNCLX = 75μM * Hz KnaNCLX = 8.2mM KcaNCLX = 8μM
-function j_nclx(ca_m, ca_c, na_m, na_c, VMAX, K_CA, K_NA)
-    A = (na_c / K_NA)^2
-    P = (na_m / K_NA)^2
-    B = ca_m / K_CA
-    Q = ca_c / K_CA
-    AB = A * B
-    PQ = P * Q
-    return VMAX * (AB - PQ) / (1 + A + B + P + Q + AB + PQ)
-end
 
 #=
 NADH shuttle
@@ -133,7 +112,7 @@ NADH(cyto) + NAD(mito) => NADH(mito) + NAD(cyto)
 function make_model(;
     name,
     simplify=true,
-    cacrhs=RestingCa + ActivatedCa * hill(ATP_c / KatpCac, ADP_c, NCac),
+    cacrhs=RestingCa + ActivatedCa * hill(ATP_c, ADP_c * KatpCac, NCac),
     glcrhs=GlcConst,
     rpdh=1,
     retc=1,
@@ -145,21 +124,21 @@ function make_model(;
     D = Differential(t)
     eqs = [
         # Reactions
-        J_GK ~ VmaxGK * hill(ATP_c, KatpGK) * hill(Glc, KglcGK, NGK),
-        J_GPD ~ VmaxGPD * hill(ADP_c, KadpGPD) * hill(NAD_c / KnadGPD, NADH_c) * hill(G3P, Kg3pGPD),
-        J_LDH ~ VmaxLDH * hill(Pyr, KpyrLDH) * hill(NADH_c / KnadhLDH, NAD_c),
-        J_ADK ~ kfAK * (ADP_c * ADP_c - ATP_c * AMP_c / kEqAK),
+        J_GK ~ j_gk(ATP_c, Glc, VmaxGK, KatpGK, KglcGK, NGK),
+        J_GPD ~ j_gpd(G3P, NAD_c, NADH_c, ADP_c, VmaxGPD, Kg3pGPD, KnadGPD, KadpGPD),
+        J_LDH ~ j_ldh(Pyr, NAD_c, NADH_c, VmaxLDH, KpyrLDH, KnadhLDH),
+        J_ADK ~ j_adk(ATP_c, ADP_c, AMP_c, kfAK, kEqAK),
         J_PDH ~ rPDH * j_pdh(Pyr, NAD_m, NADH_m, Ca_m, VmaxPDH, KpyrPDH, KnadPDH, U1PDH, U2PDH, KcaPDH),
         J_CAC ~ J_PDH + j_ffa,
         J_DH ~ 4.6 * J_CAC,
-        J_HR ~ VmaxETC * rETC * hill(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm),
+        J_HR ~ rETC * j_hl(dpsi, phl, kv)j_hr(NADH_m, ΔΨm, VmaxETC, KnadhETC, KaETC, KbETC),
         J_O2 ~ 0.1 * J_HR,
-        J_HL ~ pHleak * rHL * exp(kvHleak * ΔΨm),
-        J_HF ~ VmaxF1 * rF1 * hill(FmgadpF1 * ADP_c, KadpF1, 2) * hill(ΔΨm, KvF1, 8) * (1 - exp(-Ca_m / KcaF1)),
+        J_HL ~  rHL * j_hl(ΔΨm, pHleak, kvHleak),
+        J_HF ~ rF1 * j_hf(ADP_c, Ca_m, ΔΨm, VmaxF1, KadpF1, KvF1, KcaF1, FmgadpF1),
         J_ANT ~ J_HF / 3,
         J_MCU ~ j_uni(Ca_m, Ca_c, ΔΨm, PcaMCU),
         J_NCLX ~ j_nclx(Ca_m, Ca_c, Na_m, Na_c, VmaxNCLX, KcaNCLX, KnaNCLX),
-        J_NADHT ~ VmaxNADHT * hill(NADH_c / Ktn_c, NAD_c) * hill(NAD_m / Ktn_m, NADH_m),
+        J_NADHT ~ j_nadht(NAD_c, NADH_c, NAD_m, NADH_m, VmaxNADHT, Ktn_c, Ktn_m),
         v[1] ~ Kfuse1 * J_ANT / J_HL * x[1] * x[1] - Kfiss1 * x[2],
         v[2] ~ Kfuse2 * J_ANT / J_HL * x[1] * x[2] - Kfiss2 * x[3],
         Glc ~ glcrhs,
@@ -176,7 +155,7 @@ function make_model(;
         # Observables
         x13r ~ x[1] / x[3],
         degavg ~ (x[1] + 2x[2] + 3x[3]) / (x[1] + x[2] + x[3]),
-        AMPKactivity ~ hill(AMP_c / ATP_c, kAMPK),
+        # AMPKactivity ~ hill(AMP_c / ATP_c, kAMPK),
         # State variables
         D(NADH_m) ~ iVmtx * (J_DH + J_NADHT - J_O2) - kNADHm * NADH_m,
         # D(NAD_m) ~ # Conserved
