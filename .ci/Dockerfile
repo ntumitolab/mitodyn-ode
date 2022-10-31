@@ -7,6 +7,7 @@ ENV LC_ALL C.UTF-8
 # RUN apt-get update && apt-get install -y ffmpeg fonts-humor-sans --no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 # Julia
+ENV JULIA_PKG_SERVER ""
 ENV JULIA_PATH /usr/local/julia/
 ENV PATH $JULIA_PATH/bin:$PATH
 COPY --from=julia:1.8.2 ${JULIA_PATH} /usr/local/
