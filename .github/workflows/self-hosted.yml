@@ -42,7 +42,7 @@ jobs:
           julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate()'
       - name: Run Notebooks
         run: |
-          parallel --joblog /tmp/log -j6 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {} ::: docs/*.ipynb
+          parallel --joblog /tmp/log -j8 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {} ::: docs/*.ipynb
           cat /tmp/log
       - name: Build website
         run: jupyter-book build docs --warningiserror --keep-going -v
