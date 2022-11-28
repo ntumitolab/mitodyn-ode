@@ -1,4 +1,4 @@
-FROM ghcr.io/sosiristseng/docker-jupyterbook:0.13.1.2
+FROM python:3.11.0-slim
 
 # Supress warning emitted by parallel
 ENV LANG C.UTF-8
