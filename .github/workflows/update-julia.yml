@@ -11,8 +11,6 @@ on:
 jobs:
   update-notebook:
     runs-on: ubuntu-latest
-    container:
-      image: julia:1.8.3
     steps:
       - name: Checkout
         uses: actions/checkout@v3
