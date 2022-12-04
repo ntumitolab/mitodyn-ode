@@ -85,8 +85,8 @@ jobs:
         with:
           python-version: '3.11'
           cache: 'pip'
-          cache-dependency-path: 'requirements.txt'
-      - run: pip install -r requirements.txt
+          cache-dependency-path: '.github/requirements.txt'
+      - run: pip install -r .github/requirements.txt
       - name: Download notebooks
         uses: actions/download-artifact@v3
         with:
