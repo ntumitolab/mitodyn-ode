@@ -69,19 +69,4 @@ Returns `x / (exp(x)-1)`
 """
 exprel(x, em1=expm1(x)) = x / em1
 
-"""
-Signed sqare root
-"""
-sqrt_s(x) = sign(x) * sqrt(abs(x))
-
-"""
-Signed power
-"""
-pow_s(x, n) = sign(x) * (abs(x)^n)
-
-"""
-Signed Hill function
-"""
-hill_s(x, k, n) = hill(pow_s(x, n), pow_s(k, n))
-
 end # module
