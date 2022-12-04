@@ -14,13 +14,13 @@ jobs:
     container:
       image: julia:1.8.3
     steps:
-      - run: apt-get update && apt-get install -y git
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Update Julia dependencies
-        env:
-          JULIA_PKG_PRECOMPILE_AUTO: '0'
-        run: julia --color=yes --project=@. --threads=auto -e 'import Pkg; Pkg.update()'
+      - uses: addnab/docker-run-action@v3
+        with:
+          image: julia:1.8.3
+          options: -v ${{ github.workspace }}:/work -e JULIA_PKG_PRECOMPILE_AUTO=0
+          run: julia --color=yes --project=@. --threads=auto -e 'import Pkg; Pkg.update()'
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v4
