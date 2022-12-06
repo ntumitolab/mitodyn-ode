@@ -9,7 +9,7 @@ on:
       - '.github/workflows/**'
 
 env:
-  JULIA_PKG_PRECOMPILE_AUTO: 0
+  JULIA_PKG_PRECOMPILE_AUTO: '0'
 
 jobs:
   update-notebook:
