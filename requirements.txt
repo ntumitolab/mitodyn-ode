@@ -1,2 +1,2 @@
 matplotlib==3.6.2
-jupyter-book==0.13.1
+nbconvert==7.2.6
