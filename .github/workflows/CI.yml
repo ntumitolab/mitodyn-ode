@@ -42,6 +42,8 @@ jobs:
           julia --color=yes --project="" -e 'import Pkg; Pkg.add(["PyCall", "IJulia"]); Pkg.build(["PyCall", "IJulia"])'
           julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate()'
       - name: Run Notebooks
+        env:
+          PYTHON: ${{ steps.python.outputs.python-path }}
         run: |
           parallel --joblog ./job-log -j8 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {} ::: docs/*.ipynb
           cat ./job-log
