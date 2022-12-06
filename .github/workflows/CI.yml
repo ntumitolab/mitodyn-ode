@@ -11,93 +11,42 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+  JULIA_NUM_THREADS: '16'
+  PYTHON_VER: '3.11'
+  JULIA_VER: '1.8.3'
+  JULIA_CACHE: '1'
 
 jobs:
-  docker:
-    runs-on: ubuntu-latest
+  ci:
+    runs-on: ['self-hosted', 'ubuntu']
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
-      - name: Build and cache Docker Image
-        uses: docker/build-push-action@v3
+      - name: Setup Python ${{ env.PYTHON_VER }}
+        uses: actions/setup-python@v4
+        id: python
         with:
-          context: .
-          file: .ci/Dockerfile
-          tags: ${{ env.IMAGE_NAME }}:test
-          outputs: type=cacheonly
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-  execute:
-    needs: docker
-    env:
-      TIMEOUT: 1000
-    strategy:
-      fail-fast: false
-      matrix:
-        # Notebooks need to be executed
-        notebook:
-          - ffa_gal
-          - fig_step_response
-          - fig2_3
-          - fig5_caoscillation
-          - fig6_7
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
-      - name: Load Docker Image
-        uses: docker/build-push-action@v3
+          python-version: ${{ env.PYTHON_VER }}
+      - name: Install Python dependencies
+        run: |
+          pip install -U pip wheel setuptools
+          pip install -r requirements.txt
+      - name: Setup Julia ${{ env.JULIA_VER }}
+        uses: julia-actions/setup-julia@v1
         with:
-          context: .
-          file: .ci/Dockerfile
-          tags: ${{ env.IMAGE_NAME }}:test
-          load: true
-          cache-from: type=gha
-      - name: Execute Notebook
-        run: >
-          docker run
-          -v ${{ github.workspace }}:/work
-          -e JULIA_NUM_THREADS=auto
-          ${{ env.IMAGE_NAME }}:test
-          jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=${{ env.TIMEOUT }} --execute --inplace
-          /work/docs/${{ matrix.notebook }}.ipynb
-      - name: Upload Notebook
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ matrix.notebook }}
-          path: docs/${{ matrix.notebook }}.ipynb
-
-  jupyter-book:
-    needs: execute
-    runs-on: ubuntu-latest
-    # store success output flag for the ci job
-    outputs:
-      success: ${{ steps.setoutput.outputs.success }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-          cache-dependency-path: '.github/requirements.txt'
-      - run: pip install -r .github/requirements.txt
-      - name: Download notebooks
-        uses: actions/download-artifact@v3
-        with:
-          path: out/
-      - name: Move notebooks
-        run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
+          version: ${{ env.JULIA_VER }}
+      - name: Install Julia dependencies
+        env:
+          PYTHON: ${{ steps.python.outputs.python-path }}
+        run: |
+          julia --color=yes --project="" -e 'import Pkg; Pkg.add(["PyCall", "IJulia"]); Pkg.build(["PyCall", "IJulia"])'
+          julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate()'
+      - name: Run Notebooks
+        run: |
+          parallel --joblog ./job-log -j8 jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=600 --execute --inplace {} ::: docs/*.ipynb
+          cat ./job-log
       - name: Build website
-        run: jupyter-book build docs/ -W -v
-      - name: Set output flag
-        id: setoutput
-        run: echo "success=true" >> $GITHUB_OUTPUT
+        run: jupyter-book build docs --warningiserror --keep-going -v
       - name: Deploy
         if: github.ref == 'refs/heads/main'
         uses: peaceiris/actions-gh-pages@v3
@@ -105,23 +54,3 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/_build/html
           force_orphan: true
-
-  # This job is for GitHub status check
-  # https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
-  ci:
-    needs: [execute, jupyter-book]
-    runs-on: ubuntu-latest
-    if: always() # always run, so we never skip the check
-    steps:
-      # pass step only when output of previous jupyter-book job is set
-      # in case at least one of the execution fails, jupyter-book is skipped
-      # and the output will not be set, which will then cause the ci job to fail
-      - run: |
-          passed="${{ needs.jupyter-book.outputs.success }}"
-          if [[ $passed == "true" ]]; then
-            echo "Tests passed"
-            exit 0
-          else
-            echo "Tests failed"
-            exit 1
-          fi
