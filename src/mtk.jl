@@ -1,4 +1,4 @@
-import .Utils: hill, hillr, exprel, mM, μM, ms, minute, Hz, kHz, mV, iVT, iVmtx, iCmt, iVi, iVimtx, F_M
+using ModelingToolkit
 
 @variables t
 
@@ -8,7 +8,8 @@ Adenylate kinase:
 2ADP <=> ATP + AMP
 =#
 @variables J_ADK(t) ATP_c(t) ADP_c(t) AMP_c(t)
-@parameters kfAK = 1kHz / mM kEqAK = 0.931
+@parameters kfAK = 1kHz / mM
+@parameters kEqAK = 0.931
 
 #=
 Glucokinase (GK) Reactions:
@@ -17,7 +18,11 @@ Glucokinase (GK) Reactions:
 - G6P + ATP => FBP (+ ADP) =>> 2G3P (+ ADP)
 =#
 @variables Glc(t) J_GK(t)
-@parameters VmaxGK = 0.011mM * Hz KatpGK = 0.5mM KglcGK = 7mM NGK = 1.7 GlcConst = 5mM
+@parameters VmaxGK = 0.011mM * Hz
+@parameters KatpGK = 0.5mM
+@parameters KglcGK = 7mM
+@parameters NGK = 1.7
+@parameter GlcConst = 5mM
 
 #=
 Glyceraldehydes 3-phosphate dehydrogenase (GPD), lumped with pyruvate kinase (PK) to represent lower half of glycolysis
