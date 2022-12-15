@@ -18,10 +18,10 @@ jobs:
       env:
         JULIA_PKG_PRECOMPILE_AUTO: '0'
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
       - name: Install git
         run: apt-get update && apt-get install -y --no-install-recommends git
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Update Julia deps
         run: julia --color=yes --project=/work --threads=auto -e 'import Pkg; Pkg.update()'
       - name: Create Pull Request
