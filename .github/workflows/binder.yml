@@ -10,7 +10,6 @@ concurrency:
 
 env:
   REGISTRY: "ghcr.io"
-  IMAGE_NAME: ${{ env.REGISTRY }}/${{ github.repository	}}:binder
 
 jobs:
   build:
@@ -25,7 +24,7 @@ jobs:
       run: >
         jupyter-repo2docker --no-run --user-id 1000 --user-name jovyan
         --target-repo-dir "/home/jovyan"
-        --image-name ${{ env.IMAGE_NAME }}
+        --image-name ${{ env.REGISTRY }}/${{ github.repository }}:binder
         .
     - name: Login to ${{ env.REGISTRY }}
       uses: docker/login-action@v2
@@ -33,4 +32,4 @@ jobs:
         username: ${{ github.repository_owner }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Push image to ${{ env.REGISTRY }}
-      run: docker push ${{ env.IMAGE_NAME }}
+      run: docker push ${{ env.REGISTRY }}/${{ github.repository }}:binder
