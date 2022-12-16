@@ -17,7 +17,7 @@ jobs:
       uses: jupyterhub/repo2docker-action@master
       with:
         DOCKER_REGISTRY: ghcr.io
-        DOCKER_USERNAME: ${{ github.actor }}
+        DOCKER_USERNAME: ${{ github.repository_owner }}
         DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         LATEST_TAG_OFF: true
         ADDITIONAL_TAG: "binder"
