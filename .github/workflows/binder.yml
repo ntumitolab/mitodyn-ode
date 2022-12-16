@@ -16,8 +16,5 @@ jobs:
     - name: update jupyter dependencies with repo2docker
       uses: jupyterhub/repo2docker-action@master
       with:
-        DOCKER_REGISTRY: ghcr.io
-        DOCKER_USERNAME: ${{ github.repository_owner }}
-        DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-        LATEST_TAG_OFF: true
-        ADDITIONAL_TAG: "binder"
+        NO_PUSH: true
+        MYBINDERORG_TAG: ${{ github.event.ref }} # This builds the container on mybinder.org with the branch that was pushed on.
