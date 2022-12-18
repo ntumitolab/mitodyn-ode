@@ -21,11 +21,13 @@ jobs:
       with:
         python-version: '3.11'
     - run: pip install --no-cache-dir jupyter-repo2docker
-    - run: docker pull ${{ env.IMG_NAME }} || true
     - name: Build Binder image
       run: >
         jupyter-repo2docker
         --no-run
+        --user-id 1000
+        --user-name jovyan
+        --target-repo-dir "/home/jovyan"
         --cache-from ${{ env.IMG_NAME }}
         --image-name ${{ env.IMG_NAME }}
         .
