@@ -2,7 +2,15 @@ name: Build Binder Container
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+    paths:
+      - '.github/workflows/**'
+      - 'src/**'
+      - Project.toml
+      - Manifest.toml
+      - requirements.txt
+      - runtime.txt
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
