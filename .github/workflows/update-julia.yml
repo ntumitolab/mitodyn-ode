@@ -10,20 +10,20 @@ on:
     paths:
       - '.github/workflows/**'
 
+env:
+  JULIA_PKG_PRECOMPILE_AUTO: '0'
+
 jobs:
   update-notebook:
     runs-on: ubuntu-latest
     container:
       image: julia:1.8.3
-      env:
-        JULIA_PKG_PRECOMPILE_AUTO: '0'
     steps:
-      - name: Install git
-        run: apt-get update && apt-get install -y --no-install-recommends git
+      - run: apt-get update && apt-get install -y --no-install-recommends git
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Update Julia deps
-        run: julia --color=yes --project=/work --threads=auto -e 'import Pkg; Pkg.update()'
+      - name: Update Julia dependencies
+        run: julia --color=yes --project=@. --threads=auto -e 'import Pkg; Pkg.update()'
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v4
