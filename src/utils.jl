@@ -1,7 +1,6 @@
-# Constants and commonly-used
-module Utils
-
-# Units and physical constants
+##################################
+### Units and physical constants
+##################################
 const second = float(1)    # second
 const minute = 60second    # minute
 const ms = 1e-3second      # millisecond
@@ -38,7 +37,6 @@ const iVmtx = inv(V_MTX)
 const iVimtx = inv(V_MTX + V_I)
 const iCmt = inv(C_MIT)
 
-
 ##################################
 ### Commonly-used functions
 ##################################
@@ -68,5 +66,3 @@ expit(x) = hillr(exp(-x))
 Returns `x / (exp(x)-1)`
 """
 exprel(x, em1=expm1(x)) = x / em1
-
-end # module
