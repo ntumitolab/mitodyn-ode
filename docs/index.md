@@ -304,4 +304,3 @@ $$
 | $\Delta\Psi_{m}$ | 100mV   | Mitochondrial membrane potential           |
 | $X_2$            | 0.20    | Population of degree-2 mitochondrial nodes |
 | $X_3$            | 0.05    | Population of degree-3 mitochondrial nodes |
-
