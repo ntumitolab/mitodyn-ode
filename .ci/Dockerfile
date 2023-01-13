@@ -11,8 +11,7 @@ COPY --from=julia:1.9.0-beta2 ${JULIA_PATH} /usr/local/
 # Python dependencies
 # e.g. matplotlib
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir nbconvert
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Julia environment
 COPY Project.toml Manifest.toml ./
