@@ -14,7 +14,7 @@ jobs:
   update-manifest:
     runs-on: ubuntu-latest
     container:
-      image: julia:1.8.5
+      image: julia:1.9.0-beta2
       env:
         JULIA_PKG_PRECOMPILE_AUTO: '0'
     steps:
