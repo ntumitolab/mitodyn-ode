@@ -13,7 +13,7 @@ COPY --from=julia:1.8.5 ${JULIA_PATH} /usr/local/
 # e.g. matplotlib
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt && \
-    pip install --no-cache-dir -U nbcoinvert
+    pip install --no-cache-dir -U nbconvert
 
 # Julia environment
 COPY Project.toml Manifest.toml ./
