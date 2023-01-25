@@ -8,24 +8,39 @@ on:
     branches:
       - main
     paths:
-      - '.github/workflows/**'
+      - '**/**Dockerfile'
+
+env:
+  JULIA_PKG_PRECOMPILE_AUTO: '0'
+  JULIA_NUM_THREADS: 'auto'
 
 jobs:
-  update-notebook:
+  update-manifest:
     runs-on: ubuntu-latest
-    container:
-      image: julia:1.8.5
-      env:
-        JULIA_PKG_PRECOMPILE_AUTO: '0'
     steps:
-      - run: apt-get update && apt-get install -y --no-install-recommends git
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup Julia Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: .ci/Dockerfile
+          tags: julia:current
+          load: true
+          target: base
       - name: Update Julia dependencies
-        run: julia --color=yes --project=@. --threads=auto -e 'import Pkg; Pkg.update()'
-      # Authenticate using a custom GitHub APP
+        run: >
+          docker run --rm
+          --workdir="/work"
+          -v ${{ github.workspace }}:/work
+          -e JULIA_PKG_PRECOMPILE_AUTO
+          -e JULIA_NUM_THREADS
+          julia:current
+          julia --color=yes --project=@. -e "import Pkg; Pkg.update()"
+      # Authenticate with a custom GitHub APP
       # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
-      - uses: tibdex/github-app-token@v1
+      - name: Generate token
+        uses: tibdex/github-app-token@v1
         id: generate-token
         with:
           app_id: ${{ secrets.APP_ID }}
@@ -36,10 +51,5 @@ jobs:
         with:
           title: Julia Dependency Update
           token: ${{ steps.generate-token.outputs.token }}
-      - name: Enable Pull Request Automerge
-        if: steps.cpr.outputs.pull-request-operation == 'created'
-        uses: peter-evans/enable-pull-request-automerge@v2
-        with:
-          token: ${{ steps.generate-token.outputs.token }}
-          pull-request-number: ${{ steps.cpr.outputs.pull-request-number }}
-          merge-method: squash
+          labels: |
+            automerge
