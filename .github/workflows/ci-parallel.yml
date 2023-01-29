@@ -1,0 +1,82 @@
+name: Build Jupyter Notebooks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TIMEOUT: 600
+  JOBS: 8
+
+jobs:
+  ci:
+    name: CI (parallel)
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Install matplotlib
+        run: pip install -U matplotlib
+      - name: Read Julia version
+        uses: SebRollen/toml-action@v1.0.2
+        id: read_toml
+        with:
+          file: 'Manifest.toml'
+          field: 'julia_version'
+      - name: Write Julia version to env
+        run: echo "jlver=${{ steps.read_toml.outputs.value }}" >> $GITHUB_ENV
+      - name: Setup Julia ${{ env.jlver }}
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ env.jlver }}
+      - name: Cache Julia deps
+        uses: actions/cache@v3
+        if: ${{ runner.name != 'self-hosted' }}
+        with:
+          path: ~/.julia
+          key: ${{ runner.os }}-julia-${{ env.jlver }}-${{ env.JULIA_CACHE_NUM }}-${{ hashFiles('**/Manifest.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-julia-${{ env.jlver }}-${{ env.JULIA_CACHE_NUM }}-
+      - name: Install Julia deps
+        run: |
+          julia --color=yes --project="" -e 'import Pkg; Pkg.add("IJulia"); using IJulia; installkernel("Julia", "--project=@.", env=Dict("JULIA_NUM_THREADS"=>"auto"))'
+          julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate()'
+      - name: Build notebooks
+        run: >
+          parallel --joblog /tmp/log -j${JOBS}
+          jupyter nbconvert --to notebook
+          --ExecutePreprocessor.timeout=${{ env.TIMEOUT }}
+          --execute --inplace
+          {} ::: docs/*.ipynb
+      - name: Show execution results
+        run: cat /tmp/log
+      - name: Build website
+        run: jupyter-book build docs/ --keep-going -v
+      - name: Upload page artifact
+        if: github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: docs/_build/html
+
+  # Deployment job
+  deploy:
+    needs: ci
+    if: ${{ github.ref == 'refs/heads/main' }}
+    # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
+    permissions:
+      pages: write # to deploy to Pages
+      id-token: write # to verify the deployment originates from an appropriate source
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1
