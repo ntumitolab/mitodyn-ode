@@ -16,7 +16,7 @@ env:
 
 jobs:
   ci:
-    name: CI (parallel)
+    name: CI (self-hosted)
     runs-on: self-hosted
     steps:
       - name: Checkout repository
