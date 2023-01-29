@@ -26,7 +26,7 @@ jobs:
         with:
           python-version: '3.10'
       - name: Install matplotlib
-        run: pip install -U matplotlib nbconvert
+        run: pip install -U matplotlib jupyter-book
       - name: Read Julia version
         uses: SebRollen/toml-action@v1.0.2
         id: read_toml
