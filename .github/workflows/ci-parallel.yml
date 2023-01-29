@@ -109,7 +109,7 @@ jobs:
 
   # Deployment job
   deploy:
-    needs: ci
+    needs: jupyter-book
     if: ${{ github.ref == 'refs/heads/main' }}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
