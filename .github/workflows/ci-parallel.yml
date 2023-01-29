@@ -1,4 +1,4 @@
-name: Build Jupyter Notebooks with a Docker Container
+name: Build Jupyter Notebooks
 
 on:
   push:
@@ -11,60 +11,52 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  IMAGE_NAME: ${{ github.repository }}
   TIMEOUT: 600
+  JOBS: 8
 
 jobs:
-  docker:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: docker/setup-buildx-action@v2
-      - name: Build and cache Docker Image
-        uses: docker/build-push-action@v3
-        with:
-          file: .ci/Dockerfile
-          tags: ${{ env.IMAGE_NAME }}:test
-          outputs: type=cacheonly
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
   execute:
-    needs: docker
-    strategy:
-      fail-fast: false
-      matrix:
-        # Notebooks need to be executed
-        notebook:
-          - fig2_3
-          - fig5_caoscillation
-          - fig6_7
-          - fig_step_response
-          - ffa_gal
-    runs-on: ubuntu-latest
+    name: Execute notebooks (self-hosted)
+    runs-on: self-hosted
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-      - uses: docker/setup-buildx-action@v2
-      - name: Restore Docker image
-        uses: docker/build-push-action@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          context: .
-          file: .ci/Dockerfile
-          tags: ${{ env.IMAGE_NAME }}:test
-          load: true
-          cache-from: type=gha
-      - name: Execute Notebook
+          python-version: '3.10'
+      - name: Install matplotlib
+        run: pip install -U matplotlib nbconvert
+      - name: Read Julia version
+        uses: SebRollen/toml-action@v1.0.2
+        id: read_toml
+        with:
+          file: 'Manifest.toml'
+          field: 'julia_version'
+      - name: Write Julia version to env
+        run: echo "jlver=${{ steps.read_toml.outputs.value }}" >> $GITHUB_ENV
+      - name: Setup Julia ${{ env.jlver }}
+        uses: julia-actions/setup-julia@v1
+        with:
+          version: ${{ env.jlver }}
+      - name: Install Julia deps
+        run: |
+          julia --color=yes --project="" -e 'import Pkg; Pkg.add("IJulia"); using IJulia; installkernel("Julia", "--project=@.", env=Dict("JULIA_NUM_THREADS"=>"auto"))'
+          julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate()'
+      - name: Build notebooks
         run: >
-          docker run
-          -v ${{ github.workspace }}:/work
-          ${{ env.IMAGE_NAME }}:test
-          jupyter nbconvert --to notebook --ExecutePreprocessor.timeout=${{ env.TIMEOUT }} --execute --inplace
-          /work/docs/${{ matrix.notebook }}.ipynb
+          parallel --joblog /tmp/log -j${JOBS}
+          jupyter nbconvert --to notebook
+          --ExecutePreprocessor.timeout=${{ env.TIMEOUT }}
+          --execute --inplace
+          {} ::: docs/*.ipynb
+      - name: Show execution results
+        run: cat /tmp/log
       - name: Upload Notebook
         uses: actions/upload-artifact@v3
         with:
           name: notebook
-          path: docs/${{ matrix.notebook }}.ipynb
+          path: docs/*.ipynb
 
   jupyter-book:
     needs: execute
@@ -84,7 +76,7 @@ jobs:
       - name: Move notebooks
         run: find out/ -type f -iname '*.ipynb' -exec mv -t docs/ {} +
       - name: Build website
-        run: jupyter-book build docs/ -W -v
+        run: jupyter-book build docs/
       - name: Set output flag
         id: setoutput
         run: echo "success=true" >> $GITHUB_OUTPUT
@@ -94,10 +86,9 @@ jobs:
         with:
           path: docs/_build/html
 
-  # GitHub status check job
+  # Jobb for GitHub status check
   # https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
   ci:
-    name: CI (docker)
     needs: jupyter-book
     runs-on: ubuntu-latest
     if: always() # always run, so we never skip the check
@@ -118,7 +109,7 @@ jobs:
   # Deployment job
   deploy:
     needs: jupyter-book
-    if: github.ref == 'refs/heads/main'
+    if: ${{ github.ref == 'refs/heads/main' }}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
       pages: write # to deploy to Pages
