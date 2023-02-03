@@ -2,6 +2,7 @@ jupyter_book_task:
   only_if: $CIRRUS_BRANCH == $CIRRUS_DEFAULT_BRANCH || $CIRRUS_BASE_BRANCH == $CIRRUS_DEFAULT_BRANCH
   env:
     JOBS: 8
+    TIMEOUT: 600
     GH_TOKEN: ENCRYPTED[!2c3f50f4d2e9b05649eeeb2defee10fa3c42df0792c708c32d6c626cc737a1729406360d359ae5ed2b6fb0be9527f3c7!]
   auto_cancellation: true
   container:
@@ -12,7 +13,8 @@ jupyter_book_task:
   notebook_script: >
     parallel --joblog /tmp/log -j${JOBS}
     jupyter nbconvert --to notebook
-    --ExecutePreprocessor.timeout=600
+    --ExecutePreprocessor.timeout=${TIMEOUT}
+    --ExecutePreprocessor.kernel_name=julia
     --execute --inplace
     {} ::: docs/*.ipynb
   execution_results_script:   cat /tmp/log

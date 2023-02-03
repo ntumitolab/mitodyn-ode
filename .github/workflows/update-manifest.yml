@@ -8,15 +8,21 @@ on:
     branches:
       - main
     paths:
-      - '**/**Dockerfile'
+      - '.github/**Dockerfile'
+      - '.github/workflows/update-manifest.yml'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+  packages: write
+  pull-requests: write
+
 env:
-  DFILE: '.github/julia.Dockerfile'
-  IMAGENAME: 'myenv:current'
+  DFILE: '.github/update.Dockerfile'
+  IMAGENAME: 'myimg:test'
 
 jobs:
   update-manifest:
@@ -31,12 +37,10 @@ jobs:
           file: ${{ env.DFILE }}
           tags: ${{ env.IMAGENAME }}
           load: true
-          target: julia
       - name: Update Julia dependencies
         run: >
           docker run --rm
           --workdir=/tmp -v ${{ github.workspace }}:/tmp
-          -e JULIA_PKG_PRECOMPILE_AUTO=0
           ${{ env.IMAGENAME }}
           julia --color=yes --threads=auto --project=@. -e "import Pkg; Pkg.update()"
       # Authenticate with a custom GitHub APP
