@@ -1,7 +1,6 @@
-# Constants and commonly-used
-module Utils
-
-# Units and physical constants
+##################################
+### Units and physical constants
+##################################
 const second = float(1)    # second
 const minute = 60second    # minute
 const ms = 1e-3second      # millisecond
@@ -27,7 +26,7 @@ const VT = R * T0 / F      # Default thermal voltage (Volts)
 const iVT = inv(VT)        # Reciprocal of thermal voltage
 
 # Model Constants
-const C_MIT = 1.812μM / mV        # Mitochondrial membrane capacitance
+const C_MIT = 1.812μM / mV      # Mitochondrial membrane capacitance
 const F_M = 3E-4                # Frasction of free Ca in mitochondria
 const F_I = 0.01                # Fraction of free Ca in cytosol
 const V_I = 0.53                # Relative cytoplasmic volume
@@ -37,7 +36,6 @@ const iVi = inv(V_I)
 const iVmtx = inv(V_MTX)
 const iVimtx = inv(V_MTX + V_I)
 const iCmt = inv(C_MIT)
-
 
 ##################################
 ### Commonly-used functions
@@ -68,5 +66,3 @@ expit(x) = hillr(exp(-x))
 Returns `x / (exp(x)-1)`
 """
 exprel(x, em1=expm1(x)) = x / em1
-
-end # module
