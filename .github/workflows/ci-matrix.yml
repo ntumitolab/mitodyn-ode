@@ -73,6 +73,11 @@ jobs:
           name: notebook
           path: ${{ matrix.notebook }}
           retention-days: 1
+      - name: Upload Figures
+        uses: actions/upload-artifact@v3
+        with:
+          name: figure
+          path: docs/*.tif
 
   jupyter-book:
     needs: execute
