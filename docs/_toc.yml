@@ -7,4 +7,4 @@ chapters:
   - file: steady-state-solution
   - file: fig5_caoscillation
   - file: fig6_7
-  - file: fig_step_response
+  - file: step-response

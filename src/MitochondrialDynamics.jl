@@ -8,4 +8,4 @@ include("utils.jl")
 include("rates.jl")
 include("model.jl")
 
-end # module MitochondrialDynamics
+end
