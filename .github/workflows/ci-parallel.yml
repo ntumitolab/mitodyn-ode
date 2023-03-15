@@ -48,8 +48,8 @@ jobs:
         env:
           PYTHON: ${{ steps.python.outputs.python-path }}
         run: |
-          julia --color=yes --project="" -e 'import Pkg; Pkg.add("IJulia"); using IJulia; installkernel("Julia", "--project=@.")'
           julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
+          julia --color=yes --project="" -e 'import Pkg; Pkg.add("IJulia"); using IJulia; installkernel("Julia", "--project=@.")'
       - name: Build notebooks
         run: >
           parallel --joblog /tmp/log -j${{ env.JOBS }}
