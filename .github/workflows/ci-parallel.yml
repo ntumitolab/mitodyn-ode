@@ -14,7 +14,7 @@ env:
   JULIA_DEPOT_PATH: '~/.julia'
   JULIA_NUM_THREADS: 'auto'
   TIMEOUT: 600
-  JOBS: '8'
+  JOBS: '12'
   PYTHON_VER: '3.11'
 
 jobs:
