@@ -7,8 +7,6 @@ Calcium oscillation
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-using MitochondrialDynamics: GlcConst, degavg, ΔΨm, Ca_c, Ca_m, t, G3P
-using MitochondrialDynamics: Pyr, NADH_c, NADH_m, ATP_c, ADP_c, degavg
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 import PyPlot as plt
 rcParams = plt.PyDict(plt.matplotlib."rcParams")
@@ -19,8 +17,10 @@ rcParams["font.size"] = 14
 #---
 
 tend = 2000.0
-@named sys = make_model(; glcrhs=10mM)
-sssol = solve(SteadyStateProblem(sys, []), DynamicSS(Rodas5(), tspan=tend))
+@named sys = make_model()
+@unpack GlcConst, Ca_c = sys
+prob = SteadyStateProblem(sys, [], [GlcConst => 10mM])
+sssol = solve(prob, DynamicSS(Rodas5(), tspan=tend))
 caavg = sssol[Ca_c]
 
 #---
@@ -35,67 +35,55 @@ end
 
 #---
 
+@variables t
 @register_symbolic cac_wave(t)
-@named sysosci = make_model(; cacrhs=cac_wave(t), glcrhs=10mM)
+@named sysosci = make_model(; cacrhs=cac_wave(t))
+
+#---
+npoints=201
+ts = range(1520.0, tend, npoints)
+prob = ODEProblem(sysosci, sssol.u, tend, [GlcConst => 10mM])
+sol = solve(prob, saveat=ts)
 
 #---
 
-prob = ODEProblem(sysosci, sssol.u, tend)
-sol = solve(prob)
-
-#---
-
-function plot_fig5(
-    sol;
-    tspan=(1520.0, 2000.0),
-    npoints=200,
-    figsize=(10, 12)
-)
-    ts = LinRange(tspan[1], tspan[2], npoints)
+function plot_fig5(sol, figsize=(10, 12))
+    ts = sol.t
     tsm = ts ./ 60
-    ca_c = sol(ts, idxs=Ca_c) .* 1000
-    ca_m = sol(ts, idxs=Ca_m) .* 1000
-    g3p = sol(ts, idxs=G3P) .* 1000
-    pyr = sol(ts, idxs=Pyr) .* 1000
-    nadh_c = sol(ts, idxs=NADH_c) .* 1000
-    nadh_m = sol(ts, idxs=NADH_m) .* 1000
-    atp_c = sol(ts, idxs=ATP_c) .* 1000
-    adp_c = sol(ts, idxs=ADP_c) .* 1000
-    td = atp_c.u ./ adp_c
-    dpsi = sol(ts, idxs=ΔΨm) .* 1000
-    k = sol(ts, idxs=degavg)
-
+    @unpack Ca_c, Ca_m, G3P, Pyr, NADH_c, NADH_m, ATP_c, ADP_c, ΔΨm, degavg = sys
+    ## TODO: panel B and C not needed
     fig, ax = plt.subplots(6, 1; figsize)
 
-    ax[1].plot(tsm, ca_c, label="Ca(cyto)")
-    ax[1].plot(tsm, ca_m, label="Ca(mito)")
+    ax[1].plot(tsm, sol[Ca_c * 1000], label="Ca(cyto)")
+    ax[1].plot(tsm, sol[Ca_m * 1000], label="Ca(mito)")
     ax[1].set_title("A", loc="left")
     ax[1].set(ylabel="Conc. (μM)")
 
-    ax[2].plot(tsm, g3p, label="G3P")
-    ax[2].plot(tsm, nadh_c, label="NADH (cyto)")
+    ax[2].plot(tsm, sol[G3P * 1000], label="G3P")
+    ax[2].plot(tsm, sol[NADH_c * 1000], label="NADH (cyto)")
     ax[2].set_title("B", loc="left")
     ax[2].set(ylabel="Conc. (μM)")
 
-    ax[3].plot(tsm, pyr, label="Pyr")
-    ax[3].plot(tsm, nadh_m, label="NADH (mito)")
+    ax[3].plot(tsm, sol[Pyr * 1000], label="Pyr")
+    ax[3].plot(tsm, sol[NADH_m * 1000], label="NADH (mito)")
     ax[3].set_title("C", loc="left")
     ax[3].set(ylabel="Conc. (μM)")
 
-    ax[4].plot(tsm, td, label="ATP:ADP")
+    ## TODO: describe stage II behavior
+    ax[4].plot(tsm, sol[ATP_c / ADP_c], label="ATP:ADP")
     ax[4].set_title("D", loc="left")
 
-    ax[5].plot(tsm, dpsi, label="ΔΨm")
+    ax[5].plot(tsm, sol[ΔΨm * 1000], label="ΔΨm")
     ax[5].set_title("E", loc="left")
     ax[5].set(ylabel="mV")
 
-    ax[6].plot(tsm, k, label="<k>")
+    ax[6].plot(tsm, sol[degavg], label="<k>")
     ax[6].set_title("F", loc="left")
     ax[6].set(xlabel="Time (minute)")
 
     for a in ax
         a.grid()
-        a.legend()
+        a.legend(loc="center left")
         a.set_xlim(tsm[begin], tsm[end])
     end
 

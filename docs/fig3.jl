@@ -7,27 +7,24 @@ Steady-state solutions for a range of glucose concentrations and OXPHOS capaciti
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-using MitochondrialDynamics: GlcConst, G3P, Pyr, NADH_c, NADH_m, ATP_c, ADP_c, AMP_c, Ca_m, Ca_c, x, ΔΨm, degavg
-import MitochondrialDynamics: second, μM, mV, mM, Hz
 import PyPlot as plt
 rcParams = plt.PyDict(plt.matplotlib."rcParams")
 rcParams["font.size"] = 14
 ## rcParams["font.sans-serif"] = "Arial"
 ## rcParams["font.family"] = "sans-serif"
-using MitochondrialDynamics: GlcConst, G3P, Pyr, NADH_c, NADH_m, ATP_c, ADP_c, AMP_c, Ca_m, Ca_c, x, ΔΨm, degavg, VmaxF1, VmaxETC, pHleak
 
 #---
 
 @named sys = make_model()
+@unpack GlcConst = sys
+iGlc = findfirst(isequal(GlcConst), parameters(sys))
+
 prob = SteadyStateProblem(sys, [])
 
-pidx = Dict(k => i for (i, k) in enumerate(parameters(sys)))
-idxGlc = pidx[GlcConst]
-
-function solve_fig3(glc, r, protein, prob, alg=DynamicSS(Rodas5()))
-    idx = pidx[protein]
+function solve_fig3(glc, r, protein, prob; alg=DynamicSS(Rodas5()))
+    idx = findfirst(isequal(protein), parameters(sys))
     p = copy(prob.p)
-    p[idxGlc] = glc
+    p[iGlc] = glc
     p[idx] = prob.p[idx] * r
     return solve(remake(prob, p=p), alg)
 end
@@ -36,20 +33,21 @@ end
 
 ## TODO: use ensmeble simulation
 
-rGlc1 = LinRange(3.0, 30.0, 50)
-rGlc2 = LinRange(4.0, 30.0, 50)
-rF1 = LinRange(0.1, 2.0, 50)
-rETC = LinRange(0.1, 2.0, 50)
-rHL = LinRange(0.1, 5.0, 50)
+rGlc1 = range(3.0, 30.0, 50)
+rGlc2 = range(4.0, 30.0, 50)
+rF1 = range(0.1, 2.0, 50)
+rETC = range(0.1, 2.0, 50)
+rHL = range(0.1, 5.0, 50)
 
-uInf_f1 = [solve_fig3(glc, r, VmaxF1, prob) for r in rF1, glc in rGlc1]
-uInf_etc = [solve_fig3(glc, r, VmaxETC, prob) for r in rETC, glc in rGlc1]
+@unpack VmaxF1, VmaxETC, pHleak = sys
+uInf_f1 = [solve_fig3(glc, r, VmaxF1, prob) for r in rF1, glc in rGlc1];
+uInf_etc = [solve_fig3(glc, r, VmaxETC, prob) for r in rETC, glc in rGlc1];
 uInf_hl = [solve_fig3(glc, r, pHleak, prob) for r in rHL, glc in rGlc2];
 
 #---
 
 function plot_fig3(;
-    figsize=(13, 10),
+    figsize=(10, 10),
     levels=40,
     cmaps=["bwr", "magma", "viridis"],
     ylabels=[
@@ -65,6 +63,7 @@ function plot_fig3(;
     extremes=((1.0, 2.0), (80.0, 180.0), (0.0, 60.0))
 )
     ## mapping functions
+    @unpack degavg, ΔΨm, ATP_c, ADP_c = sys
     fs = (s -> s[degavg], s -> s[ΔΨm] * 1000, s -> s[ATP_c] / s[ADP_c])
 
     fig, axes = plt.subplots(3, 3; figsize)
@@ -115,7 +114,7 @@ end
 
 #---
 
-fig3 = plot_fig3()
+fig3 = plot_fig3(figsize=(13, 10))
 plt.gcf()
 
 # TIFF file
