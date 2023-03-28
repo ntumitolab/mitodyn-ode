@@ -88,7 +88,7 @@ function plot_fig3(;
                 xx, yy, map(f, z);
                 shading="gouraud",
                 rasterized=true,
-                # levels=levels,
+                ## levels=levels,
                 cmap=cm,
                 vmin=vmin,
                 vmax=vmax

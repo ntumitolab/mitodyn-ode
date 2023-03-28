@@ -34,6 +34,8 @@ function remake_glc(prob, g)
     remake(prob; p=p)
 end
 
+glc = range(3.0mM, 30.0mM, length=101)  # Range of glucose
+
 sols = map(glc) do g
     solve(remake_glc(prob, g), DynamicSS(Rodas5()))
 end
@@ -45,6 +47,7 @@ solsffa = map(glc) do g
     solve(remake_glc(probffa, g), DynamicSS(Rodas5()))
 end
 
+# Change stoichiometry to make glycolysis futile
 @named sys_gal = make_model(gk_atp_stoich=4)
 prob_gal = SteadyStateProblem(sys_gal, [])
 sols_gal = map(glc) do g
@@ -52,6 +55,8 @@ sols_gal = map(glc) do g
 end;
 
 #---
+
+extract(sols, k) = map(s->s[k], sols)
 
 function plot_ffa(
     sols, solsffa, glc;

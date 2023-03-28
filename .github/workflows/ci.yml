@@ -60,8 +60,8 @@ jobs:
         env:
           PYTHON: ${{ steps.python.outputs.python-path }}
         run: |
-          julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
           julia --color=yes --project="" -e 'import Pkg; Pkg.add(["Literate", "PrettyTables"])'
+          julia --color=yes --project=@. -e 'import Pkg; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
       - name: Build notebooks, ${{ env.NPROC }} processes
         run: julia --color=yes -p ${{ env.NPROC }} literate.jl
       - name: Deploy Notebooks
