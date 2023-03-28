@@ -4,7 +4,10 @@
 format: jb-book
 root: index
 chapters:
-  - file: steady-state-solution
+  - file: fig2
+  - file: fig2_1
+  - file: fig3
   - file: fig5_caoscillation
   - file: fig6_7
-  - file: step-response
+  - file: figs1
+  - file: figs2
