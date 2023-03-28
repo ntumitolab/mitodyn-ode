@@ -16,16 +16,18 @@ permissions:
   pull-requests: write
 
 env:
-  NPROC: '2'
+  NPROC: '4'
   JULIA_DEPOT_PATH: '~/.julia'
   JULIA_NUM_THREADS: 'auto'
-  JULIA_CACHE: '1'
+  JULIA_CACHE: '0'
   PYTHON_VER: '3.11'
 
 jobs:
   jupyter-book:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
+      - name: Clean up workspace
+        uses: colpal/actions-clean@v1
       - name: Checkout repository
         uses: actions/checkout@v3
       - name: Setup Python ${{ env.PYTHON_VER }}
