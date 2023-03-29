@@ -9,7 +9,7 @@ using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: GlcConst, G3P, Pyr, NADH_c, NADH_m, ATP_c, ADP_c, AMP_c, Ca_m, Ca_c, x, ΔΨm, degavg
 import MitochondrialDynamics: second, μM, mV, mM, Hz
-import PyPlot as plt
+import PythonPlot as plt
 rcParams = plt.PyDict(plt.matplotlib."rcParams")
 rcParams["font.size"] = 14
 ## rcParams["font.sans-serif"] = "Arial"

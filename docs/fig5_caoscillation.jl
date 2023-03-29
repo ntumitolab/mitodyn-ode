@@ -8,7 +8,7 @@ using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
-import PyPlot as plt
+import PythonPlot as plt
 rcParams = plt.PyDict(plt.matplotlib."rcParams")
 rcParams["font.size"] = 14
 ## rcParams["font.sans-serif"] = "Arial"
