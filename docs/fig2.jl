@@ -10,10 +10,9 @@ using MitochondrialDynamics
 using MitochondrialDynamics: GlcConst, G3P, Pyr, NADH_c, NADH_m, ATP_c, ADP_c, AMP_c, Ca_m, Ca_c, x, ΔΨm, degavg
 import MitochondrialDynamics: second, μM, mV, mM, Hz
 import PythonPlot as plt
-rcParams = plt.PyDict(plt.matplotlib."rcParams")
-rcParams["font.size"] = 14
-## rcParams["font.sans-serif"] = "Arial"
-## rcParams["font.family"] = "sans-serif"
+plt.matplotlib.rcParams["font.size"] = 14
+## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
+## plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
 #---
 

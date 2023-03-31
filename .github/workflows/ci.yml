@@ -17,7 +17,7 @@ permissions:
 
 env:
   NPROC: '2'
-  JULIA_CACHE: '2'
+  JULIA_CACHE: '1'
   PYTHON_VER: '3.11'
 
 jobs:
@@ -118,5 +118,3 @@ jobs:
         IMAGE_NAME: ${{ github.repository }}
         BINDER_CACHE: true
         PUBLIC_REGISTRY_CHECK: true
-        ADDITIONAL_TAG: "binder"
-        LATEST_TAG_OFF: true

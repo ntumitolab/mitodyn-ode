@@ -19,10 +19,9 @@ using MitochondrialDynamics: G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ΔΨm, ATP_c,
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 
 import PythonPlot as plt
-rcParams = plt.PyDict(plt.matplotlib."rcParams")
-rcParams["font.size"] = 14
-## rcParams["font.sans-serif"] = "Arial"
-## rcParams["font.family"] = "sans-serif"
+plt.matplotlib.rcParams["font.size"] = 14
+## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
+## plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
 #---
 
