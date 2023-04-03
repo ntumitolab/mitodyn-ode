@@ -1,44 +1,48 @@
-md"""
+#===
 # Figure 2
 
 Steady-state solutions across a range of glucose levels.
-"""
+===#
 
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-using MitochondrialDynamics: GlcConst, G3P, Pyr, NADH_c, NADH_m, ATP_c, ADP_c, AMP_c, Ca_m, Ca_c, x, ΔΨm, degavg
 import MitochondrialDynamics: second, μM, mV, mM, Hz
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 ## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
 ## plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
-#---
-
+# Default staedy-state
 @named sys = make_model()
+prob = SteadyStateProblem(sys, []) ## Use default u0
+sol = solve(prob)
 
 #---
 
-pidx = Dict(k => i for (i, k) in enumerate(parameters(sys)))
-idxGlc = pidx[GlcConst]
+@named sys_gal = make_model(gk_atp_stoich=4)
+@named sysffa = make_model(j_ffa=sol[J_CAC] * 0.5)
+#---
 
-function remake_glc(prob, g)
-    p = copy(prob.p)
-    p[idxGlc] = g
-    remake(prob; p=p)
-end
+@unpack GlcConst = sys
+idxGlc = findfirst(isequal(GlcConst), parameters(sys))
 
 #---
 
 ##  using default u0
 prob = SteadyStateProblem(sys, [])
 
-glc = range(3.0mM, 30.0mM, length=101)  # Range of glucose
+glc = range(3.0mM, 30.0mM, length=51)  # Range of glucose
 
-sols = map(glc) do g
-    solve(remake_glc(prob, g), alg=DynamicSS(Rodas5()))
-end;
+prob_func = function (prob, i, repeat)
+    p = copy(prob.p)
+    p[idxGlc] = glc[i]
+    remake(prob; p=p)
+end
+
+ensprob = EnsembleProblem(prob; prob_func)
+
+sim = solve(ensprob, DynamicSS(Rodas5()), trajectories=length(glc))
 
 #---
 
