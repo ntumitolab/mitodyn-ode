@@ -78,7 +78,7 @@ function plot_fig3(;
             xx = xxs[row] ./ xscale
             yy = yys[row]
             z = zs[row]
-            ax = axes[row, col]
+            ax = axes[row-1, col-1]
 
             ylabel = ylabels[row]
 
@@ -107,14 +107,14 @@ function plot_fig3(;
         end
     end
 
-    plt.tight_layout()
+    fig.tight_layout()
     return fig
 end
 
 #---
 
 fig3 = plot_fig3(figsize=(13, 10))
-plt.gcf()
+fig3
 
 # TIFF file
 fig3.savefig("Fig3.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))

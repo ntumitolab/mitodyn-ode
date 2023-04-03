@@ -15,7 +15,7 @@ plt.matplotlib.rcParams["font.size"] = 14
 
 #---
 
-glc = range(3.0mM, 30.0mM, length=301)
+glc = range(3.0mM, 30.0mM, length=201)
 tend = 50minute
 @named sys = make_model()
 prob = SteadyStateProblem(sys, [])
@@ -85,50 +85,50 @@ function plot_fig6(sols, solsDM, glc; figsize=(12, 12), tight=true)
 
     fig, ax = plt.subplots(3, 3; figsize)
 
-    ax[1, 1].plot(glc5, getindex.(sols, G3P) .* 1000, label="Baseline")
-    ax[1, 1].plot(glc5, getindex.(solsDM, G3P) .* 1000, label="Diabetic")
-    ax[1, 1].set_title("(A) G3P", loc="left")
+    ax[0, 0].plot(glc5, getindex.(sols, G3P) .* 1000, label="Baseline")
+    ax[0, 0].plot(glc5, getindex.(solsDM, G3P) .* 1000, label="Diabetic")
+    ax[0, 0].set_title("(A) G3P", loc="left")
+    ax[0, 0].set(ylabel="Conc. (μM)")
+
+    ax[0, 1].plot(glc5, getindex.(sols, Pyr) .* 1000, label="Baseline")
+    ax[0, 1].plot(glc5, getindex.(solsDM, Pyr) .* 1000, label="Diabetic")
+    ax[0, 1].set_title("(B) Pyr", loc="left")
+    ax[0, 1].set(ylabel="Conc. (μM)")
+
+    ax[0, 2].plot(glc5, getindex.(sols, NADH_c) .* 1000, label="Baseline")
+    ax[0, 2].plot(glc5, getindex.(solsDM, NADH_c) .* 1000, label="Diabetic")
+    ax[0, 2].set_title("(C) NADH (cyto)", loc="left")
+    ax[0, 2].set(ylabel="Conc. (μM)")
+
+    ax[1, 0].plot(glc5, getindex.(sols, NADH_m) .* 1000, label="Baseline")
+    ax[1, 0].plot(glc5, getindex.(solsDM, NADH_m) .* 1000, label="Diabetic")
+    ax[1, 0].set_title("(D) NADH (mito)", loc="left")
+    ax[1, 0].set(ylabel="Conc. (μM)")
+
+    ax[1, 1].plot(glc5, getindex.(sols, Ca_c) .* 1000, label="Baseline")
+    ax[1, 1].plot(glc5, getindex.(solsDM, Ca_c) .* 1000, label="Diabetic")
+    ax[1, 1].set_title("(E) Calcium (cyto)", loc="left")
     ax[1, 1].set(ylabel="Conc. (μM)")
 
-    ax[1, 2].plot(glc5, getindex.(sols, Pyr) .* 1000, label="Baseline")
-    ax[1, 2].plot(glc5, getindex.(solsDM, Pyr) .* 1000, label="Diabetic")
-    ax[1, 2].set_title("(B) Pyr", loc="left")
+    ax[1, 2].plot(glc5, getindex.(sols, Ca_m) .* 1000, label="Baseline")
+    ax[1, 2].plot(glc5, getindex.(solsDM, Ca_m) .* 1000, label="Diabetic")
+    ax[1, 2].set_title("(F) Calcium (mito)", loc="left")
     ax[1, 2].set(ylabel="Conc. (μM)")
 
-    ax[1, 3].plot(glc5, getindex.(sols, NADH_c) .* 1000, label="Baseline")
-    ax[1, 3].plot(glc5, getindex.(solsDM, NADH_c) .* 1000, label="Diabetic")
-    ax[1, 3].set_title("(C) NADH (cyto)", loc="left")
-    ax[1, 3].set(ylabel="Conc. (μM)")
+    ax[2, 0].plot(glc5, getindex.(sols, ΔΨm) .* 1000, label="Baseline")
+    ax[2, 0].plot(glc5, getindex.(solsDM, ΔΨm) .* 1000, label="Diabetic")
+    ax[2, 0].set_title("(G) ΔΨ", loc="left")
+    ax[2, 0].set(xlabel="Glucose (X)", ylabel="mV")
 
-    ax[2, 1].plot(glc5, getindex.(sols, NADH_m) .* 1000, label="Baseline")
-    ax[2, 1].plot(glc5, getindex.(solsDM, NADH_m) .* 1000, label="Diabetic")
-    ax[2, 1].set_title("(D) NADH (mito)", loc="left")
-    ax[2, 1].set(ylabel="Conc. (μM)")
+    ax[2, 1].plot(glc5, td, label="Baseline")
+    ax[2, 1].plot(glc5, tdDM, label="Diabetic")
+    ax[2, 1].set_title("(H) ATP:ADP", loc="left")
+    ax[2, 1].set(xlabel="Glucose (X)")
 
-    ax[2, 2].plot(glc5, getindex.(sols, Ca_c) .* 1000, label="Baseline")
-    ax[2, 2].plot(glc5, getindex.(solsDM, Ca_c) .* 1000, label="Diabetic")
-    ax[2, 2].set_title("(E) Calcium (cyto)", loc="left")
-    ax[2, 2].set(ylabel="Conc. (μM)")
-
-    ax[2, 3].plot(glc5, getindex.(sols, Ca_m) .* 1000, label="Baseline")
-    ax[2, 3].plot(glc5, getindex.(solsDM, Ca_m) .* 1000, label="Diabetic")
-    ax[2, 3].set_title("(F) Calcium (mito)", loc="left")
-    ax[2, 3].set(ylabel="Conc. (μM)")
-
-    ax[3, 1].plot(glc5, getindex.(sols, ΔΨm) .* 1000, label="Baseline")
-    ax[3, 1].plot(glc5, getindex.(solsDM, ΔΨm) .* 1000, label="Diabetic")
-    ax[3, 1].set_title("(G) ΔΨ", loc="left")
-    ax[3, 1].set(xlabel="Glucose (X)", ylabel="mV")
-
-    ax[3, 2].plot(glc5, td, label="Baseline")
-    ax[3, 2].plot(glc5, tdDM, label="Diabetic")
-    ax[3, 2].set_title("(H) ATP:ADP", loc="left")
-    ax[3, 2].set(xlabel="Glucose (X)")
-
-    ax[3, 3].plot(glc5, getindex.(sols, degavg), label="Baseline")
-    ax[3, 3].plot(glc5, getindex.(solsDM, degavg), label="Diabetic")
-    ax[3, 3].set_title("(I) Average node degree", loc="left")
-    ax[3, 3].set(xlabel="Glucose (X)")
+    ax[2, 2].plot(glc5, getindex.(sols, degavg), label="Baseline")
+    ax[2, 2].plot(glc5, getindex.(solsDM, degavg), label="Diabetic")
+    ax[2, 2].set_title("(I) Average node degree", loc="left")
+    ax[2, 2].set(xlabel="Glucose (X)")
 
     fig.set_tight_layout(tight)
     return fig
@@ -137,7 +137,7 @@ end
 #---
 
 fig6 = plot_fig6(sols, solsDM, glc)
-plt.gcf()
+fig6
 
 # Generating tiff file
 fig6.savefig("Fig6.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
@@ -186,23 +186,23 @@ function plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc;
 
     fig, ax = plt.subplots(1, 2; figsize)
 
-    ax[1].plot(glc5, ff_baseline, "b-", label="Baseline")
-    ax[1].plot(glc5, ff_dm, "r--", label="Diabetic")
-    ax[1].plot(glc5, ff_rot, "g--", label="Rotenone")
-    ax[1].plot(glc5, ff_oligo, "c--", label="Oligomycin")
-    ax[1].plot(glc5, ff_fccp, "k--", label="Uncoupler")
-    ax[1].set(xlabel="Glucose (X)", ylabel="Fusion rate / Fission rate", xlim=(0.0, 6.0), ylim=(0.0, 2.5))
-    ax[1].set_title("(A)", loc="left")
-    ax[1].legend()
+    ax[0].plot(glc5, ff_baseline, "b-", label="Baseline")
+    ax[0].plot(glc5, ff_dm, "r--", label="Diabetic")
+    ax[0].plot(glc5, ff_rot, "g--", label="Rotenone")
+    ax[0].plot(glc5, ff_oligo, "c--", label="Oligomycin")
+    ax[0].plot(glc5, ff_fccp, "k--", label="Uncoupler")
+    ax[0].set(xlabel="Glucose (X)", ylabel="Fusion rate / Fission rate", xlim=(0.0, 6.0), ylim=(0.0, 2.5))
+    ax[0].set_title("(A)", loc="left")
+    ax[0].legend()
 
-    ax[2].plot(jHL_baseline, jANT_baseline, "bo-", label="Baseline")
-    ax[2].plot(jHL_dm, jANT_dm, "ro-", label="Diabetic")
-    ax[2].plot(jHL_rot, jANT_rot, "go-", label="Rotenone")
-    ax[2].plot(jHL_oligo, jANT_oligo, "co-", label="Oligomycin")
-    ax[2].plot(jHL_fccp, jANT_fccp, "ko-", label="Uncoupler")
-    ax[2].set(xlabel="Proton leak rate (mM/s)", ylabel="ATP synthase rate (mM/s)", xlim=(0.0, 0.45), ylim=(0.0, 0.15))
-    ax[2].set_title("(B)", loc="left")
-    ax[2].legend()
+    ax[1].plot(jHL_baseline, jANT_baseline, "bo-", label="Baseline")
+    ax[1].plot(jHL_dm, jANT_dm, "ro-", label="Diabetic")
+    ax[1].plot(jHL_rot, jANT_rot, "go-", label="Rotenone")
+    ax[1].plot(jHL_oligo, jANT_oligo, "co-", label="Oligomycin")
+    ax[1].plot(jHL_fccp, jANT_fccp, "ko-", label="Uncoupler")
+    ax[1].set(xlabel="Proton leak rate (mM/s)", ylabel="ATP synthase rate (mM/s)", xlim=(0.0, 0.45), ylim=(0.0, 0.15))
+    ax[1].set_title("(B)", loc="left")
+    ax[1].legend()
 
     fig.set_tight_layout(tight)
     return fig
@@ -211,7 +211,7 @@ end
 #---
 
 fig7 = plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc)
-plt.gcf()
+fig7
 
 # Generating tiff file
 fig7.savefig("Fig7.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))

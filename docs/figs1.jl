@@ -50,46 +50,46 @@ function plot_figs1(
 
     fig, ax = plt.subplots(3, 3; figsize)
 
-    ax[1, 1].plot(tsm, g3p)
-    ax[1, 1].set(title="(A) G3P (μM)", ylim=(0.0, 8.0))
+    ax[0, 0].plot(tsm, g3p)
+    ax[0, 0].set(title="(A) G3P (μM)", ylim=(0.0, 8.0))
 
-    ax[1, 2].plot(tsm, pyr)
-    ax[1, 2].set(title="(B) Pyruvate (μM)", ylim=(0.0, 80.0))
+    ax[0, 1].plot(tsm, pyr)
+    ax[0, 1].set(title="(B) Pyruvate (μM)", ylim=(0.0, 80.0))
 
-    ax[1, 3].plot(tsm, ca_c, label="cyto")
-    ax[1, 3].plot(tsm, ca_m, label="mito")
-    ax[1, 3].set(title="(C) Calcium (μM)")
-    ax[1, 3].legend()
+    ax[0, 2].plot(tsm, ca_c, label="cyto")
+    ax[0, 2].plot(tsm, ca_m, label="mito")
+    ax[0, 2].set(title="(C) Calcium (μM)")
+    ax[0, 2].legend()
 
-    ax[2, 1].plot(tsm, nadh_c, label="cyto")
-    ax[2, 1].plot(tsm, nadh_m, label="mito")
-    ax[2, 1].set(title="(D) NADH (μM)")
+    ax[1, 0].plot(tsm, nadh_c, label="cyto")
+    ax[1, 0].plot(tsm, nadh_m, label="mito")
+    ax[1, 0].set(title="(D) NADH (μM)")
+    ax[1, 0].legend()
+
+    ax[1, 1].plot(tsm, atp_c, label="ATP")
+    ax[1, 1].plot(tsm, adp_c, label="ADP")
+    ax[1, 1].plot(tsm, amp_c, label="AMP")
+    ax[1, 1].set(title="(E) Adenylates (μM)")
+    ax[1, 1].legend()
+
+    ax[1, 2].plot(tsm, atp_c ./ adp_c)
+    ax[1, 2].set(title="(F) ATP:ADP", ylim=(0, 40))
+
+    ax[2, 0].plot(tsm, dpsi)
+    ax[2, 0].set(title="(G) ΔΨ (mV)", ylim=(80, 150), xlabel="Time (seconds)")
+
+    ax[2, 1].plot(tsm, x1, label="X1")
+    ax[2, 1].plot(tsm, x2, label="X2")
+    ax[2, 1].plot(tsm, x3, label="X3")
+    ax[2, 1].set(title="(H) Mitochondrial nodes", xlabel="Time (seconds)")
     ax[2, 1].legend()
 
-    ax[2, 2].plot(tsm, atp_c, label="ATP")
-    ax[2, 2].plot(tsm, adp_c, label="ADP")
-    ax[2, 2].plot(tsm, amp_c, label="AMP")
-    ax[2, 2].set(title="(E) Adenylates (μM)")
-    ax[2, 2].legend()
-
-    ax[2, 3].plot(tsm, atp_c ./ adp_c)
-    ax[2, 3].set(title="(F) ATP:ADP", ylim=(0, 40))
-
-    ax[3, 1].plot(tsm, dpsi)
-    ax[3, 1].set(title="(G) ΔΨ (mV)", ylim=(80, 150), xlabel="Time (seconds)")
-
-    ax[3, 2].plot(tsm, x1, label="X1")
-    ax[3, 2].plot(tsm, x2, label="X2")
-    ax[3, 2].plot(tsm, x3, label="X3")
-    ax[3, 2].set(title="(H) Mitochondrial nodes", xlabel="Time (seconds)")
-    ax[3, 2].legend()
-
-    ax[3, 3].plot(tsm, k)
-    ax[3, 3].set(title="(I) Average Node Degree", xlabel="Time (seconds)")
+    ax[2, 2].plot(tsm, k)
+    ax[2, 2].set(title="(I) Average Node Degree", xlabel="Time (seconds)")
 
     if grid
-        for a in ax
-            a.grid()
+        for i in 0:2, j in 0:2
+            ax[i, j].grid()
         end
     end
 
@@ -100,7 +100,7 @@ end
 #---
 
 figs1 = plot_figs1(sol)
-plt.gcf()
+figs1
 
 # TIF file
 figs1.savefig("FigS1.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))

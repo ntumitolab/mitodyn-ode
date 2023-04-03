@@ -92,54 +92,54 @@ function plot_figs2(sol, solDM;
 
     fig, ax = plt.subplots(3, 3; figsize)
 
-    ax[1, 1].plot(tsm, g3p, label=labels[1])
-    ax[1, 1].plot(tsm, g3pDM, label=labels[2])
-    ax[1, 1].set(ylabel="G3P (μM)")
-    ax[1, 1].set_title("(A)", loc="left")
+    ax[0, 0].plot(tsm, g3p, label=labels[1])
+    ax[0, 0].plot(tsm, g3pDM, label=labels[2])
+    ax[0, 0].set(ylabel="G3P (μM)")
+    ax[0, 0].set_title("(A)", loc="left")
 
-    ax[1, 2].plot(tsm, pyr, label=labels[1])
-    ax[1, 2].plot(tsm, pyrDM, label=labels[2])
-    ax[1, 2].set(ylabel="Pyruvate (μM)")
-    ax[1, 2].set_title("(B)", loc="left")
+    ax[0, 1].plot(tsm, pyr, label=labels[1])
+    ax[0, 1].plot(tsm, pyrDM, label=labels[2])
+    ax[0, 1].set(ylabel="Pyruvate (μM)")
+    ax[0, 1].set_title("(B)", loc="left")
 
-    ax[1, 3].plot(tsm, nadh_c, label=labels[1])
-    ax[1, 3].plot(tsm, nadh_cDM, label=labels[2])
-    ax[1, 3].set(ylabel="Cytosolic NADH (μM)")
-    ax[1, 3].set_title("(C)", loc="left")
+    ax[0, 2].plot(tsm, nadh_c, label=labels[1])
+    ax[0, 2].plot(tsm, nadh_cDM, label=labels[2])
+    ax[0, 2].set(ylabel="Cytosolic NADH (μM)")
+    ax[0, 2].set_title("(C)", loc="left")
 
-    ax[2, 1].plot(tsm, nadh_m, label=labels[1])
-    ax[2, 1].plot(tsm, nadh_mDM, label=labels[2])
-    ax[2, 1].set(ylabel="Mitochondrial NADH (μM)")
-    ax[2, 1].set_title("(D)", loc="left")
+    ax[1, 0].plot(tsm, nadh_m, label=labels[1])
+    ax[1, 0].plot(tsm, nadh_mDM, label=labels[2])
+    ax[1, 0].set(ylabel="Mitochondrial NADH (μM)")
+    ax[1, 0].set_title("(D)", loc="left")
 
-    ax[2, 2].plot(tsm, ca_c, label=labels[1])
-    ax[2, 2].plot(tsm, ca_cDM, label=labels[2])
-    ax[2, 2].set(ylabel="Cytosolic Calcium (μM)")
-    ax[2, 2].set_title("(E)", loc="left")
+    ax[1, 1].plot(tsm, ca_c, label=labels[1])
+    ax[1, 1].plot(tsm, ca_cDM, label=labels[2])
+    ax[1, 1].set(ylabel="Cytosolic Calcium (μM)")
+    ax[1, 1].set_title("(E)", loc="left")
 
-    ax[2, 3].plot(tsm, ca_m, label=labels[1])
-    ax[2, 3].plot(tsm, ca_mDM, label=labels[2])
-    ax[2, 3].set(ylabel="Mitochondrial Calcium (μM)")
-    ax[2, 3].set_title("(F)", loc="left")
+    ax[1, 2].plot(tsm, ca_m, label=labels[1])
+    ax[1, 2].plot(tsm, ca_mDM, label=labels[2])
+    ax[1, 2].set(ylabel="Mitochondrial Calcium (μM)")
+    ax[1, 2].set_title("(F)", loc="left")
 
-    ax[3, 1].plot(tsm, td, label=labels[1])
-    ax[3, 1].plot(tsm, tdDM, label=labels[2])
-    ax[3, 1].set(ylabel="ATP:ADP")
-    ax[3, 1].set_title("(G)", loc="left")
+    ax[2, 0].plot(tsm, td, label=labels[1])
+    ax[2, 0].plot(tsm, tdDM, label=labels[2])
+    ax[2, 0].set(ylabel="ATP:ADP")
+    ax[2, 0].set_title("(G)", loc="left")
 
-    ax[3, 2].plot(tsm, dpsi, label=labels[1])
-    ax[3, 2].plot(tsm, dpsiDM, label=labels[2])
-    ax[3, 2].set(ylabel="ΔΨm (mV)")
-    ax[3, 2].set_title("(H)", loc="left")
+    ax[2, 1].plot(tsm, dpsi, label=labels[1])
+    ax[2, 1].plot(tsm, dpsiDM, label=labels[2])
+    ax[2, 1].set(ylabel="ΔΨm (mV)")
+    ax[2, 1].set_title("(H)", loc="left")
 
-    ax[3, 3].plot(tsm, k, label=labels[1])
-    ax[3, 3].plot(tsm, kDM, label=labels[2])
-    ax[3, 3].set(ylabel="Average Node Degree")
-    ax[3, 3].set_title("(I)", loc="left")
+    ax[2, 2].plot(tsm, k, label=labels[1])
+    ax[2, 2].plot(tsm, kDM, label=labels[2])
+    ax[2, 2].set(ylabel="Average Node Degree")
+    ax[2, 2].set_title("(I)", loc="left")
 
-    for a in ax
-        a.grid()
-        a.legend()
+    for i in 0:2, j in 0:2
+        ax[i, j].grid()
+        ax[i, j].legend()
     end
 
     fig.set_tight_layout(tight)
@@ -149,7 +149,7 @@ end
 #---
 
 figs2 = plot_figs2(sol, solDM)
-plt.gcf()
+figs2
 
 # TIF file
 figs2.savefig("FigS2.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
@@ -188,7 +188,7 @@ sols3 = solve(probs3; tstops)
 solDMs3 = solve(probs3DM; tstops)
 
 figs3 = plot_figs2(sols3, solDMs3; tspan=(0.0, tend))
-plt.gcf()
+figs3
 
 # TIF file
 figs3.savefig("FigS3.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
@@ -224,7 +224,7 @@ end
 #---
 
 figs4 = plot_jo2(sols3, solDMs3, tspan=(0.0, tend))
-plt.gcf()
+figs4
 
 # TIF file
 figs4.savefig("FigS4.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
@@ -246,7 +246,7 @@ sols5 = solve(prob2)
 sols5DM = solve(prob2DM)
 
 figs5 = plot_figs2(sols5, sols5DM; tspan=(0.0, tend))
-plt.gcf()
+figs5
 
 # TIF file
 figs5.savefig("FigS5.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
@@ -255,7 +255,7 @@ figs5.savefig("FigS5.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression"
 # Oxygen consumption of Baseline and Diabetic models using the protocol from Figure S5.
 
 figs6 = plot_jo2(sols5, sols5DM)
-plt.gcf()
+figs6
 
 # TIF file
 figs6.savefig("FigS6.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
