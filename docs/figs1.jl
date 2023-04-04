@@ -103,4 +103,4 @@ figs1 = plot_figs1(sol)
 figs1
 
 # TIF file
-figs1.savefig("FigS1.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+# `figs1.savefig("FigS1.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`

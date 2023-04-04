@@ -96,5 +96,4 @@ fig5 = plot_fig5(sol)
 fig5
 
 # Generate Tiff file
-
-fig5.savefig("Fig5.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+# `fig5.savefig("Fig5.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`

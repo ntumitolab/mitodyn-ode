@@ -123,13 +123,6 @@ fig_glc_gal = plot_steady_state(glc, sim_gal, sys_gal, title="Galactose paramete
 
 # Compare default, FFA, and Gal parameter sets
 
-fig, ax = plt.subplots()
-lineObjects = ax.plot(1:10, rand(10, 3))
-
-ax.legend(lineObjects, ["foo", "bar", "baz"])
-
-fig
-
 function plot_fig2(glc, sim, sim_gal, sim_ffa, sys; figsize=(8, 8), title="", labels=["Default", "Gal", "FFA"])
 
     extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
@@ -176,4 +169,4 @@ end
 fig2 = plot_fig2(glc, sim, sim_gal, sim_ffa, sys)
 
 # Tiff figure
-fig2.savefig("Fig2.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+# `fig2.savefig("Fig2.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`

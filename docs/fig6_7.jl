@@ -140,7 +140,7 @@ fig6 = plot_fig6(sols, solsDM, glc)
 fig6
 
 # Generating tiff file
-fig6.savefig("Fig6.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+# `fig6.savefig("Fig6.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
 
 # ## Figure 7
 
@@ -214,4 +214,4 @@ fig7 = plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc)
 fig7
 
 # Generating tiff file
-fig7.savefig("Fig7.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+# `fig7.savefig("Fig7.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`

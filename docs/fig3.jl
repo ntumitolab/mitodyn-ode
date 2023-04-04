@@ -117,4 +117,4 @@ fig3 = plot_fig3(figsize=(13, 10))
 fig3
 
 # TIFF file
-fig3.savefig("Fig3.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+# `fig3.savefig("Fig3.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`

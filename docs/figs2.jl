@@ -152,7 +152,7 @@ figs2 = plot_figs2(sol, solDM)
 figs2
 
 # TIF file
-figs2.savefig("FigS2.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+# `figs2.savefig("FigS2.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
 
 #---
 
@@ -191,7 +191,7 @@ figs3 = plot_figs2(sols3, solDMs3; tspan=(0.0, tend))
 figs3
 
 # TIF file
-figs3.savefig("FigS3.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+# `figs3.savefig("FigS3.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
 
 # ## Figure S4
 # Oxygen consumption in response to both glucose stimulation and chemical agents.
@@ -227,7 +227,7 @@ figs4 = plot_jo2(sols3, solDMs3, tspan=(0.0, tend))
 figs4
 
 # TIF file
-figs4.savefig("FigS4.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+# `figs4.savefig("FigS4.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
 
 # ## Figure S5
 # Baseline vs. Diabetic models using Glucose-Oligomycin-Rotenone protocol.
@@ -249,7 +249,7 @@ figs5 = plot_figs2(sols5, sols5DM; tspan=(0.0, tend))
 figs5
 
 # TIF file
-figs5.savefig("FigS5.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+# `figs5.savefig("FigS5.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
 
 # ## Figure S6
 # Oxygen consumption of Baseline and Diabetic models using the protocol from Figure S5.
@@ -258,4 +258,4 @@ figs6 = plot_jo2(sols5, sols5DM)
 figs6
 
 # TIF file
-figs6.savefig("FigS6.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+# `figs6.savefig("FigS6.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
