@@ -70,7 +70,7 @@ html:
   use_repository_button: true # Whether to add a link to your repository button
   use_issues_button: false # Whether to add an "open an issue" button
   use_multitoc_numbering: true # Continuous numbering across parts/chapters
-  extra_navbar: Powered by <a href="https://jupyterbook.org">Jupyter Book</a> # Will be displayed underneath the left navbar.
+  extra_navbar: "" # Will be displayed underneath the left navbar.
   extra_footer: '' # Will be displayed underneath the footer.
   google_analytics_id: '' # A GA id that can be used to track book views.
   home_page_in_navbar: false # Whether to include your home page in the left Navigation Bar
@@ -78,3 +78,19 @@ html:
   comments:
     hypothesis: false
     utterances: false
+  announcement              : "" # A banner announcement at the top of the site.
+
+
+# Advanced and power-user settings
+sphinx:
+  extra_extensions          :   # A list of extra extensions to load by Sphinx (added to those already used by JB).
+  local_extensions          :   # A list of local extensions to load by sphinx specified by "name: path" items
+  recursive_update          : false # A boolean indicating whether to overwrite the Sphinx config (true) or recursively update (false)
+  config:
+    mathjax_path: https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+    mathjax3_config:
+      loader:
+        load: ['[tex]/mhchem']
+      tex:
+        packages:
+          '[+]': ['mhchem']
