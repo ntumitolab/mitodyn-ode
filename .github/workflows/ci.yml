@@ -39,8 +39,8 @@ jobs:
           path: |
             /srv/juliapkgs
           key: ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-${{ hashFiles('**/Manifest.toml') }}
-          # restore-keys: |
-          #   ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
+          restore-keys: |
+            ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
         env:
           JULIA_PROJECT: ${{ github.workspace }}
@@ -54,7 +54,7 @@ jobs:
         run: jupyter-book build docs/
       - name: Copy binder environments
         run: |
-          cp *.toml *.txt docs/_build/html/_sources
+          cp *.toml docs/_build/html/_sources
           cp -R src docs/_build/html/_sources
       - name: Deploy Notebooks
         if: ${{ github.ref == 'refs/heads/main' }}
@@ -105,10 +105,5 @@ jobs:
         run: |
           mkdir -p .binder
           echo "FROM ${{ env.IMAGE_NAME }}" >> .binder/Dockerfile
-      - name: Git push
-        run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
-          git add .
-          git commit -m "Add Dockerfile"
-          git push
+      - name: Push changes
+        uses: stefanzweifel/git-auto-commit-action@v4
