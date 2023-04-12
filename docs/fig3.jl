@@ -7,10 +7,11 @@ Steady-state solutions for a range of glucose concentrations and OXPHOS capaciti
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-import PythonPlot as plt
-plt.matplotlib.rcParams["font.size"] = 14
-## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
-## plt.matplotlib.rcParams["font.family"] = "sans-serif"
+import PyPlot as plt
+rcParams = plt.PyDict(plt.matplotlib."rcParams")
+rcParams["font.size"] = 14
+## rcParams["font.sans-serif"] = "Arial"
+## rcParams["font.family"] = "sans-serif"
 
 #---
 
@@ -20,6 +21,7 @@ iGlc = findfirst(isequal(GlcConst), parameters(sys))
 
 prob = SteadyStateProblem(sys, [])
 
+# TODO: use ensmeble simulation
 function solve_fig3(glc, r, protein, prob; alg=DynamicSS(Rodas5()))
     idx = findfirst(isequal(protein), parameters(sys))
     p = copy(prob.p)
@@ -63,7 +65,7 @@ function plot_fig3(;
 )
     ## mapping functions
     @unpack degavg, ΔΨm, ATP_c, ADP_c = sys
-    fs = (s -> s[degavg], s -> s[ΔΨm] * 1000, s -> s[ATP_c] / s[ADP_c])
+    fs = (s -> s[degavg], s -> s[ΔΨm * 1000] , s -> s[ATP_c / ADP_c])
 
     fig, axes = plt.subplots(3, 3; figsize)
 
@@ -78,7 +80,7 @@ function plot_fig3(;
             xx = xxs[row] ./ xscale
             yy = yys[row]
             z = zs[row]
-            ax = axes[row-1, col-1]
+            ax = axes[row, col]
 
             ylabel = ylabels[row]
 

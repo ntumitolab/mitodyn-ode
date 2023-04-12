@@ -8,10 +8,11 @@ using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
-import PythonPlot as plt
-plt.matplotlib.rcParams["font.size"] = 14
-## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
-## plt.matplotlib.rcParams["font.family"] = "sans-serif"
+import PyPlot as plt
+rcParams = plt.PyDict(plt.matplotlib."rcParams")
+rcParams["font.size"] = 14
+## rcParams["font.sans-serif"] = "Arial"
+## rcParams["font.family"] = "sans-serif"
 
 #---
 
@@ -53,37 +54,37 @@ function plot_fig5(sol, figsize=(10, 12))
     ## TODO: panel B and C not needed
     fig, ax = plt.subplots(6, 1; figsize)
 
-    ax[0].plot(tsm, sol[Ca_c * 1000], label="Ca(cyto)")
-    ax[0].plot(tsm, sol[Ca_m * 1000], label="Ca(mito)")
-    ax[0].set_title("A", loc="left")
-    ax[0].set(ylabel="Conc. (μM)")
-
-    ax[1].plot(tsm, sol[G3P * 1000], label="G3P")
-    ax[1].plot(tsm, sol[NADH_c * 1000], label="NADH (cyto)")
-    ax[1].set_title("B", loc="left")
+    ax[1].plot(tsm, sol[Ca_c * 1000], label="Ca(cyto)")
+    ax[1].plot(tsm, sol[Ca_m * 1000], label="Ca(mito)")
+    ax[1].set_title("A", loc="left")
     ax[1].set(ylabel="Conc. (μM)")
 
-    ax[2].plot(tsm, sol[Pyr * 1000], label="Pyr")
-    ax[2].plot(tsm, sol[NADH_m * 1000], label="NADH (mito)")
-    ax[2].set_title("C", loc="left")
+    ax[2].plot(tsm, sol[G3P * 1000], label="G3P")
+    ax[2].plot(tsm, sol[NADH_c * 1000], label="NADH (cyto)")
+    ax[2].set_title("B", loc="left")
     ax[2].set(ylabel="Conc. (μM)")
 
-    ## TODO: describe stage II behavior
-    ax[3].plot(tsm, sol[ATP_c / ADP_c], label="ATP:ADP")
-    ax[3].set_title("D", loc="left")
+    ax[3].plot(tsm, sol[Pyr * 1000], label="Pyr")
+    ax[3].plot(tsm, sol[NADH_m * 1000], label="NADH (mito)")
+    ax[3].set_title("C", loc="left")
+    ax[3].set(ylabel="Conc. (μM)")
 
-    ax[4].plot(tsm, sol[ΔΨm * 1000], label="ΔΨm")
-    ax[4].set_title("E", loc="left")
-    ax[4].set(ylabel="mV")
+    ## TODO: describe state III behavior
+    ax[4].plot(tsm, sol[ATP_c / ADP_c], label="ATP:ADP")
+    ax[4].set_title("D", loc="left")
 
-    ax[5].plot(tsm, sol[degavg], label="<k>")
-    ax[5].set_title("F", loc="left")
-    ax[5].set(xlabel="Time (minute)")
+    ax[5].plot(tsm, sol[ΔΨm * 1000], label="ΔΨm")
+    ax[5].set_title("E", loc="left")
+    ax[5].set(ylabel="mV")
 
-    for i in 0:5
-        ax[i].grid()
-        ax[i].legend(loc="center left")
-        ax[i].set_xlim(tsm[begin], tsm[end])
+    ax[6].plot(tsm, sol[degavg], label="<k>")
+    ax[6].set_title("F", loc="left")
+    ax[6].set(xlabel="Time (minute)")
+
+    for a in ax
+        a.grid()
+        a.legend(loc="center left")
+        a.set_xlim(tsm[begin], tsm[end])
     end
 
     plt.tight_layout()
