@@ -10,27 +10,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  update-manifest:
+  update:
     permissions:
       contents: write
       pull-requests: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Julia
-        uses: julia-actions/setup-julia@v1
-        with:
-          version: "~1.9.0-rc2"
-      - name: Update Julia dependencies
-        env:
-          JULIA_PKG_PRECOMPILE_AUTO: 0
-        run: julia --color=yes --project=@. -e "import Pkg; Pkg.update()"
-      - name: Create Pull Request
-        id: cpr
-        uses: peter-evans/create-pull-request@v5
-        with:
-          title: Julia Dependency Update
-          token: ${{ secrets.PAT }}
-          labels: |
-            automerge
+    uses: sosiristseng/jbook-workflows/.github/workflows/update-manifest.yml@main
+    secrets:
+      APP_ID: ${{ secrets.APP_ID }}
+      APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
