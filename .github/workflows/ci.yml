@@ -40,7 +40,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-julia-${{ env.JULIA_CACHE }}-
       - name: Install Julia dependencies
-        run: julia --color=yes --prohect=@. -e 'import Pkg; Pkg.Registry.update(); Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
+        run: JULIA_PROJECT="@." julia --color=yes -e 'import Pkg; Pkg.Registry.update(); Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
       - name: Build notebooks with ${{ env.NPROC }} processes
         run: JULIA_PROJECT="@." julia --color=yes -p ${{ env.NPROC }} literate.jl
       - name: Build website
