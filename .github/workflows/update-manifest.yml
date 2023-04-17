@@ -17,5 +17,4 @@ jobs:
     uses: sosiristseng/jbook-workflows/.github/workflows/update-manifest.yml@main
     with:
       julia-version: "~1.9.0-rc2"
-    secrets:
-      inherit
+    secrets: inherit
