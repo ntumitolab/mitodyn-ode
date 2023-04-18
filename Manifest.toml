@@ -467,10 +467,10 @@ uuid = "86223c79-3864-5bf0-83f7-82e725a168b6"
 version = "1.8.0"
 
 [[deps.Groebner]]
-deps = ["AbstractAlgebra", "Combinatorics", "Logging", "MultivariatePolynomials", "Primes", "Random"]
-git-tree-sha1 = "08d57de45f19170d69a98b14244bce6df4b4c823"
+deps = ["AbstractAlgebra", "Combinatorics", "Logging", "MultivariatePolynomials", "Primes", "Random", "SnoopPrecompile"]
+git-tree-sha1 = "b6c3e9e1eb8dcc6fd9bc68fe08dcc7ab22710de6"
 uuid = "0b43b601-686d-58a3-8a1c-6623616c7cd4"
-version = "0.3.3"
+version = "0.3.4"
 
 [[deps.GroupsCore]]
 deps = ["Markdown", "Random"]
