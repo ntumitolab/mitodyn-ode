@@ -16,30 +16,24 @@ rcParams["font.size"] = 14
 #---
 
 @named sys = make_model()
-@unpack GlcConst = sys
+@unpack GlcConst, VmaxF1, VmaxETC, pHleak = sys
 iGlc = findfirst(isequal(GlcConst), parameters(sys))
-
+iVmaxF1 = findfirst(isequal(VmaxF1), parameters(sys))
+iVmaxETC = findfirst(isequal(VmaxETC), parameters(sys))
+ipHleak = findfirst(isequal(pHleak), parameters(sys))
 prob = SteadyStateProblem(sys, [])
 
-fieldnames(typeof(prob))
-
-remake(prob, p = [])
-
 # TODO: use ensmeble simulation
-function solve_fig3(glc, r, protein, prob; alg=DynamicSS(Rodas5()))
-    idx = findfirst(isequal(protein), parameters(sys))
-    p = copy(prob.p)
-    p[iGlc] = glc
-    p[idx] = prob.p[idx] * r
-    return solve(remake(prob, p=p), alg)
-end
+# function solve_fig3(glc, r, protein, prob; alg=DynamicSS(Rodas5()))
+#     idx = findfirst(isequal(protein), parameters(sys))
+#     p = copy(prob.p)
+#     p[iGlc] = glc
+#     p[idx] = prob.p[idx] * r
+#     return solve(remake(prob, p=p), alg)
+# end
 
 #---
 
-@time let
-    @unpack GlcConst = sys
-    iGlc = findfirst(isequal(GlcConst), parameters(sys))
-end
 
 ## TODO: use ensmeble simulation
 
@@ -50,11 +44,19 @@ rF1 = range(0.1, 2.0, 50)
 rETC = range(0.1, 2.0, 50)
 rHL = range(0.1, 5.0, 50)
 
-remake
-
+# https://discourse.julialang.org/t/julia-usage-how-to-get-2d-indexes-from-1d-index-when-accessing-a-2d-array/61440/2
 probf_f1 = function (prob, i, repeat)
-
+    C = CartesianIndices((length(rGlcF1), length(rF1)))
+    glc = C[i][1]
+    rf1 = C[i][2]
+    prob.p[iGlc] = rGlcF1[glc]
+    prob.p[iVmaxF1] *= rF1[rf1]
+    return prob
 end
+
+eprobf1 = EnsembleProblem(prob; prob_func = probf_f1)
+simf1 = solve(eprobf1, DynamicSS(Rodas5()); trajectories=length(rGlcF1)*length(rF1))
+
 
 @unpack VmaxF1, VmaxETC, pHleak = sys
 uInf_f1 = [solve_fig3(glc, r, VmaxF1, prob) for r in rF1, glc in rGlc1];
