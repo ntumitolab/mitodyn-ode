@@ -21,6 +21,10 @@ iGlc = findfirst(isequal(GlcConst), parameters(sys))
 
 prob = SteadyStateProblem(sys, [])
 
+fieldnames(typeof(prob))
+
+remake(prob, p = [])
+
 # TODO: use ensmeble simulation
 function solve_fig3(glc, r, protein, prob; alg=DynamicSS(Rodas5()))
     idx = findfirst(isequal(protein), parameters(sys))
@@ -32,13 +36,25 @@ end
 
 #---
 
+@time let
+    @unpack GlcConst = sys
+    iGlc = findfirst(isequal(GlcConst), parameters(sys))
+end
+
 ## TODO: use ensmeble simulation
 
-rGlc1 = range(3.0, 30.0, 50)
-rGlc2 = range(4.0, 30.0, 50)
+rGlcF1 = range(3.0, 30.0, 50)
+rGlcETC = range(3.0, 30.0, 50)
+rGlcHL = range(4.0, 30.0, 50)
 rF1 = range(0.1, 2.0, 50)
 rETC = range(0.1, 2.0, 50)
 rHL = range(0.1, 5.0, 50)
+
+remake
+
+probf_f1 = function (prob, i, repeat)
+
+end
 
 @unpack VmaxF1, VmaxETC, pHleak = sys
 uInf_f1 = [solve_fig3(glc, r, VmaxF1, prob) for r in rF1, glc in rGlc1];

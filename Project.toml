@@ -5,6 +5,7 @@ version = "0.2.0"
 
 [deps]
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
+Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
 Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
 PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"

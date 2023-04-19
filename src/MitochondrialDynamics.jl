@@ -1,37 +1,62 @@
+
+
 module MitochondrialDynamics
 
 using ModelingToolkit
 
 export make_model
 
-include("utils.jl")
-include("rates.jl")
+##
+## Units and physical constants
+const second = float(1)    # second
+const minute = 60second    # minute
+const ms = 1e-3second      # millisecond
+const Hz = inv(second)     # Herz
+const kHz = 1000Hz         # kilohertz
+const metre = float(1)     # meter
+const cm = 0.01metre       # centimeter
+const cm² = cm^2           # square centimeter
+const mL = cm^3            # milliliter = cubic centimeter
+const Liter = 1000mL        # liter
+const μL = 1E-6Liter
+const pL = 1E-12Liter
+const mM = float(1)
+const Molar = 1000mM       # molar (1000 since the SI units is mM)
+const μM = 1E-3mM          # micromolar
+const nM = 1E-6mM          # nanomolar
+const Volt = float(1)      # volt
+const mV = 1E-3Volt        # millivolt
+const T0 = 310.0           # Default temperature
+const F = 96485.0          # Faraday constant (c / mol)
+const R = 8.314            # Ideal gas constant (K/mol)
+const VT = R * T0 / F      # Default thermal voltage (Volts)
+const iVT = inv(VT)        # Reciprocal of thermal voltage
 
-
-# Convineince function
+## Convineince function
 hil(x, k=one(x)) = x / (x + k)
 hil(x, k, n) = hil(x^n, k^n)
 
-"Steady-state cytosolic calcium based on ATP:ADP ratio"
-function cac_eq_atp()
+"Average cytosolic calcium level based on the ATP:ADP ratio"
+function cac_atp()
     @variables t Ca_c(t) ATP_c(t) ADP_c(t)
     @parameters RestingCa=0.09μM ActivatedCa=0.25μM NCac=4 KatpCac=25
-    caceq = Ca_c(t) ~ RestingCa + ActivatedCa * hil(ATP_c, KatpCac * ADP_c, NCac)
+    caceq = Ca_c ~ RestingCa + ActivatedCa * hil(ATP_c, KatpCac * ADP_c, NCac)
     return caceq
 end
 
-function glc_eq()
+"Constant glucose equation"
+function const_glc(glc=5mM)
     @variables t Glc(t)
-    @parameters GlcConst=5mM
-    glceq = Glc(t) ~ GlcConst
+    @parameters GlcConst=glc
+    glceq = Glc ~ GlcConst
     return glceq
 end
 
 function make_model(;
     name,
     simplify=true,
-    caceq=cac_eq_atp(),
-    glceq=glc_eq(),
+    caceq=cac_atp(),
+    glceq=const_glc(5mM),
     gk_atp_stoich::Int=2
 )
     @constants C_MIT=1.812μM/mV # Mitochondrial membrane capacitance
@@ -46,24 +71,24 @@ function make_model(;
     # Adenylate kinase (AdK)
     @variables J_ADK(t) ATP_c(t) ADP_c(t) AMP_c(t)
     @parameters kfAK=1000Hz/mM kEqAK=0.931
-    adkeq = J_ADK(t) ~ kfAK * (ADP_c * ADP_c - ATP_c * AMP_c * kEqAK)
+    adkeq = J_ADK ~ kfAK * (ADP_c * ADP_c - ATP_c * AMP_c * kEqAK)
 
     # Glucokinase (GK)
     @variables Glc(t) J_GK(t)
     @parameters VmaxGK=0.011mM*Hz KatpGK=0.5mM KglcGK=7mM nGK=1.7
-    gkeq = J_GK(t) ~ VmaxGK * hil(ATP_c, KatpGK) * hil(Glc, KglcGK, nGK)
+    gkeq = J_GK ~ VmaxGK * hil(ATP_c, KatpGK) * hil(Glc, KglcGK, nGK)
 
     # Glyceraldehydes 3-phosphate dehydrogenase (GPD)
     @variables J_GPD(t) G3P(t) NAD_c(t) NADH_c(t)
     @parameters VmaxGPD=0.5mM*Hz Kg3pGPD=0.2mM KnadGPD=0.09 KadpGPD=2μM
-    gpdeq = J_GPD(t) ~ VmaxGPD * hil(ADP_c, KadpGPD) * hil(NAD_c, NADH_c * KnadGPD) * hil(G3P, Kg3pGPD)
+    gpdeq = J_GPD ~ VmaxGPD * hil(ADP_c, KadpGPD) * hil(NAD_c, NADH_c * KnadGPD) * hil(G3P, Kg3pGPD)
 
     # Lactate dehydrogenase (LDH)
     @variables J_LDH(t) Pyr(t)
     @parameters VmaxLDH=1.2mM*Hz KpyrLDH=47.5μM KnadhLDH=1
-    ldheq = J_LDH(t) ~ VmaxLDH * hil(Pyr, KpyrLDH) * hil(NADH_c, NAD_c * KnadhLDH)
+    ldheq = J_LDH ~ VmaxLDH * hil(Pyr, KpyrLDH) * hil(NADH_c, NAD_c * KnadhLDH)
 
-    # Pyruvaye dehydrogenase (PDH)
+    # Pyruvate dehydrogenase (PDH), lumped with the citric acid cycle (CAC)
     @variables J_PDH(t) J_DH(t) J_CAC(t) NAD_m(t) NADH_m(t) Ca_m(t)
     @parameters VmaxPDH=300μM*Hz KpyrPDH=47.5μM KnadPDH=81 U1PDH=1.5 U2PDH=1.1 KcaPDH=0.05μM J_FFA=0μM*Hz
     pdheq = let
@@ -74,10 +99,10 @@ function make_model(;
         J_PDH ~ VmaxPDH * fpCa * fNAD * fPyr
     end
 
-    # Electron trasnport chain (ETC)
+    # Electron transport chain (ETC)
     @variables J_HR(t) J_O2(t) ΔΨm(t)
     @parameters VmaxETC=22mM*Hz KnadhETC=3mM KaETC=-4.92E-3/mV KbETC=-4.43E-3/mV
-    hreq = J_HR ~ VmaxETC * hill(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm)
+    hreq = J_HR ~ VmaxETC * hil(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm)
 
     # Proton leak
     @variables J_HL(t)
@@ -95,12 +120,11 @@ function make_model(;
     end
 
     # Mitochondrial calcium uniporter (MCU)
-    @variables J_MCU(t)
+    @variables J_MCU(t) Ca_c(t)
     @parameters PcaMCU=4Hz
     mcueq = let
         zvfrt = 2 * iVT * ΔΨm
-        em1 = expm1(zvfrt)
-        J_MCU ~ PcaMCU * zvfrt / em1 * (0.341 * Ca_c * (1 + em1) - 0.200 * Ca_m)
+        J_MCU ~ PcaMCU * (zvfrt / expm1(zvfrt)) * (0.341 * Ca_c * exp(zvfrt) - 0.200 * Ca_m)
     end
 
     # Mitochondrial sodium calcium exchanger (NCLX)
@@ -113,12 +137,12 @@ function make_model(;
         Q = Ca_c / KcaNCLX
         AB = A * B
         PQ = P * Q
-        J_NCLX ~ (AB - PQ) / (1 + A + B + P + Q + AB + PQ)
+        J_NCLX ~ VmaxNCLX * (AB - PQ) / (1 + A + B + P + Q + AB + PQ)
     end
 
     # NADH shuttle
     @variables J_NADHT(t)
-    @parameters VmaxNADHT=50μM*Hz =0.002 Ktn_m=16.78
+    @parameters VmaxNADHT=50μM*Hz Ktn_c=0.002 Ktn_m=16.78
     nadhteq = J_NADHT ~ VmaxNADHT * hil(NADH_c, NAD_c * Ktn_c) * hil(NAD_m, NADH_m, Ktn_m)
 
     # Baseline consumption rates
@@ -160,20 +184,20 @@ function make_model(;
         # Observables
         degavg ~ (x[1] + 2x[2] + 3x[3]) / (x[1] + x[2] + x[3]),
         # State variables
-        V_MTX * D(NADH_m) ~ J_DH + J_NADHT - J_O2 - V_MTX * kNADHm * NADH_m,
+        D(NADH_m) ~ inv(V_MTX) * (J_DH + J_NADHT - J_O2) - kNADHm * NADH_m,
         # D(NAD_m) ~ # Conserved
-        V_I * D(NADH_c) ~ J_GPD - J_NADHT - J_LDH - V_I * kNADHc * NADH_c,
+        D(NADH_c) ~ inv(V_I) * (J_GPD - J_NADHT - J_LDH) - kNADHc * NADH_c,
         # D(NAD_c) ~ # Conserved
-        V_MTX * D(Ca_m) ~ F_M * (J_MCU - J_NCLX),
-        C_MIT * D(ΔΨm) ~ J_HR - J_HF - J_HL - J_ANT - 2 * J_MCU,
-        V_I * D(G3P) ~ 2J_GK - J_GPD - V_I * kG3P * G3P,
-        (V_I + V_MTX) * D(Pyr) ~ (J_GPD - J_PDH - J_LDH) - (V_I + V_MTX) * kPyr * Pyr,
-        V_I * D(ATP_c) ~ (-gk_atp_stoich * J_GK + 2 * J_GPD + J_ANT + J_ADK) - V_I * ATP_c * (kATP + kATPCa * Ca_c),
-        V_I * D(AMP_c) ~ J_ADK,
+        D(Ca_m) ~ inv(V_MTX) * F_M * (J_MCU - J_NCLX),
+        D(ΔΨm) ~ inv(C_MIT) * (J_HR - J_HF - J_HL - J_ANT - 2 * J_MCU),
+        D(G3P) ~ inv(V_I) * (2J_GK - J_GPD) - kG3P * G3P,
+        D(Pyr) ~ inv(V_I + V_MTX) * (J_GPD - J_PDH - J_LDH) - kPyr * Pyr,
+        D(ATP_c) ~ inv(V_I) * (-gk_atp_stoich * J_GK + 2 * J_GPD + J_ANT + J_ADK) - ATP_c * (kATP + kATPCa * Ca_c),
+        D(AMP_c) ~ inv(V_I) * J_ADK,
         # D(ADP_c) ~ # Conserved
         # D(x[1]) ~ # Conserved
-        D(x[2]) ~ v[1] - v[2],
-        D(x[3]) ~ v[2],
+        D(x[2]) ~ v1 - v2,
+        D(x[3]) ~ v2,
     ]
     sys = ODESystem(eqs, t; name,
         defaults=[
@@ -197,5 +221,4 @@ function make_model(;
     return sys
 end
 
-
-end
+end # Module
