@@ -37,37 +37,58 @@ prob = SteadyStateProblem(sys, [])
 
 ## TODO: use ensmeble simulation
 
-rGlcF1 = range(3.0, 30.0, 50)
-rGlcETC = range(3.0, 30.0, 50)
-rGlcHL = range(4.0, 30.0, 50)
-rF1 = range(0.1, 2.0, 50)
-rETC = range(0.1, 2.0, 50)
-rHL = range(0.1, 5.0, 50)
+rGlcF1 = range(3.0, 30.0, 51)
+rGlcETC = range(3.0, 30.0, 51)
+rGlcHL = range(4.0, 30.0, 51)
+rF1 = range(0.1, 2.0, 51)
+rETC = range(0.1, 2.0, 51)
+rHL = range(0.1, 5.0, 51)
+
+#---
+
+Cf1 = CartesianIndices((length(rF1), length(rGlcF1)))
+Cetc = CartesianIndices((length(rGlcETC), length(rETC)))
+Chl = CartesianIndices((length(rGlcHL), length(rHL)))
 
 # https://discourse.julialang.org/t/julia-usage-how-to-get-2d-indexes-from-1d-index-when-accessing-a-2d-array/61440/2
 probf_f1 = function (prob, i, repeat)
-    C = CartesianIndices((length(rGlcF1), length(rF1)))
-    glc = C[i][1]
-    rf1 = C[i][2]
+    glc = Cf1[i][2]
+    rf1 = Cf1[i][1]
     prob.p[iGlc] = rGlcF1[glc]
     prob.p[iVmaxF1] *= rF1[rf1]
     return prob
 end
 
+probf_etc = function (prob, i, repeat)
+    glc = Cetc[i][2]
+    retc = Cetc[i][1]
+    prob.p[iGlc] = rGlcETC[glc]
+    prob.p[iVmaxETC] *= rETC[retc]
+    return prob
+end
+
+probf_hl = function (prob, i, repeat)
+    glc = Chl[i][2]
+    rhl = Chl[i][1]
+    prob.p[iGlc] = rGlcHL[glc]
+    prob.p[ipHleak] *= rHL[rhl]
+    return prob
+end
+
+#---
+
+alg = DynamicSS(Rodas5())
 eprobf1 = EnsembleProblem(prob; prob_func = probf_f1)
-simf1 = solve(eprobf1, DynamicSS(Rodas5()); trajectories=length(rGlcF1)*length(rF1))
-
-
-@unpack VmaxF1, VmaxETC, pHleak = sys
-uInf_f1 = [solve_fig3(glc, r, VmaxF1, prob) for r in rF1, glc in rGlc1];
-uInf_etc = [solve_fig3(glc, r, VmaxETC, prob) for r in rETC, glc in rGlc1];
-uInf_hl = [solve_fig3(glc, r, pHleak, prob) for r in rHL, glc in rGlc2];
+simf1 = solve(eprobf1, alg; trajectories=length(Cf1))
+eprobetc = EnsembleProblem(prob; prob_func = probf_etc)
+simetc =solve(eprobetc, alg; trajectories=length(Cetc))
+eprobhl = EnsembleProblem(prob; prob_func = probf_hl)
+simhl =solve(eprobhl, alg; trajectories=length(Chl))
 
 #---
 
 function plot_fig3(;
     figsize=(10, 10),
-    levels=40,
     cmaps=["bwr", "magma", "viridis"],
     ylabels=[
         "ATP synthase capacity (X)",
@@ -75,10 +96,10 @@ function plot_fig3(;
         "Proton leak rate (X)"
     ],
     cbarlabels=["<k>", "ΔΨ", "ATP/ADP"],
-    xxs=(rGlc1, rGlc1, rGlc2),
+    xxs=(rGlcF1, rGlcETC, rGlcHL),
     xscale=5.0,
     yys=(rF1, rETC, rHL),
-    zs=(uInf_f1, uInf_etc, uInf_hl),
+    zs=(simf1, simetc, simhl),
     extremes=((1.0, 2.0), (80.0, 180.0), (0.0, 60.0))
 )
     ## mapping functions
@@ -103,10 +124,9 @@ function plot_fig3(;
             ylabel = ylabels[row]
 
             mesh = ax.pcolormesh(
-                xx, yy, map(f, z);
+                xx, yy, reshape(map(f, z), length(xx), length(yy));
                 shading="gouraud",
                 rasterized=true,
-                ## levels=levels,
                 cmap=cm,
                 vmin=vmin,
                 vmax=vmax
