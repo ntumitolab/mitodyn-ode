@@ -31,6 +31,7 @@ function plot_figs1(
     tight=true,
     grid=true
 )
+    @unpack G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ATP_c, ADP_c, AMP_c = sol.prob.f.sys
     ts = sol.t
     tsm = ts ./ 60
     g3p = sol[G3P * 1000]

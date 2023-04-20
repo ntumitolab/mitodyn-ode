@@ -1,13 +1,13 @@
-md"""
+#===
 # Figure 5
 
 Calcium oscillation
-"""
+===#
 
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
+# using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 import PyPlot as plt
 rcParams = plt.PyDict(plt.matplotlib."rcParams")
 rcParams["font.size"] = 14
@@ -19,7 +19,7 @@ rcParams["font.size"] = 14
 tend = 2000.0
 @named sys = make_model()
 @unpack GlcConst, Ca_c = sys
-prob = SteadyStateProblem(sys, [], [GlcConst => 10mM])
+prob = SteadyStateProblem(sys, [], [GlcConst => 10])
 sssol = solve(prob, DynamicSS(Rodas5(), tspan=tend))
 caavg = sssol[Ca_c]
 
@@ -33,19 +33,19 @@ function cac_wave(t)
     return ca_r + ka_ca * (x * exp(1 - x))^4
 end
 
-#---
-
 @variables t
 @register_symbolic cac_wave(t)
-@named sysosci = make_model(; cacrhs=cac_wave(t))
+@named sysosci = make_model(; caceq=Ca_c~cac_wave(t))
+
+#---
 
 #---
 npoints=201
 ts = range(1520.0, tend, npoints)
-prob = ODEProblem(sysosci, sssol.u, tend, [GlcConst => 10mM])
+prob = ODEProblem(sysosci, sssol.u, tend, [GlcConst => 10])
 sol = solve(prob, saveat=ts)
 
-#---
+# TODO: Less information
 
 function plot_fig5(sol, figsize=(10, 12))
     ts = sol.t

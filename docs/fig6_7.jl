@@ -5,8 +5,8 @@ md"""
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-using MitochondrialDynamics: GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC, J_ANT, J_HL
-using MitochondrialDynamics: G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ΔΨm, ATP_c, ADP_c, degavg
+# using MitochondrialDynamics: GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC, J_ANT, J_HL
+# using MitochondrialDynamics: G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ΔΨm, ATP_c, ADP_c, degavg
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 import PyPlot as plt
 rcParams = plt.PyDict(plt.matplotlib."rcParams")
@@ -23,12 +23,13 @@ prob = SteadyStateProblem(sys, [])
 
 #---
 
-pidx = Dict(k => i for (i, k) in enumerate(parameters(sys)))
-idxGlc = pidx[GlcConst]
-idxVmaxPDH = pidx[VmaxPDH]
-idxpHleak = pidx[pHleak]
-idxVmaxF1 = pidx[VmaxF1]
-idxVmaxETC = pidx[VmaxETC]
+@unpack GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC = sys
+
+idxGlc = findfirst(isequal(GlcConst), parameters(sys))
+idxVmaxPDH = findfirst(isequal(VmaxPDH), parameters(sys))
+idxpHleak = findfirst(isequal(pHleak), parameters(sys))
+idxVmaxF1 =  findfirst(isequal(VmaxF1), parameters(sys))
+idxVmaxETC =  findfirst(isequal(VmaxETC), parameters(sys))
 
 # ## Fig 6
 
@@ -43,7 +44,7 @@ end
 
 function make_rotenone_prob(prob; rETC=0.1)
     p = copy(prob.p)
-    p[idxVmaxETC] *= rETC
+    prob.p[idxVmaxETC] *= rETC
     return remake(prob, p=p)
 end
 
@@ -77,17 +78,19 @@ solsDM = map(glc) do g
     solve(remake_glc(prob_dm, g), DynamicSS(Rodas5()))
 end;
 
-#---
+# TODO: less information
 
-function plot_fig6(sols, solsDM, glc; figsize=(12, 12), tight=true)
+function plot_fig6(sols, solsDM, glc; figsize=(12, 12), tight=true, labels=["Baseline", "Diabetic"])
+    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
+    @unpack ATP_c, ADP_c = sol.prob.f.sys
     glc5 = glc ./ 5
-    td = getindex.(sols, ATP_c/ADP_c)
-    tdDM = getindex.(solsDM, ATP_c/ADP_c)
+    td = extract(sols, ATP_c/ADP_c)
+    tdDM = extract(solsDM, ATP_c/ADP_c)
 
     fig, ax = plt.subplots(3, 3; figsize)
 
-    ax[1, 1].plot(glc5, getindex.(sols, G3P) .* 1000, label="Baseline")
-    ax[1, 1].plot(glc5, getindex.(solsDM, G3P) .* 1000, label="Diabetic")
+    ax[1, 1].plot(glc5, getindex.(sols, G3P) .* 1000, label=labels[1])
+    ax[1, 1].plot(glc5, getindex.(solsDM, G3P) .* 1000, label=labels[2])
     ax[1, 1].set_title("(A) G3P", loc="left")
     ax[1, 1].set(ylabel="Conc. (μM)")
 
