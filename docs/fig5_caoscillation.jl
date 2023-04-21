@@ -23,7 +23,7 @@ prob = SteadyStateProblem(sys, [], [GlcConst => 10])
 sssol = solve(prob, DynamicSS(Rodas5(), tspan=tend))
 caavg = sssol[Ca_c]
 
-#---
+# Calcium wave that is independent to ATP:ADP ratio
 
 function cac_wave(t)
     ca_r = 0.09μM

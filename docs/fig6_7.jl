@@ -1,6 +1,6 @@
-md"""
+#===
 # Figure 6 and 7
-"""
+===#
 
 using DifferentialEquations
 using ModelingToolkit
@@ -82,6 +82,7 @@ end;
 
 function plot_fig6(sols, solsDM, glc; figsize=(12, 12), tight=true, labels=["Baseline", "Diabetic"])
     extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
+
     @unpack ATP_c, ADP_c = sol.prob.f.sys
     glc5 = glc ./ 5
     td = extract(sols, ATP_c/ADP_c)
@@ -89,48 +90,56 @@ function plot_fig6(sols, solsDM, glc; figsize=(12, 12), tight=true, labels=["Bas
 
     fig, ax = plt.subplots(3, 3; figsize)
 
-    ax[1, 1].plot(glc5, getindex.(sols, G3P) .* 1000, label=labels[1])
-    ax[1, 1].plot(glc5, getindex.(solsDM, G3P) .* 1000, label=labels[2])
+    sys = sol.prob.f.sys
+    @unpack G3P = sys
+    ax[1, 1].plot(glc5, extract(sols, G3P, 1000), label=labels[1])
+    ax[1, 1].plot(glc5, extract(solsDM, G3P, 1000), label=labels[2])
     ax[1, 1].set_title("(A) G3P", loc="left")
     ax[1, 1].set(ylabel="Conc. (μM)")
 
-    ax[1, 2].plot(glc5, getindex.(sols, Pyr) .* 1000, label="Baseline")
-    ax[1, 2].plot(glc5, getindex.(solsDM, Pyr) .* 1000, label="Diabetic")
+    @unpack Pyr = sys
+    ax[1, 2].plot(glc5, extract(sols, Pyr, 1000), label=labels[1])
+    ax[1, 2].plot(glc5, extract(solsDM, Pyr, 1000), label=labels[2])
     ax[1, 2].set_title("(B) Pyr", loc="left")
     ax[1, 2].set(ylabel="Conc. (μM)")
 
-    ax[1, 3].plot(glc5, getindex.(sols, NADH_c) .* 1000, label="Baseline")
-    ax[1, 3].plot(glc5, getindex.(solsDM, NADH_c) .* 1000, label="Diabetic")
-    ax[1, 3].set_title("(C) NADH (cyto)", loc="left")
-    ax[1, 3].set(ylabel="Conc. (μM)")
+    @unpack NADH_c, NAD_c = sys
+    ax[1, 3].plot(glc5, extract(sols, NADH_c/NAD_c), label=labels[1])
+    ax[1, 3].plot(glc5, extract(solsDM, NADH_c/NAD_c), label=labels[2])
+    ax[1, 3].set_title("(C) NADH:NAD (cyto)", loc="left")
 
-    ax[2, 1].plot(glc5, getindex.(sols, NADH_m) .* 1000, label="Baseline")
-    ax[2, 1].plot(glc5, getindex.(solsDM, NADH_m) .* 1000, label="Diabetic")
-    ax[2, 1].set_title("(D) NADH (mito)", loc="left")
-    ax[2, 1].set(ylabel="Conc. (μM)")
+    @unpack NADH_m, NAD_m = sys
+    ax[2, 1].plot(glc5, extract(sols, NADH_m/NAD_m), label=labels[1])
+    ax[2, 1].plot(glc5, extract(solsDM, NADH_m/NAD_m), label=labels[2])
+    ax[2, 1].set_title("(D) NADH:NAD (mito)", loc="left")
 
-    ax[2, 2].plot(glc5, getindex.(sols, Ca_c) .* 1000, label="Baseline")
-    ax[2, 2].plot(glc5, getindex.(solsDM, Ca_c) .* 1000, label="Diabetic")
+    @unpack Ca_c = sys
+    ax[2, 2].plot(glc5, extract(sols, Ca_c, 1000), label=labels[1])
+    ax[2, 2].plot(glc5, extract(solsDM, Ca_c, 1000), label=labels[2])
     ax[2, 2].set_title("(E) Calcium (cyto)", loc="left")
     ax[2, 2].set(ylabel="Conc. (μM)")
 
-    ax[2, 3].plot(glc5, getindex.(sols, Ca_m) .* 1000, label="Baseline")
-    ax[2, 3].plot(glc5, getindex.(solsDM, Ca_m) .* 1000, label="Diabetic")
+    @unpack Ca_m = sys
+    ax[2, 3].plot(glc5, extract(sols, Ca_m, 1000), label=labels[1])
+    ax[2, 3].plot(glc5, extract(solsDM, Ca_m, 1000), label=labels[2])
     ax[2, 3].set_title("(F) Calcium (mito)", loc="left")
     ax[2, 3].set(ylabel="Conc. (μM)")
 
-    ax[3, 1].plot(glc5, getindex.(sols, ΔΨm) .* 1000, label="Baseline")
-    ax[3, 1].plot(glc5, getindex.(solsDM, ΔΨm) .* 1000, label="Diabetic")
+    @unpack ΔΨm = sys
+    ax[3, 1].plot(glc5, extract(sols, ΔΨm, 1000), label=labels[1])
+    ax[3, 1].plot(glc5, extract(solsDM, ΔΨm, 1000), label=labels[2])
     ax[3, 1].set_title("(G) ΔΨ", loc="left")
     ax[3, 1].set(xlabel="Glucose (X)", ylabel="mV")
 
-    ax[3, 2].plot(glc5, td, label="Baseline")
-    ax[3, 2].plot(glc5, tdDM, label="Diabetic")
+    @unpack ATP_c, ADP_c = sys
+    ax[3, 2].plot(glc5, extract(sols, ATP_c/ADP_c), label=labels[1])
+    ax[3, 2].plot(glc5, extract(solsDM, ATP_c/ADP_c), label=labels[2])
     ax[3, 2].set_title("(H) ATP:ADP", loc="left")
     ax[3, 2].set(xlabel="Glucose (X)")
 
-    ax[3, 3].plot(glc5, getindex.(sols, degavg), label="Baseline")
-    ax[3, 3].plot(glc5, getindex.(solsDM, degavg), label="Diabetic")
+    @unpack degavg = sys
+    ax[3, 3].plot(glc5, extract(sols, degavg), label=labels[1])
+    ax[3, 3].plot(glc5, extract(solsDM, degavg), label=labels[2])
     ax[3, 3].set_title("(I) Average node degree", loc="left")
     ax[3, 3].set(xlabel="Glucose (X)")
 

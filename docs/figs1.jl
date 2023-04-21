@@ -4,8 +4,6 @@
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-using MitochondrialDynamics: GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC, J_ANT, J_O2
-using MitochondrialDynamics: G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ΔΨm, ATP_c, ADP_c, AMP_c, degavg, t, x
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 
 import PyPlot as plt
@@ -16,8 +14,9 @@ rcParams["font.size"] = 14
 
 #---
 
+@variables t, Glc(t)
 glc_step(t) = 5.0mM * (1 + (t >= 20minute) + (t >= 40minute))
-@named sys = make_model(; glcrhs=glc_step(t))
+@named sys = make_model(; glceq=Glc~glc_step(t))
 
 ts = range(0, 60minute, 101)
 prob = ODEProblem(sys, [], ts[end])
@@ -31,7 +30,7 @@ function plot_figs1(
     tight=true,
     grid=true
 )
-    @unpack G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ATP_c, ADP_c, AMP_c = sol.prob.f.sys
+    @unpack G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ATP_c, ADP_c, AMP_c, ΔΨm, degavg, x = sol.prob.f.sys
     ts = sol.t
     tsm = ts ./ 60
     g3p = sol[G3P * 1000]
@@ -55,7 +54,7 @@ function plot_figs1(
     ax[1, 1].set(title="(A) G3P (μM)", ylim=(0.0, 8.0))
 
     ax[1, 2].plot(tsm, pyr)
-    ax[1, 2].set(title="(B) Pyruvate (μM)", ylim=(0.0, 80.0))
+    ax[1, 2].set(title="(B) Pyruvate (μM)", ylim=(0.0, 100.0))
 
     ax[1, 3].plot(tsm, ca_c, label="cyto")
     ax[1, 3].plot(tsm, ca_m, label="mito")
@@ -74,19 +73,19 @@ function plot_figs1(
     ax[2, 2].legend()
 
     ax[2, 3].plot(tsm, atp_c ./ adp_c)
-    ax[2, 3].set(title="(F) ATP:ADP", ylim=(0, 40))
+    ax[2, 3].set(title="(F) ATP:ADP", ylim=(0, 45))
 
     ax[3, 1].plot(tsm, dpsi)
-    ax[3, 1].set(title="(G) ΔΨ (mV)", ylim=(80, 150), xlabel="Time (seconds)")
+    ax[3, 1].set(title="(G) ΔΨ (mV)", ylim=(80, 150), xlabel="Time (minutes)")
 
     ax[3, 2].plot(tsm, x1, label="X1")
     ax[3, 2].plot(tsm, x2, label="X2")
     ax[3, 2].plot(tsm, x3, label="X3")
-    ax[3, 2].set(title="(H) Mitochondrial nodes", xlabel="Time (seconds)")
+    ax[3, 2].set(title="(H) Mitochondrial nodes", xlabel="Time (minutes)")
     ax[3, 2].legend(loc="upper left")
 
     ax[3, 3].plot(tsm, k)
-    ax[3, 3].set(title="(I) Average Node Degree", xlabel="Time (seconds)")
+    ax[3, 3].set(title="(I) Average Node Degree", xlabel="Time (minutes)")
 
     if grid
         for a in ax
