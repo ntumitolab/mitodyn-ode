@@ -16,12 +16,12 @@ rcParams["font.size"] = 14
 
 #---
 
-glc = range(3.0mM, 30.0mM, length=201)
+glc = range(3.0mM, 30.0mM; step=0.5mM)
 tend = 50minute
 @named sys = make_model()
 prob = SteadyStateProblem(sys, [])
 
-#---
+# Parameters to be tweaked
 
 @unpack GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC = sys
 
@@ -33,64 +33,59 @@ idxVmaxETC =  findfirst(isequal(VmaxETC), parameters(sys))
 
 # ## Fig 6
 
-function make_dm_prob(prob; rPDH=0.5, rETC=0.75, rHL=1.4, rF1=0.5)
+function remake_rotenone(prob; rETC=0.1)
     p = copy(prob.p)
-    p[idxVmaxPDH] *= rPDH
-    p[idxpHleak] *= rHL
-    p[idxVmaxF1] *= rF1
     p[idxVmaxETC] *= rETC
     return remake(prob, p=p)
 end
 
-function make_rotenone_prob(prob; rETC=0.1)
-    p = copy(prob.p)
-    prob.p[idxVmaxETC] *= rETC
-    return remake(prob, p=p)
-end
-
-function make_oligomycin_prob(prob; rF1=0.1)
+function remake_oligomycin(prob; rF1=0.1)
     p = copy(prob.p)
     p[idxVmaxF1] *= rF1
     return remake(prob, p=p)
 end
 
-function make_fccp_prob(prob; rHL=5)
+function remake_fccp(prob; rHL=5)
     p = copy(prob.p)
     p[idxpHleak] *= rHL
     return remake(prob, p=p)
 end
 
-function remake_glc(prob, g)
+function remake_dm(prob; rPDH=0.5, rETC=0.75, rHL=1.4, rF1=0.5)
+    prob = remake_rotenone(prob; rETC)
+    prob = remake_oligomycin(prob; rF1)
+    prob = remake_fccp(prob; rHL)
     p = copy(prob.p)
-    p[idxGlc] = g
-    remake(prob; p=p)
+    p[idxVmaxPDH] *= rPDH
+    return remake(prob, p=p)
 end
+
+function prob_func_glc(prob, i, repeat)
+    prob.p[idxGlc] = glc[i]
+    prob
+end
+
+# Problem forDM cells
+
+prob_dm = remake_dm(prob)
 
 #---
+alg = DynamicSS(Rodas5())
+prob_func=prob_func_glc
+trajectories=length(glc)
 
-prob_dm = make_dm_prob(prob)
-
-sols = map(glc) do g
-    solve(remake_glc(prob, g), DynamicSS(Rodas5()))
-end
-
-solsDM = map(glc) do g
-    solve(remake_glc(prob_dm, g), DynamicSS(Rodas5()))
-end;
+sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
+solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories)
 
 # TODO: less information
 
-function plot_fig6(sols, solsDM, glc; figsize=(12, 12), tight=true, labels=["Baseline", "Diabetic"])
+function plot_fig6(sols, solsDM, glc; figsize=(10, 10), tight=true, labels=["Baseline", "Diabetic"])
     extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
-
-    @unpack ATP_c, ADP_c = sol.prob.f.sys
     glc5 = glc ./ 5
-    td = extract(sols, ATP_c/ADP_c)
-    tdDM = extract(solsDM, ATP_c/ADP_c)
 
     fig, ax = plt.subplots(3, 3; figsize)
 
-    sys = sol.prob.f.sys
+    sys = sols[begin].prob.f.sys
     @unpack G3P = sys
     ax[1, 1].plot(glc5, extract(sols, G3P, 1000), label=labels[1])
     ax[1, 1].plot(glc5, extract(solsDM, G3P, 1000), label=labels[2])
@@ -140,11 +135,12 @@ function plot_fig6(sols, solsDM, glc; figsize=(12, 12), tight=true, labels=["Bas
     @unpack degavg = sys
     ax[3, 3].plot(glc5, extract(sols, degavg), label=labels[1])
     ax[3, 3].plot(glc5, extract(solsDM, degavg), label=labels[2])
-    ax[3, 3].set_title("(I) Average node degree", loc="left")
+    ax[3, 3].set_title("(I) <k>", loc="left")
     ax[3, 3].set(xlabel="Glucose (X)")
 
     for a in ax
         a.grid()
+        a.legend()
     end
 
     fig.set_tight_layout(tight)
@@ -161,42 +157,41 @@ fig6
 
 # ## Figure 7
 
-prob_fccp = make_fccp_prob(prob)
-prob_rotenone = make_rotenone_prob(prob)
-prob_oligomycin = make_oligomycin_prob(prob)
+prob_fccp = remake_fccp(prob)
+prob_rotenone = remake_rotenone(prob)
+prob_oligomycin = remake_oligomycin(prob)
 
-solsFCCP = map(glc) do g
-    solve(remake_glc(prob_fccp, g), DynamicSS(Rodas5()))
-end
-
-solsRot = map(glc) do g
-    solve(remake_glc(prob_rotenone, g), DynamicSS(Rodas5()))
-end
-
-solsOligo = map(glc) do g
-    solve(remake_glc(prob_oligomycin, g), DynamicSS(Rodas5()))
-end
+#---
+sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
+solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories)
+solsFCCP = solve(EnsembleProblem(prob_fccp; prob_func), alg; trajectories)
+solsRot = solve(EnsembleProblem(prob_oligomycin; prob_func), alg; trajectories)
+solsOligo = solve(EnsembleProblem(prob_rotenone; prob_func), alg; trajectories)
 
 #---
 
 function plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc;
     figsize=(12, 6), tight=true
 )
+    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
+
+    sys = sols[begin].prob.f.sys
+    @unpack J_HL, J_ANT = sys
     ## Gather ATP synthesis rate (fusion) and proton leak rate (fission)
-    jHL_baseline = getindex.(sols, J_HL)
-    jANT_baseline = getindex.(sols, J_ANT)
+    jHL_baseline = extract(sols, J_HL)
+    jANT_baseline = extract(sols, J_ANT)
     ff_baseline = jANT_baseline ./ jHL_baseline
-    jHL_dm = getindex.(solsDM, J_HL)
-    jANT_dm = getindex.(solsDM, J_ANT)
+    jHL_dm = extract(solsDM, J_HL)
+    jANT_dm = extract(solsDM, J_ANT)
     ff_dm = jANT_dm ./ jHL_dm
-    jHL_fccp = getindex.(solsFCCP, J_HL)
-    jANT_fccp = getindex.(solsFCCP, J_ANT)
+    jHL_fccp = extract(solsFCCP, J_HL)
+    jANT_fccp = extract(solsFCCP, J_ANT)
     ff_fccp = jANT_fccp ./ jHL_fccp
-    jHL_rot = getindex.(solsRot, J_HL)
-    jANT_rot = getindex.(solsRot, J_ANT)
+    jHL_rot = extract(solsRot, J_HL)
+    jANT_rot = extract(solsRot, J_ANT)
     ff_rot = jANT_rot ./ jHL_rot
-    jHL_oligo = getindex.(solsOligo, J_HL)
-    jANT_oligo = getindex.(solsOligo, J_ANT)
+    jHL_oligo = extract(solsOligo, J_HL)
+    jANT_oligo = extract(solsOligo, J_ANT)
     ff_oligo = jANT_oligo ./ jHL_oligo
 
     glc5 = glc ./ 5
