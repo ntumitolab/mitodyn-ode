@@ -52,7 +52,7 @@ sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories);
 
 #---
 
-function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
+function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="", grid=true, tight=true)
     extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
 
     @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x, degavg = sys
@@ -105,11 +105,11 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
 
     for a in ax
         a.set_xticks(1:6)
-        a.grid()
+        a.grid(grid)
     end
 
     fig.suptitle(title)
-    fig.tight_layout()
+    fig.tight_layout(tight)
     return fig
 end
 
@@ -122,7 +122,7 @@ fig_glc_gal = plot_steady_state(glc, sim_gal, sys_gal, title="Galactose paramete
 
 # Compare default, FFA, and Gal parameter sets
 
-function plot_fig2(glc, sim, sim_gal, sim_ffa, sys; figsize=(8, 8), title="", labels=["Default", "Gal", "FFA"])
+function plot_fig2(glc, sim, sim_gal, sim_ffa, sys; figsize=(8, 8), title="", labels=["Default", "Gal", "FFA"], grid=true, tight=true)
 
     extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
 
@@ -159,11 +159,11 @@ function plot_fig2(glc, sim, sim_gal, sim_ffa, sys; figsize=(8, 8), title="", la
 
     for a in ax
         a.set_xticks(1:6)
-        a.grid()
+        a.grid(grid)
     end
 
     fig.suptitle(title)
-    fig.tight_layout()
+    fig.tight_layout(tight)
     return fig
 end
 

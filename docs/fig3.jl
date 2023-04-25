@@ -100,7 +100,8 @@ function plot_fig3(;
     xscale=5.0,
     yys=(rF1, rETC, rHL),
     zs=(simf1, simetc, simhl),
-    extremes=((1.0, 2.0), (80.0, 180.0), (0.0, 60.0))
+    extremes=((1.0, 2.0), (80.0, 180.0), (0.0, 60.0)),
+    tight=true
 )
     ## mapping functions
     @unpack degavg, ΔΨm, ATP_c, ADP_c = sys
@@ -147,7 +148,7 @@ function plot_fig3(;
         end
     end
 
-    fig.tight_layout()
+    fig.tight_layout(tight)
     return fig
 end
 
