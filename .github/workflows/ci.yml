@@ -24,9 +24,6 @@ jobs:
     container:
       image: ghcr.io/sosiristseng/juliabook:1.9.0rc2
       env:
-        JULIA_NUM_THREADS: 'auto'
-        # Let PythonCall use built-in python
-        JULIA_CONDAPKG_BACKEND: 'Null'
         GKSwstype: 100
     steps:
       - name: Checkout repository
