@@ -25,12 +25,7 @@ sol = solve(prob, tstops=[20minute, 40minute], saveat=ts);
 
 #---
 
-function plot_figs1(
-    sol;
-    figsize=(10, 10),
-    tight=true,
-    grid=true
-)
+function plot_figs1( sol; figsize=(10, 10))
     @unpack G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ATP_c, ADP_c, AMP_c, ΔΨm, degavg, x = sol.prob.f.sys
     ts = sol.t
     tsm = ts ./ 60
@@ -90,10 +85,10 @@ function plot_figs1(
 
 
     for a in ax
-        a.grid(grid)
+        a.grid()
     end
 
-    fig.set_tight_layout(tight)
+    fig.tight_layout()
     return fig
 end
 
@@ -138,22 +133,17 @@ prob_dm = remake_dm(prob)
 
 #---
 
+ts = range(0, 60minute; step=0.5minute)
 solDM = solve(prob_dm, tstops=[20minute, 40minute], saveat=ts);
 
 #---
-function plot_figs2(
-    sol, solDM;
-    figsize=(12, 12),
-    labels=["Baseline", "Diabetic"],
-    tight=true,
-    grid=true
-)
-    @unpack G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ATP_c, ADP_c, ΔΨm, degavg = sol.prob.f.sys
+function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"])
+    @unpack G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ATP_c, ADP_c, ΔΨm, degavg, J_O2 = sol.prob.f.sys
     ts = sol.t
     tsm = ts ./ 60
 
     g3p = sol[G3P * 1000]
-    pyr = sol[Pyr * 1000]
+    jo2 = sol[J_O2]
     nadh_c = sol[NADH_c * 1000]
     nadh_m = sol[NADH_m * 1000]
     ca_c = sol[Ca_c * 1000]
@@ -163,7 +153,7 @@ function plot_figs2(
     k = sol[degavg]
 
     g3pDM = solDM[G3P * 1000]
-    pyrDM = solDM[Pyr * 1000]
+    jo2DM = solDM[J_O2]
     nadh_cDM = solDM[NADH_c * 1000]
     nadh_mDM = solDM[NADH_m * 1000]
     ca_cDM = solDM[Ca_c * 1000]
@@ -179,9 +169,9 @@ function plot_figs2(
     ax[1, 1].set(ylabel="G3P (μM)")
     ax[1, 1].set_title("(A)", loc="left")
 
-    ax[1, 2].plot(tsm, pyr, label=labels[1])
-    ax[1, 2].plot(tsm, pyrDM, label=labels[2])
-    ax[1, 2].set(ylabel="Pyruvate (μM)")
+    ax[1, 2].plot(tsm, jo2, label=labels[1])
+    ax[1, 2].plot(tsm, jo2DM, label=labels[2])
+    ax[1, 2].set(ylabel="OCR (mM/s)")
     ax[1, 2].set_title("(B)", loc="left")
 
     ax[1, 3].plot(tsm, nadh_c, label=labels[1])
@@ -220,11 +210,11 @@ function plot_figs2(
     ax[3, 3].set_title("(I)", loc="left")
 
     for a in ax
-        a.grid(grid)
+        a.grid()
         a.legend()
     end
 
-    fig.set_tight_layout(tight)
+    fig.tight_layout()
     return fig
 end
 
@@ -253,6 +243,7 @@ tend = 80minute
 ts = range(0, tend, 401)
 
 prob = ODEProblem(sys, [], ts[end])
+probs5 = deepcopy(prob)
 
 function remake_dm(prob; rPDH=0.5, rETC=0.75, rHL=1.4, rF1=0.5)
     p = copy(prob.p)
@@ -264,10 +255,11 @@ function remake_dm(prob; rPDH=0.5, rETC=0.75, rHL=1.4, rF1=0.5)
 end
 
 prob_dm = remake_dm(prob)
+prob_dmS5 = remake_dm(probs5)
 
 # Define events
 function add_glucose!(i)
-    i.p[idxGlc] += 20mM
+    i.p[idxGlc] += 15mM
     set_proposed_dt!(i, 0.1)
 end
 
@@ -301,57 +293,16 @@ solDMs3 = solve(prob_dm; callback=cbs, saveat=ts)
 figs3 = plot_figs2(sols3, solDMs3)
 figs3
 
-#===
-## Figure S4
-Oxygen consumption in response to both glucose stimulation and chemical agents.
-===#
-
-function plot_jo2(sol, solDM;
-    labels=["Baseline", "Diabetic"],
-    figsize=(6, 6),
-    tight=true,
-    grid=true
-)
-    ts = sol.t
-    tsm = ts ./ 60
-
-    @unpack J_O2 = sol.prob.f.sys
-    jo2 = sol[J_O2]
-    jo2DM = solDM[J_O2]
-
-    fig, ax = plt.subplots(; figsize)
-
-    ax.plot(tsm, jo2, label=labels[1])
-    ax.plot(tsm, jo2DM, label=labels[2])
-    ax.set(xlabel="Time (minute)", ylabel="Rate (mM/s)", title="Oxygen consumption rate")
-
-    ax.grid(grid)
-    ax.legend()
-    fig.set_tight_layout(tight)
-    return fig
-end
-
-#---
-
-figs4 = plot_jo2(sols3, solDMs3)
-figs4
+# TIFF file
+## `figs3.savefig("Fig35.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
 
 # ## Figure S5
 # Baseline vs. Diabetic models using Glucose-Oligomycin-Rotenone protocol.
 cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_rotenone_cb)
-sols5 = solve(prob; callback=cbs, saveat=ts)
-sols5DM = solve(prob_dm; callback=cbs, saveat=ts)
+sols5 = solve(probs5; callback=cbs, saveat=ts)
+sols5DM = solve(prob_dmS5; callback=cbs, saveat=ts)
 figs5 = plot_figs2(sols5, sols5DM)
 figs5
 
-# TIF file
-# `figs5.savefig("FigS5.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
-
-# ## Figure S6
-# Oxygen consumption of Baseline and Diabetic models using the protocol from Figure S5.
-
-figs6 = plot_jo2(sols5, sols5DM)
-figs6
-
-# TIF file
-# `figs6.savefig("FigS6.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
+# TIFF file
+## `figs5.savefig("FigS5.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`

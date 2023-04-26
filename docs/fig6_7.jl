@@ -16,8 +16,7 @@ rcParams["font.size"] = 14
 
 #---
 
-glc = range(3.0mM, 30.0mM; step=0.5mM)
-tend = 50minute
+glc = 3.0:0.5:30.0
 @named sys = make_model()
 prob = SteadyStateProblem(sys, [])
 
@@ -52,10 +51,10 @@ function remake_fccp(prob; rHL=5)
 end
 
 function remake_dm(prob; rPDH=0.5, rETC=0.75, rHL=1.4, rF1=0.5)
-    prob = remake_rotenone(prob; rETC)
-    prob = remake_oligomycin(prob; rF1)
-    prob = remake_fccp(prob; rHL)
     p = copy(prob.p)
+    p[idxVmaxETC] *= rETC
+    p[idxVmaxF1] *= rF1
+    p[idxpHleak] *= rHL
     p[idxVmaxPDH] *= rPDH
     return remake(prob, p=p)
 end
@@ -75,11 +74,13 @@ prob_func=prob_func_glc
 trajectories=length(glc)
 
 sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
-solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories)
+solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories);
+#---
 
-# TODO: less information
+## TODO: less information
 
-function plot_fig6(sols, solsDM, glc; figsize=(10, 10), tight=true, labels=["Baseline", "Diabetic"])
+function plot_fig6(sols, solsDM, glc; figsize=(10, 10), labels=["Baseline", "Diabetic"])
+
     extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
     glc5 = glc ./ 5
 
@@ -143,7 +144,7 @@ function plot_fig6(sols, solsDM, glc; figsize=(10, 10), tight=true, labels=["Bas
         a.legend()
     end
 
-    fig.set_tight_layout(tight)
+    fig.tight_layout()
     return fig
 end
 
@@ -153,7 +154,7 @@ fig6 = plot_fig6(sols, solsDM, glc)
 fig6
 
 # Generating tiff file
-# `fig6.savefig("Fig6.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
+## `fig6.savefig("Fig6.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
 
 # ## Figure 7
 
@@ -170,9 +171,7 @@ solsOligo = solve(EnsembleProblem(prob_rotenone; prob_func), alg; trajectories)
 
 #---
 
-function plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc;
-    figsize=(12, 6), tight=true
-)
+function plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc; figsize=(12, 6))
     extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
 
     sys = sols[begin].prob.f.sys
@@ -218,7 +217,7 @@ function plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc;
     ax[2].grid()
     ax[2].legend()
 
-    fig.set_tight_layout(tight)
+    fig.tight_layout()
     return fig
 end
 
@@ -228,4 +227,4 @@ fig7 = plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc)
 fig7
 
 # Generating tiff file
-# `fig7.savefig("Fig7.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
+## `fig7.savefig("Fig7.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
