@@ -3,8 +3,6 @@
 
 Steady-state solutions across a range of glucose levels.
 ===#
-using BenchmarkTools
-using Latexify
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
