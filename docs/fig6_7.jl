@@ -1,12 +1,12 @@
-md"""
+#===
 # Figure 6 and 7
-"""
+===#
 
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-using MitochondrialDynamics: GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC, J_ANT, J_HL
-using MitochondrialDynamics: G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ΔΨm, ATP_c, ADP_c, degavg
+# using MitochondrialDynamics: GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC, J_ANT, J_HL
+# using MitochondrialDynamics: G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ΔΨm, ATP_c, ADP_c, degavg
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 import PyPlot as plt
 rcParams = plt.PyDict(plt.matplotlib."rcParams")
@@ -16,126 +16,135 @@ rcParams["font.size"] = 14
 
 #---
 
-glc = range(3.0mM, 30.0mM, length=201)
-tend = 50minute
+glc = 3.0:0.5:30.0
 @named sys = make_model()
 prob = SteadyStateProblem(sys, [])
 
-#---
+# Parameters to be tweaked
 
-pidx = Dict(k => i for (i, k) in enumerate(parameters(sys)))
-idxGlc = pidx[GlcConst]
-idxVmaxPDH = pidx[VmaxPDH]
-idxpHleak = pidx[pHleak]
-idxVmaxF1 = pidx[VmaxF1]
-idxVmaxETC = pidx[VmaxETC]
+@unpack GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC = sys
+
+idxGlc = findfirst(isequal(GlcConst), parameters(sys))
+idxVmaxPDH = findfirst(isequal(VmaxPDH), parameters(sys))
+idxpHleak = findfirst(isequal(pHleak), parameters(sys))
+idxVmaxF1 =  findfirst(isequal(VmaxF1), parameters(sys))
+idxVmaxETC =  findfirst(isequal(VmaxETC), parameters(sys))
 
 # ## Fig 6
 
-function make_dm_prob(prob; rPDH=0.5, rETC=0.75, rHL=1.4, rF1=0.5)
+function remake_rotenone(prob; rETC=0.1)
     p = copy(prob.p)
+    p[idxVmaxETC] *= rETC
+    return remake(prob, p=p)
+end
+
+function remake_oligomycin(prob; rF1=0.1)
+    p = copy(prob.p)
+    p[idxVmaxF1] *= rF1
+    return remake(prob, p=p)
+end
+
+function remake_fccp(prob; rHL=5)
+    p = copy(prob.p)
+    p[idxpHleak] *= rHL
+    return remake(prob, p=p)
+end
+
+function remake_dm(prob; rPDH=0.5, rETC=0.75, rHL=1.4, rF1=0.5)
+    p = copy(prob.p)
+    p[idxVmaxETC] *= rETC
+    p[idxVmaxF1] *= rF1
+    p[idxpHleak] *= rHL
     p[idxVmaxPDH] *= rPDH
-    p[idxpHleak] *= rHL
-    p[idxVmaxF1] *= rF1
-    p[idxVmaxETC] *= rETC
     return remake(prob, p=p)
 end
 
-function make_rotenone_prob(prob; rETC=0.1)
-    p = copy(prob.p)
-    p[idxVmaxETC] *= rETC
-    return remake(prob, p=p)
+function prob_func_glc(prob, i, repeat)
+    prob.p[idxGlc] = glc[i]
+    prob
 end
 
-function make_oligomycin_prob(prob; rF1=0.1)
-    p = copy(prob.p)
-    p[idxVmaxF1] *= rF1
-    return remake(prob, p=p)
-end
+# Problem forDM cells
 
-function make_fccp_prob(prob; rHL=5)
-    p = copy(prob.p)
-    p[idxpHleak] *= rHL
-    return remake(prob, p=p)
-end
-
-function remake_glc(prob, g)
-    p = copy(prob.p)
-    p[idxGlc] = g
-    remake(prob; p=p)
-end
+prob_dm = remake_dm(prob)
 
 #---
+alg = DynamicSS(Rodas5())
+prob_func=prob_func_glc
+trajectories=length(glc)
 
-prob_dm = make_dm_prob(prob)
-
-sols = map(glc) do g
-    solve(remake_glc(prob, g), DynamicSS(Rodas5()))
-end
-
-solsDM = map(glc) do g
-    solve(remake_glc(prob_dm, g), DynamicSS(Rodas5()))
-end;
-
+sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
+solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories);
 #---
 
-function plot_fig6(sols, solsDM, glc; figsize=(12, 12), tight=true)
+## TODO: less information
+
+function plot_fig6(sols, solsDM, glc; figsize=(10, 10), labels=["Baseline", "Diabetic"])
+
+    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
     glc5 = glc ./ 5
-    td = getindex.(sols, ATP_c/ADP_c)
-    tdDM = getindex.(solsDM, ATP_c/ADP_c)
 
     fig, ax = plt.subplots(3, 3; figsize)
 
-    ax[1, 1].plot(glc5, getindex.(sols, G3P) .* 1000, label="Baseline")
-    ax[1, 1].plot(glc5, getindex.(solsDM, G3P) .* 1000, label="Diabetic")
+    sys = sols[begin].prob.f.sys
+    @unpack G3P = sys
+    ax[1, 1].plot(glc5, extract(sols, G3P, 1000), label=labels[1])
+    ax[1, 1].plot(glc5, extract(solsDM, G3P, 1000), label=labels[2])
     ax[1, 1].set_title("(A) G3P", loc="left")
     ax[1, 1].set(ylabel="Conc. (μM)")
 
-    ax[1, 2].plot(glc5, getindex.(sols, Pyr) .* 1000, label="Baseline")
-    ax[1, 2].plot(glc5, getindex.(solsDM, Pyr) .* 1000, label="Diabetic")
+    @unpack Pyr = sys
+    ax[1, 2].plot(glc5, extract(sols, Pyr, 1000), label=labels[1])
+    ax[1, 2].plot(glc5, extract(solsDM, Pyr, 1000), label=labels[2])
     ax[1, 2].set_title("(B) Pyr", loc="left")
     ax[1, 2].set(ylabel="Conc. (μM)")
 
-    ax[1, 3].plot(glc5, getindex.(sols, NADH_c) .* 1000, label="Baseline")
-    ax[1, 3].plot(glc5, getindex.(solsDM, NADH_c) .* 1000, label="Diabetic")
-    ax[1, 3].set_title("(C) NADH (cyto)", loc="left")
-    ax[1, 3].set(ylabel="Conc. (μM)")
+    @unpack NADH_c, NAD_c = sys
+    ax[1, 3].plot(glc5, extract(sols, NADH_c/NAD_c), label=labels[1])
+    ax[1, 3].plot(glc5, extract(solsDM, NADH_c/NAD_c), label=labels[2])
+    ax[1, 3].set_title("(C) NADH:NAD (cyto)", loc="left")
 
-    ax[2, 1].plot(glc5, getindex.(sols, NADH_m) .* 1000, label="Baseline")
-    ax[2, 1].plot(glc5, getindex.(solsDM, NADH_m) .* 1000, label="Diabetic")
-    ax[2, 1].set_title("(D) NADH (mito)", loc="left")
-    ax[2, 1].set(ylabel="Conc. (μM)")
+    @unpack NADH_m, NAD_m = sys
+    ax[2, 1].plot(glc5, extract(sols, NADH_m/NAD_m), label=labels[1])
+    ax[2, 1].plot(glc5, extract(solsDM, NADH_m/NAD_m), label=labels[2])
+    ax[2, 1].set_title("(D) NADH:NAD (mito)", loc="left")
 
-    ax[2, 2].plot(glc5, getindex.(sols, Ca_c) .* 1000, label="Baseline")
-    ax[2, 2].plot(glc5, getindex.(solsDM, Ca_c) .* 1000, label="Diabetic")
+    @unpack Ca_c = sys
+    ax[2, 2].plot(glc5, extract(sols, Ca_c, 1000), label=labels[1])
+    ax[2, 2].plot(glc5, extract(solsDM, Ca_c, 1000), label=labels[2])
     ax[2, 2].set_title("(E) Calcium (cyto)", loc="left")
     ax[2, 2].set(ylabel="Conc. (μM)")
 
-    ax[2, 3].plot(glc5, getindex.(sols, Ca_m) .* 1000, label="Baseline")
-    ax[2, 3].plot(glc5, getindex.(solsDM, Ca_m) .* 1000, label="Diabetic")
+    @unpack Ca_m = sys
+    ax[2, 3].plot(glc5, extract(sols, Ca_m, 1000), label=labels[1])
+    ax[2, 3].plot(glc5, extract(solsDM, Ca_m, 1000), label=labels[2])
     ax[2, 3].set_title("(F) Calcium (mito)", loc="left")
     ax[2, 3].set(ylabel="Conc. (μM)")
 
-    ax[3, 1].plot(glc5, getindex.(sols, ΔΨm) .* 1000, label="Baseline")
-    ax[3, 1].plot(glc5, getindex.(solsDM, ΔΨm) .* 1000, label="Diabetic")
+    @unpack ΔΨm = sys
+    ax[3, 1].plot(glc5, extract(sols, ΔΨm, 1000), label=labels[1])
+    ax[3, 1].plot(glc5, extract(solsDM, ΔΨm, 1000), label=labels[2])
     ax[3, 1].set_title("(G) ΔΨ", loc="left")
     ax[3, 1].set(xlabel="Glucose (X)", ylabel="mV")
 
-    ax[3, 2].plot(glc5, td, label="Baseline")
-    ax[3, 2].plot(glc5, tdDM, label="Diabetic")
+    @unpack ATP_c, ADP_c = sys
+    ax[3, 2].plot(glc5, extract(sols, ATP_c/ADP_c), label=labels[1])
+    ax[3, 2].plot(glc5, extract(solsDM, ATP_c/ADP_c), label=labels[2])
     ax[3, 2].set_title("(H) ATP:ADP", loc="left")
     ax[3, 2].set(xlabel="Glucose (X)")
 
-    ax[3, 3].plot(glc5, getindex.(sols, degavg), label="Baseline")
-    ax[3, 3].plot(glc5, getindex.(solsDM, degavg), label="Diabetic")
-    ax[3, 3].set_title("(I) Average node degree", loc="left")
+    @unpack degavg = sys
+    ax[3, 3].plot(glc5, extract(sols, degavg), label=labels[1])
+    ax[3, 3].plot(glc5, extract(solsDM, degavg), label=labels[2])
+    ax[3, 3].set_title("(I) <k>", loc="left")
     ax[3, 3].set(xlabel="Glucose (X)")
 
     for a in ax
         a.grid()
+        a.legend()
     end
 
-    fig.set_tight_layout(tight)
+    fig.tight_layout()
     return fig
 end
 
@@ -145,46 +154,43 @@ fig6 = plot_fig6(sols, solsDM, glc)
 fig6
 
 # Generating tiff file
-# `fig6.savefig("Fig6.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
+## `fig6.savefig("Fig6.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
 
 # ## Figure 7
 
-prob_fccp = make_fccp_prob(prob)
-prob_rotenone = make_rotenone_prob(prob)
-prob_oligomycin = make_oligomycin_prob(prob)
+prob_fccp = remake_fccp(prob)
+prob_rotenone = remake_rotenone(prob)
+prob_oligomycin = remake_oligomycin(prob)
 
-solsFCCP = map(glc) do g
-    solve(remake_glc(prob_fccp, g), DynamicSS(Rodas5()))
-end
-
-solsRot = map(glc) do g
-    solve(remake_glc(prob_rotenone, g), DynamicSS(Rodas5()))
-end
-
-solsOligo = map(glc) do g
-    solve(remake_glc(prob_oligomycin, g), DynamicSS(Rodas5()))
-end
+#---
+sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
+solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories)
+solsFCCP = solve(EnsembleProblem(prob_fccp; prob_func), alg; trajectories)
+solsRot = solve(EnsembleProblem(prob_oligomycin; prob_func), alg; trajectories)
+solsOligo = solve(EnsembleProblem(prob_rotenone; prob_func), alg; trajectories)
 
 #---
 
-function plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc;
-    figsize=(12, 6), tight=true
-)
+function plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc; figsize=(12, 6))
+    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
+
+    sys = sols[begin].prob.f.sys
+    @unpack J_HL, J_ANT = sys
     ## Gather ATP synthesis rate (fusion) and proton leak rate (fission)
-    jHL_baseline = getindex.(sols, J_HL)
-    jANT_baseline = getindex.(sols, J_ANT)
+    jHL_baseline = extract(sols, J_HL)
+    jANT_baseline = extract(sols, J_ANT)
     ff_baseline = jANT_baseline ./ jHL_baseline
-    jHL_dm = getindex.(solsDM, J_HL)
-    jANT_dm = getindex.(solsDM, J_ANT)
+    jHL_dm = extract(solsDM, J_HL)
+    jANT_dm = extract(solsDM, J_ANT)
     ff_dm = jANT_dm ./ jHL_dm
-    jHL_fccp = getindex.(solsFCCP, J_HL)
-    jANT_fccp = getindex.(solsFCCP, J_ANT)
+    jHL_fccp = extract(solsFCCP, J_HL)
+    jANT_fccp = extract(solsFCCP, J_ANT)
     ff_fccp = jANT_fccp ./ jHL_fccp
-    jHL_rot = getindex.(solsRot, J_HL)
-    jANT_rot = getindex.(solsRot, J_ANT)
+    jHL_rot = extract(solsRot, J_HL)
+    jANT_rot = extract(solsRot, J_ANT)
     ff_rot = jANT_rot ./ jHL_rot
-    jHL_oligo = getindex.(solsOligo, J_HL)
-    jANT_oligo = getindex.(solsOligo, J_ANT)
+    jHL_oligo = extract(solsOligo, J_HL)
+    jANT_oligo = extract(solsOligo, J_ANT)
     ff_oligo = jANT_oligo ./ jHL_oligo
 
     glc5 = glc ./ 5
@@ -211,7 +217,7 @@ function plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc;
     ax[2].grid()
     ax[2].legend()
 
-    fig.set_tight_layout(tight)
+    fig.tight_layout()
     return fig
 end
 
@@ -221,4 +227,4 @@ fig7 = plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc)
 fig7
 
 # Generating tiff file
-# `fig7.savefig("Fig7.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
+## `fig7.savefig("Fig7.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`

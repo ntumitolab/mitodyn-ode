@@ -1,8 +1,8 @@
-md"""
+#===
 # Figure 3
 
 Steady-state solutions for a range of glucose concentrations and OXPHOS capacities.
-"""
+===#
 
 using DifferentialEquations
 using ModelingToolkit
@@ -16,12 +16,22 @@ rcParams["font.size"] = 14
 #---
 
 @named sys = make_model()
-@unpack GlcConst = sys
+@unpack GlcConst, VmaxF1, VmaxETC, pHleak = sys
 iGlc = findfirst(isequal(GlcConst), parameters(sys))
-
+iVmaxF1 = findfirst(isequal(VmaxF1), parameters(sys))
+iVmaxETC = findfirst(isequal(VmaxETC), parameters(sys))
+ipHleak = findfirst(isequal(pHleak), parameters(sys))
 prob = SteadyStateProblem(sys, [])
 
-# TODO: use ensmeble simulation
+# Range for two parameters
+
+rGlcF1 = range(3.0, 30.0, 51)
+rGlcETC = range(3.0, 30.0, 51)
+rGlcHL = range(4.0, 30.0, 51)
+rF1 = range(0.1, 2.0, 51)
+rETC = range(0.1, 2.0, 51)
+rHL = range(0.1, 5.0, 51)
+
 function solve_fig3(glc, r, protein, prob; alg=DynamicSS(Rodas5()))
     idx = findfirst(isequal(protein), parameters(sys))
     p = copy(prob.p)
@@ -30,26 +40,15 @@ function solve_fig3(glc, r, protein, prob; alg=DynamicSS(Rodas5()))
     return solve(remake(prob, p=p), alg)
 end
 
-#---
-
-## TODO: use ensmeble simulation
-
-rGlc1 = range(3.0, 30.0, 50)
-rGlc2 = range(4.0, 30.0, 50)
-rF1 = range(0.1, 2.0, 50)
-rETC = range(0.1, 2.0, 50)
-rHL = range(0.1, 5.0, 50)
-
 @unpack VmaxF1, VmaxETC, pHleak = sys
-uInf_f1 = [solve_fig3(glc, r, VmaxF1, prob) for r in rF1, glc in rGlc1];
-uInf_etc = [solve_fig3(glc, r, VmaxETC, prob) for r in rETC, glc in rGlc1];
-uInf_hl = [solve_fig3(glc, r, pHleak, prob) for r in rHL, glc in rGlc2];
+solsf1 = [solve_fig3(glc, r, VmaxF1, prob) for r in rF1, glc in rGlcF1];
+solsetc = [solve_fig3(glc, r, VmaxETC, prob) for r in rETC, glc in rGlcETC];
+solshl = [solve_fig3(glc, r, pHleak, prob) for r in rHL, glc in rGlcHL];
 
 #---
 
 function plot_fig3(;
     figsize=(10, 10),
-    levels=40,
     cmaps=["bwr", "magma", "viridis"],
     ylabels=[
         "ATP synthase capacity (X)",
@@ -57,11 +56,11 @@ function plot_fig3(;
         "Proton leak rate (X)"
     ],
     cbarlabels=["<k>", "ΔΨ", "ATP/ADP"],
-    xxs=(rGlc1, rGlc1, rGlc2),
+    xxs=(rGlcF1, rGlcETC, rGlcHL),
     xscale=5.0,
     yys=(rF1, rETC, rHL),
-    zs=(uInf_f1, uInf_etc, uInf_hl),
-    extremes=((1.0, 2.0), (80.0, 180.0), (0.0, 60.0))
+    zs=(solsf1, solsetc, solshl),
+    extremes=((1.0, 1.8), (80.0, 180.0), (0.0, 60.0))
 )
     ## mapping functions
     @unpack degavg, ΔΨm, ATP_c, ADP_c = sys
@@ -88,7 +87,6 @@ function plot_fig3(;
                 xx, yy, map(f, z);
                 shading="gouraud",
                 rasterized=true,
-                ## levels=levels,
                 cmap=cm,
                 vmin=vmin,
                 vmax=vmax
@@ -119,4 +117,4 @@ fig3 = plot_fig3(figsize=(13, 10))
 fig3
 
 # TIFF file
-# `fig3.savefig("Fig3.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
+## `fig3.savefig("Fig3.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`

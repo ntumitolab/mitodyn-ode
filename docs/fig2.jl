@@ -3,11 +3,9 @@
 
 Steady-state solutions across a range of glucose levels.
 ===#
-
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-import MitochondrialDynamics: second, μM, mV, mM, Hz
 import PyPlot as plt
 rcParams = plt.PyDict(plt.matplotlib."rcParams")
 rcParams["font.size"] = 14
@@ -17,14 +15,17 @@ rcParams["font.size"] = 14
 # Default model
 @named sys = make_model()
 prob = SteadyStateProblem(sys, []) ## Use default u0
-sol = solve(prob)
+alg = DynamicSS(Rodas5())
+sol = solve(prob, alg)
 
 # Galactose model: glycolysis produces zero net ATP
 @named sys_gal = make_model(gk_atp_stoich=4)
+prob_gal = SteadyStateProblem(sys_gal, [])
 
 # FFA model: Additional flux producing mitochondrial NADH
-@unpack J_CAC = sys
-@named sys_ffa = make_model(j_ffa=sol[J_CAC] * 0.5)
+@named sys_ffa = make_model()
+@unpack J_CAC, J_FFA = sys_ffa
+prob_ffa = SteadyStateProblem(sys_ffa, [], [J_FFA => sol[J_CAC] * 0.5])
 
 # Simulating on a range of glucose
 @unpack GlcConst = sys
@@ -32,29 +33,24 @@ idxGlc = findfirst(isequal(GlcConst), parameters(sys))
 
 #---
 
-prob = SteadyStateProblem(sys, [])
-prob_gal = SteadyStateProblem(sys_gal, [])
-prob_ffa = SteadyStateProblem(sys_ffa, [])
-glc = range(3.0mM, 30.0mM, length=51)  # Range of glucose
+glc = range(3.0, 30.0, length=101)  # Range of glucose
+prob_func_glc(prob, i, repeat) = remake(prob, p=replace!(prob.p, idxGlc=>glc[i]))
 
-function prob_func_glc(prob, i, repeat)
-    prob.p[idxGlc] = glc[i]
-    prob
-end
+#---
 
-alg = DynamicSS(Rodas5())
 prob_func=prob_func_glc
 trajectories=length(glc)
 sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
 sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; trajectories)
-sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories)
+sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories);
 
 #---
 
 function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
-    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
 
+    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
     @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x, degavg = sys
+
     glc5 = glc ./ 5
     g3p = extract(sols, G3P, 1000)
     pyr = extract(sols, Pyr, 1000)
@@ -106,7 +102,6 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
         a.set_xticks(1:6)
         a.grid()
     end
-
     fig.suptitle(title)
     fig.tight_layout()
     return fig
@@ -169,4 +164,4 @@ end
 fig2 = plot_fig2(glc, sim, sim_gal, sim_ffa, sys)
 
 # Tiff figure
-# `fig2.savefig("Fig2.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
+## `fig2.savefig("Fig2.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
