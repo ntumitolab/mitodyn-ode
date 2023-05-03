@@ -21,7 +21,7 @@ jobs:
       pull-requests: write
     uses: sosiristseng/juliabook/.github/workflows/update-manifest.yml@main
     with:
-      julia-version: "~1.9.0-rc2"
+      julia-version: "~1.9.0-0"
     secrets:
       APP_ID: ${{ secrets.APP_ID }}
       APP_PRIVATE_KEY: ${{ secrets.APP_PRIVATE_KEY }}
