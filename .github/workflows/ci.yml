@@ -19,7 +19,7 @@ jobs:
       NPROC: '2'
       JULIA_CACHE: '1'
     container:
-      image: ghcr.io/sosiristseng/juliabook:1.9.0rc3
+      image: ghcr.io/sosiristseng/juliabook:1.9.0rc3.post1
       env:
         GKSwstype: 100
     steps:
