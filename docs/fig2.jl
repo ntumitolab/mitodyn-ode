@@ -17,7 +17,6 @@ rcParams["font.size"] = 14
 prob = SteadyStateProblem(sys, []) ## Use default u0
 alg = DynamicSS(Rodas5())
 sol = solve(prob, alg)
-
 # Galactose model: glycolysis produces zero net ATP
 @named sys_gal = make_model(gk_atp_stoich=4)
 prob_gal = SteadyStateProblem(sys_gal, [])
@@ -34,15 +33,24 @@ idxGlc = findfirst(isequal(GlcConst), parameters(sys))
 #---
 
 glc = range(3.0, 30.0, length=101)  # Range of glucose
-prob_func_glc(prob, i, repeat) = remake(prob, p=replace!(prob.p, idxGlc=>glc[i]))
 
-#---
+sim = map(glc) do g
+    p = copy(prob.p)
+    p[idxGlc] = g
+    solve(remake(prob, p=p), alg)
+end
 
-prob_func=prob_func_glc
-trajectories=length(glc)
-sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
-sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; trajectories)
-sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories);
+sim_gal = map(glc) do g
+    p = copy(prob_gal.p)
+    p[idxGlc] = g
+    solve(remake(prob_gal, p=p), alg)
+end
+
+sim_ffa = map(glc) do g
+    p = copy(prob_ffa.p)
+    p[idxGlc] = g
+    solve(remake(prob_ffa, p=p), alg)
+end;
 
 #---
 
@@ -109,6 +117,10 @@ end
 
 #---
 fig_glc_default = plot_steady_state(glc, sim, sys, title="Default parameters")
+
+# Print figure
+## fig_glc_default.savefig("Fig2.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+
 #---
 fig_glc_ffa = plot_steady_state(glc, sim_ffa, sys_ffa, title="FFA parameters")
 #---
@@ -116,7 +128,7 @@ fig_glc_gal = plot_steady_state(glc, sim_gal, sys_gal, title="Galactose paramete
 
 # Compare default, FFA, and Gal parameter sets
 
-function plot_fig2(glc, sim, sim_gal, sim_ffa, sys; figsize=(8, 8), title="", labels=["Default", "Gal", "FFA"])
+function plot_fig2s(glc, sim, sim_gal, sim_ffa, sys; figsize=(8, 8), title="", labels=["Default", "Gal", "FFA"])
 
     extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
 
@@ -161,7 +173,7 @@ function plot_fig2(glc, sim, sim_gal, sim_ffa, sys; figsize=(8, 8), title="", la
     return fig
 end
 
-fig2 = plot_fig2(glc, sim, sim_gal, sim_ffa, sys)
+fig2s = plot_fig2s(glc, sim, sim_gal, sim_ffa, sys)
 
-# Tiff figure
-## `fig2.savefig("Fig2.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
+# Print figure
+fig2.savefig("Fig2s.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
