@@ -176,4 +176,4 @@ end
 fig2s = plot_fig2s(glc, sim, sim_gal, sim_ffa, sys)
 
 # Print figure
-fig2.savefig("Fig2s.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+## fig2s.savefig("Fig2s.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
