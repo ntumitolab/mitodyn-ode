@@ -34,23 +34,17 @@ idxGlc = findfirst(isequal(GlcConst), parameters(sys))
 
 glc = range(3.0, 30.0, length=101)  # Range of glucose
 
-sim = map(glc) do g
-    p = copy(prob.p)
-    p[idxGlc] = g
-    solve(remake(prob, p=p), alg)
+prob_func = function (prob, i, repeat)
+    prob.p[idxGlc] = glc[i]
+    prob
 end
 
-sim_gal = map(glc) do g
-    p = copy(prob_gal.p)
-    p[idxGlc] = g
-    solve(remake(prob_gal, p=p), alg)
-end
+alg = DynamicSS(Rodas5())
+trajectories=length(glc)
 
-sim_ffa = map(glc) do g
-    p = copy(prob_ffa.p)
-    p[idxGlc] = g
-    solve(remake(prob_ffa, p=p), alg)
-end;
+sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
+sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; trajectories)
+sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories);
 
 #---
 
