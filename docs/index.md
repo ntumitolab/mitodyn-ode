@@ -1,12 +1,14 @@
 # Glucose stimulation and Mitochondrial dynamics
 
 ## Difference from the original Fridlyand's model
+
 - We  added an dilution term for pyruvate and a ADP Michaelis constant in Glyceraldehyde 3-phosphate dehydrogenase to increase the robustness in the ODE systems.
 - We added adenylate kinase (Adk) equilibrium for the ATP-ADP-AMP pool to address the high energy phosphate distribution in the cytosol. Also, the adenylate pool size was bumped up to keep the steady state ATP/ADP ratio the same as before (~5) at the resting glucose level of 5mM.
 - We altered the mathematical expressions of mitochondrial sodium calcium exchanger (NCLX). The  specific concentrations of sodium and calcium were on the exponent in the original model. We moved the specific concentrations down to multipliers was inconsistent with the original model of Nguyen et al.
 - The mitochondrial fission rate is fixed to once per 10 minutes, and the fusion rate depends on the proton leak flux and the ATP synthase flux.
 
 ## Current Limitations
+
 - Glycolysis, ETC, ATP synthesis, and cytosolic calcium dynamics were expressed in an empirical fashion rather than fully mechanistic. No signal transduction nor complex calcium dynamics.
 - There is no role for reactive oxygen species (ROS),  potential signals for bioenergetics and mitochondrial dynamics.
 - Mitochondrial content was assumed conserved and homogenous.
@@ -32,7 +34,6 @@
 | $k_{NADHc}$   | 0.1/s         | Consumption rate of cyto NADH                                         |
 | $k_{ATP}$     | 0.04/s        | Basal consumption rate of ATP                                         |
 | $k_{ATPCa}$   | 90/mM/s       | Consumption rate of ATP activated by calcium                          |
-
 
 
 ## Conservation relationships
@@ -304,4 +305,3 @@ $$
 | $\Delta\Psi_{m}$ | 100mV   | Mitochondrial membrane potential           |
 | $X_2$            | 0.20    | Population of degree-2 mitochondrial nodes |
 | $X_3$            | 0.05    | Population of degree-3 mitochondrial nodes |
-
