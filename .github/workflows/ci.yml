@@ -66,13 +66,12 @@ jobs:
           import Pkg
           Pkg.Registry.update()
           Pkg.instantiate()
-          Pkg.build("PyCall")
           Pkg.resolve()
           Pkg.precompile()
           Pkg.gc()
       - name: Save Julia dependencies
         uses: actions/cache/save@v3
-        if: ${{ steps.restore-cache.outputs.cache-hit != 'true' }}
+        if: ${{ steps.restore-cache.outputs.cache-hit != 'true' && env.JULIA_CACHE != '0' }}
         with:
           path: |
             ~/.julia
