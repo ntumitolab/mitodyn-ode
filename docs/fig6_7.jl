@@ -227,4 +227,4 @@ fig7 = plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc)
 fig7
 
 # Export figure
-fig7.savefig("Fig7.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))`
+fig7.savefig("Fig7.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
