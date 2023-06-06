@@ -17,7 +17,9 @@ rcParams["font.size"] = 14
 prob = SteadyStateProblem(sys, []) ## Use default u0
 alg = DynamicSS(Rodas5())
 sol = solve(prob, alg)
+
 # Galactose model: glycolysis produces zero net ATP
+# By increasing the ATP consumed in the first part of glycolysis from 2 to 4
 @named sys_gal = make_model(gk_atp_stoich=4)
 prob_gal = SteadyStateProblem(sys_gal, [])
 
@@ -30,7 +32,7 @@ prob_ffa = SteadyStateProblem(sys_ffa, [], [J_FFA => sol[J_CAC] * 0.5])
 @unpack GlcConst = sys
 idxGlc = findfirst(isequal(GlcConst), parameters(sys))
 
-#---
+# Test on a range of glucose
 
 glc = range(3.0, 30.0, length=101)  # Range of glucose
 
@@ -46,7 +48,7 @@ sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
 sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; trajectories)
 sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories);
 
-#---
+# ## Steady states for a range of glucose
 
 function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
 
@@ -110,17 +112,18 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
 end
 
 #---
-fig_glc_default = plot_steady_state(glc, sim, sys, title="Default parameters")
+fig_glc_default = plot_steady_state(glc, sim, sys, title="")
 
-# Print figure
-## fig_glc_default.savefig("Fig2.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+# Default parameters
+fig_glc_default.savefig("Fig2.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
 
-#---
+# Adding free fatty acids
 fig_glc_ffa = plot_steady_state(glc, sim_ffa, sys_ffa, title="FFA parameters")
-#---
+
+# Using galactose instead of glucose as the hydrocarbon source
 fig_glc_gal = plot_steady_state(glc, sim_gal, sys_gal, title="Galactose parameters")
 
-# Compare default, FFA, and Gal parameter sets
+# ## Comparing default, FFA, and galactose models
 
 function plot_fig2s(glc, sim, sim_gal, sim_ffa, sys; figsize=(8, 8), title="", labels=["Default", "Gal", "FFA"])
 
@@ -169,5 +172,5 @@ end
 
 fig2s = plot_fig2s(glc, sim, sim_gal, sim_ffa, sys)
 
-# Print figure
-## fig2s.savefig("Fig2s.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+# Export figure
+fig2s.savefig("Fig2s.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))

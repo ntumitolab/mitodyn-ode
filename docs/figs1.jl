@@ -97,8 +97,8 @@ end
 figs1 = plot_figs1(sol)
 figs1
 
-# TIF file
-## figs1.savefig("FigS1.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+# Export figure
+figs1.savefig("FigS1.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
 
 #===
 ## Figure S2
@@ -294,7 +294,7 @@ figs3 = plot_figs2(sols3, solDMs3)
 figs3
 
 # TIFF file
-## figs3.savefig("Fig35.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+figs3.savefig("FigS3-Glucose-Oligomycin-FCCP.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
 
 # ## Figure S5
 # Baseline vs. Diabetic models using Glucose-Oligomycin-Rotenone protocol.
@@ -305,4 +305,4 @@ figs5 = plot_figs2(sols5, sols5DM)
 figs5
 
 # TIFF file
-## figs5.savefig("FigS5.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+figs5.savefig("FigS5-Glucose-Oligomycin-Rotenone.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
