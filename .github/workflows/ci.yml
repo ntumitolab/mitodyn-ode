@@ -66,6 +66,7 @@ jobs:
           import Pkg
           Pkg.Registry.update()
           Pkg.instantiate()
+          Pkg.build("PyCall")
           Pkg.resolve()
           Pkg.precompile()
           Pkg.gc()
