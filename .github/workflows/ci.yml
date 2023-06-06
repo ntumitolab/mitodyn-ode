@@ -66,7 +66,7 @@ jobs:
           Pkg.gc()
       - name: Save Julia dependencies
         uses: actions/cache/save@v3
-        if: ${{ steps.restore-cache.outputs.cache-hit != 'true' && env.JULIA_CACHE != '0' }}
+        if: ${{ steps.restore-cache.outputs.cache-hit != 'true' }}
         with:
           path: |
             ~/.julia
@@ -75,6 +75,12 @@ jobs:
         run: JULIA_PROJECT=@. julia --color=yes -p ${{ env.NPROC }} literate.jl
       - name: Build website
         run: jupyter-book build docs/
+      - name: Upload TIFF figures
+        uses: actions/upload-artifact@v3
+        with:
+          name: figures
+          path: |
+            doc/**/*.tif
       - name: Upload artifact for GH pages
         uses: actions/upload-pages-artifact@v1
         if: ${{ github.ref == 'refs/heads/main' }}
