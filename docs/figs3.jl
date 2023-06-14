@@ -77,21 +77,93 @@ add_fccp_cb = PresetTimeCallback(60minute, add_fccp!)
 
 cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_fccp_cb)
 sols3 = solve(prob; callback=cbs, saveat=ts)
-solDMs3 = solve(prob_dm; callback=cbs, saveat=ts)
+solDMs3 = solve(prob_dm; callback=cbs, saveat=ts);
 
+#---
+function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"])
+    @unpack G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ATP_c, ADP_c, ΔΨm, degavg, J_O2 = sol.prob.f.sys
+    ts = sol.t
+    tsm = ts ./ 60
+
+    g3p = sol[G3P * 1000]
+    jo2 = sol[J_O2]
+    nadh_c = sol[NADH_c * 1000]
+    nadh_m = sol[NADH_m * 1000]
+    ca_c = sol[Ca_c * 1000]
+    ca_m = sol[Ca_m * 1000]
+    td = sol[ATP_c/ADP_c]
+    dpsi = sol[ΔΨm * 1000]
+    k = sol[degavg]
+
+    g3pDM = solDM[G3P * 1000]
+    jo2DM = solDM[J_O2]
+    nadh_cDM = solDM[NADH_c * 1000]
+    nadh_mDM = solDM[NADH_m * 1000]
+    ca_cDM = solDM[Ca_c * 1000]
+    ca_mDM = solDM[Ca_m * 1000]
+    tdDM = solDM[ATP_c/ADP_c]
+    dpsiDM = solDM[ΔΨm * 1000]
+    kDM = solDM[degavg]
+
+    fig, ax = plt.subplots(3, 3; figsize)
+
+    ax[1, 1].plot(tsm, g3p, label=labels[1])
+    ax[1, 1].plot(tsm, g3pDM, label=labels[2])
+    ax[1, 1].set(ylabel="G3P (μM)")
+    ax[1, 1].set_title("(A)", loc="left")
+
+    ax[1, 2].plot(tsm, jo2, label=labels[1])
+    ax[1, 2].plot(tsm, jo2DM, label=labels[2])
+    ax[1, 2].set(ylabel="OCR (mM/s)")
+    ax[1, 2].set_title("(B)", loc="left")
+
+    ax[1, 3].plot(tsm, nadh_c, label=labels[1])
+    ax[1, 3].plot(tsm, nadh_cDM, label=labels[2])
+    ax[1, 3].set(ylabel="Cytosolic NADH (μM)")
+    ax[1, 3].set_title("(C)", loc="left")
+
+    ax[2, 1].plot(tsm, nadh_m, label=labels[1])
+    ax[2, 1].plot(tsm, nadh_mDM, label=labels[2])
+    ax[2, 1].set(ylabel="Mitochondrial NADH (μM)")
+    ax[2, 1].set_title("(D)", loc="left")
+
+    ax[2, 2].plot(tsm, ca_c, label=labels[1])
+    ax[2, 2].plot(tsm, ca_cDM, label=labels[2])
+    ax[2, 2].set(ylabel="Cytosolic Calcium (μM)")
+    ax[2, 2].set_title("(E)", loc="left")
+
+    ax[2, 3].plot(tsm, ca_m, label=labels[1])
+    ax[2, 3].plot(tsm, ca_mDM, label=labels[2])
+    ax[2, 3].set(ylabel="Mitochondrial Calcium (μM)")
+    ax[2, 3].set_title("(F)", loc="left")
+
+    ax[3, 1].plot(tsm, td, label=labels[1])
+    ax[3, 1].plot(tsm, tdDM, label=labels[2])
+    ax[3, 1].set(ylabel="ATP:ADP")
+    ax[3, 1].set_title("(G)", loc="left")
+
+    ax[3, 2].plot(tsm, dpsi, label=labels[1])
+    ax[3, 2].plot(tsm, dpsiDM, label=labels[2])
+    ax[3, 2].set(ylabel="ΔΨm (mV)")
+    ax[3, 2].set_title("(H)", loc="left")
+
+    ax[3, 3].plot(tsm, k, label=labels[1])
+    ax[3, 3].plot(tsm, kDM, label=labels[2])
+    ax[3, 3].set(ylabel="Average Node Degree")
+    ax[3, 3].set_title("(I)", loc="left")
+
+    for a in ax
+        a.grid()
+        a.legend()
+    end
+
+    fig.tight_layout()
+    return fig
+end
+
+#---
 figs3 = plot_figs2(sols3, solDMs3)
 figs3
 
 # TIFF file
 figs3.savefig("FigS3-Glucose-Oligomycin-FCCP.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
-
-# ## Figure S5
-# Baseline vs. Diabetic models using Glucose-Oligomycin-Rotenone protocol.
-cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_rotenone_cb)
-sols5 = solve(probs5; callback=cbs, saveat=ts)
-sols5DM = solve(prob_dmS5; callback=cbs, saveat=ts)
-figs5 = plot_figs2(sols5, sols5DM)
-figs5
-
-# TIFF file
-figs5.savefig("FigS5-Glucose-Oligomycin-Rotenone.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
