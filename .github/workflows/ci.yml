@@ -13,7 +13,7 @@ concurrency:
 
 env:
   NPROC: '2'       # Number of Julia processes to run the notebooks
-  JULIA_CACHE: '1' # Set this env var '0' to disable caching
+  JULIA_CACHE: '0' # Set this env var '0' to disable caching
   JULIA_CONDAPKG_BACKEND: 'Null'  # Use system python for PythonCall.jl
   GKSwstype: 100
   JULIA_NUM_THREADS: 'auto'
@@ -21,7 +21,7 @@ env:
 
 jobs:
   CI:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -30,10 +30,10 @@ jobs:
         id: python
         with:
           python-version: ${{ env.PY_VER }}
-          cache: 'pip'
-          cache-dependency-path: |
-            requirements.txt
-            .github/requirements.txt
+          # cache: 'pip'
+          # cache-dependency-path: |
+          #   requirements.txt
+          #   .github/requirements.txt
       - name: Install Python dependencies
         run: |
           pip install -U pip
