@@ -1,11 +1,22 @@
-
 #===
+# Supplimentary figures
 ## Figure S3
 
 Changes in response to both glucose stimulation and chemical agents.
 
 Using the Glucose-Oligomycin-FCCP protocol.
 ===#
+
+using DifferentialEquations
+using ModelingToolkit
+using MitochondrialDynamics
+using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
+
+import PyPlot as plt
+rcParams = plt.PyDict(plt.matplotlib."rcParams")
+rcParams["font.size"] = 14
+## rcParams["font.sans-serif"] = "Arial"
+## rcParams["font.family"] = "sans-serif"
 
 @named sys = make_model()
 
