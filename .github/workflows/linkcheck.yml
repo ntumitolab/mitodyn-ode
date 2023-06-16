@@ -9,6 +9,7 @@ on:
       - main
     paths:
       - '.github/workflows/linkcheck.yml'
+      - 'docs/**'
 
 env:
   DIR: 'docs'
