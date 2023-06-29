@@ -125,40 +125,52 @@ fig_glc_gal = plot_steady_state(glc, sim_gal, sys_gal, title="Galactose paramete
 
 # ## Comparing default, FFA, and galactose models
 
-function plot_fig2s(glc, sim, sim_gal, sim_ffa, sys; figsize=(8, 8), title="", labels=["Default", "Gal", "FFA"])
+function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(8, 8), title="", labels=["Default", "Gal", "FFA"])
 
     extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
 
-    @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, degavg = sys
+    @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, degavg, J_O2 = sys
 
     glc5 = glc ./ 5
-    fig, ax = plt.subplots(2, 2; figsize)
+    fig, ax = plt.subplots(3, 2; figsize)
 
-    ax[1, 1].set(title="(A) Mitochondrial NADH:NAD")
-    k = NADH_m/NAD_m
+    ax[1, 1].set(title="(A) Cytosolic NADH:NAD")
+    k = NADH_c/NAD_c
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = ax[1, 1].plot(glc5, yy)
     ax[1, 1].legend(lines, labels)
 
-    ax[1, 2].set(title="(B) ATP:ADP")
-    k = ATP_c/ADP_c
+    ax[1, 2].set(title="(B) Mitochondrial NADH:NAD")
+    k = NADH_m/NAD_m
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = ax[1, 2].plot(glc5, yy)
     ax[1, 2].legend(lines, labels)
 
-    ax[2, 1].set(title="(C) ΔΨm (mV)")
-    k = ΔΨm
-    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)] .* 1000
+    ax[2, 1].set(title="(C) ATP:ADP")
+    k = ATP_c/ADP_c
+    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = ax[2, 1].plot(glc5, yy)
     ax[2, 1].legend(lines, labels)
-    ax[2, 1].set(xlabel="Glucose (X)")
 
-    ax[2, 2].set(title="(D) Average node degree")
-    k = degavg
-    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
+    ax[2, 2].set(title="(D) ΔΨm (mV)")
+    k = ΔΨm
+    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)] .* 1000
     lines = ax[2, 2].plot(glc5, yy)
     ax[2, 2].legend(lines, labels)
-    ax[2, 2].set(xlabel="Glucose (X)")
+
+    ax[3, 1].set(title="(E) Average node degree")
+    k = degavg
+    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
+    lines = ax[3, 1].plot(glc5, yy)
+    ax[3, 1].legend(lines, labels)
+    ax[3, 1].set(xlabel="Glucose (X)")
+
+    ax[3, 2].set(title="(F) Oxygen consumption")
+    k = J_O2
+    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
+    lines = ax[3, 2].plot(glc5, yy)
+    ax[3, 2].legend(lines, labels)
+    ax[3, 2].set(xlabel="Glucose (X)", ylabel="mM/s")
 
     for a in ax
         a.set_xticks(1:6)
@@ -170,7 +182,7 @@ function plot_fig2s(glc, sim, sim_gal, sim_ffa, sys; figsize=(8, 8), title="", l
     return fig
 end
 
-fig2s = plot_fig2s(glc, sim, sim_gal, sim_ffa, sys)
+figFFAGal = plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys)
 
 # Export figure
-fig2s.savefig("Fig2s.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+figFFAGal.savefig("S1Fig1.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
