@@ -1,4 +1,4 @@
-FROM julia:1.9.2 as julia
+FROM julia:1.9.3 as julia
 FROM ghcr.io/sosiristseng/docker-jupyterbook:latest as base
 
 # Julia config
