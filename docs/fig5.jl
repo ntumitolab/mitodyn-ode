@@ -25,10 +25,10 @@ caavg = sssol[Ca_c]
 
 # Calcium wave independent to ATP:ADP ratio
 
-function cac_wave(t)
+function cac_wave(t, amplitude=1.5)
     ca_r = 0.09μM
     period = 2minute
-    ka_ca = (caavg - ca_r) * 1.5
+    ka_ca = (caavg - ca_r) * amplitude
     x = 5 * ((t / period) % 1.0)
     return ca_r + ka_ca * (x * exp(1 - x))^4
 end
