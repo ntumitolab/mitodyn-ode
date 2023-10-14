@@ -40,7 +40,8 @@ jobs:
             ~/.julia/artifacts
             ~/.julia/compiled
             ~/.julia/packages
-          key: ${{ runner.os }}-juliacontainer-${{ hashFiles('Manifest.toml')}}
+            ~/.julia/environments
+          key: ${{ runner.os }}-juliacontainer-${{ hashFiles('Project.toml','Manifest.toml','src/**')}}
           restore-keys: |
             ${{ runner.os }}-juliacontainer-
       - name: Install Julia packages
