@@ -37,9 +37,9 @@ hil(x, k=one(x)) = x / (x + k)
 hil(x, k, n) = hil(x^n, k^n)
 
 "Average cytosolic calcium level based on the ATP:ADP ratio"
-function cac_atp()
+function cac_atp(; ca_base = 0.09μM, ca_act = 0.25μM, n=4, katp=25)
     @variables t Ca_c(t) ATP_c(t) ADP_c(t)
-    @parameters (RestingCa=0.09μM, ActivatedCa=0.25μM, NCac=4, KatpCac=25)
+    @parameters (RestingCa=ca_base, ActivatedCa=ca_act, NCac=n, KatpCac=katp)
     caceq = Ca_c ~ RestingCa + ActivatedCa * hil(ATP_c, KatpCac * ADP_c, NCac)
     return caceq
 end
