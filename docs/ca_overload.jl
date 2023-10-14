@@ -109,12 +109,8 @@ end
 #---
 fig_glc_default = plot_steady_state(glc, sim, sys, title="")
 
-# Default parameters
-fig_glc_default.savefig("Fig2.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
-
 # Adding free fatty acids
 fig_ca = plot_steady_state(glc, sim_ca, sys_ca, title="High calcium")
-
 
 # ## Comparing default and high calcium models
 
@@ -178,4 +174,4 @@ end
 figcomp = plot_comparision(glc, sim, sim_ca, sys)
 
 # Export figure
-figcomp.savefig("S1Fig1.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+figcomp.savefig("S1_HighCa.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
