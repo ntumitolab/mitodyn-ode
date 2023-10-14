@@ -1,12 +1,9 @@
-
-
 module MitochondrialDynamics
 
 using ModelingToolkit
 
 export make_model
 
-##
 ## Units and physical constants
 const second = float(1)    # second
 const minute = 60second    # minute
@@ -17,7 +14,7 @@ const metre = float(1)     # meter
 const cm = 0.01metre       # centimeter
 const cm² = cm^2           # square centimeter
 const mL = cm^3            # milliliter = cubic centimeter
-const Liter = 1000mL        # liter
+const Liter = 1000mL       # liter
 const μL = 1E-6Liter
 const pL = 1E-12Liter
 const mM = float(1)
@@ -51,6 +48,18 @@ function const_glc(glc=5mM)
     return Glc ~ GlcConst
 end
 
+"Adenylate kinase (AdK)"
+function get_adk_eqs(;keq=0.931,atot=4.5mM)
+    @variables t ATP_c(t) ADP_c(t) AMP_c(t)
+    @parameters kEqAK=keq
+    @parameters ΣAc=atot
+    eqs = [
+        ΣAc ~ ATP_c + ADP_c + AMP_c
+        ADP_c ~ (-ATP_c + sqrt(ATP_c^2 + 4*kEqAK*ATP_c*(ΣAc-ATP_c)))/(2 * kEqAK)
+    ]
+    return eqs
+end
+
 function make_model(;
     name,
     simplify=true,
@@ -68,9 +77,10 @@ function make_model(;
     @variables t
 
     # Adenylate kinase (AdK)
-    @variables J_ADK(t) ATP_c(t) ADP_c(t) AMP_c(t)
-    @parameters (kfAK=1000Hz/mM, kEqAK=0.931)
-    adkeq = J_ADK ~ kfAK * (ADP_c * ADP_c - ATP_c * AMP_c * kEqAK)
+    @variables ATP_c(t) ADP_c(t) AMP_c(t)
+    @parameters kEqAK=0.931
+    @parameters ΣAc=4.5mM
+    adkeq = ADP_c ~ (-ATP_c + sqrt(ATP_c^2 + 4*kEqAK*ATP_c*(ΣAc-ATP_c)))/(2 * kEqAK)
 
     # Glucokinase (GK)
     @variables Glc(t) J_GK(t)
@@ -147,7 +157,7 @@ function make_model(;
     # Baseline consumption rates
     @parameters (kNADHc=0.1Hz, kNADHm=0.1Hz, kATP=0.04Hz, kATPCa=90Hz/mM, kG3P=0.01Hz, kPyr=0.01Hz)
     # Conservation relationships
-    @parameters (ΣAc=4.5mM, Σn_c=2mM, Σn_m=2.2mM)
+    @parameters (Σn_c=2mM, Σn_m=2.2mM)
 
     # Fission-fusion rates
     @variables (x(t))[1:3] degavg(t) v1(t) v2(t)
@@ -191,8 +201,8 @@ function make_model(;
         D(ΔΨm) ~ inv(C_MIT) * (J_HR - J_HF - J_HL - J_ANT - 2 * J_MCU),
         D(G3P) ~ inv(V_I) * (2J_GK - J_GPD) - kG3P * G3P,
         D(Pyr) ~ inv(V_I + V_MTX) * (J_GPD - J_PDH - J_LDH) - kPyr * Pyr,
-        D(ATP_c) ~ inv(V_I) * (-gk_atp_stoich * J_GK + 2 * J_GPD + J_ANT + J_ADK) - ATP_c * (kATP + kATPCa * Ca_c),
-        D(AMP_c) ~ inv(V_I) * J_ADK,
+        D(ATP_c) ~ inv(V_I) * (-gk_atp_stoich * J_GK + 2 * J_GPD + J_ANT) - ATP_c * (kATP + kATPCa * Ca_c),
+        # D(AMP_c) ~ inv(V_I) * J_ADK,
         # D(ADP_c) ~ # Conserved
         # D(x[1]) ~ # Conserved
         D(x[2]) ~ v1 - v2,
