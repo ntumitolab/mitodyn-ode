@@ -5,8 +5,8 @@
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-# using MitochondrialDynamics: GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC, J_ANT, J_HL
-# using MitochondrialDynamics: G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ΔΨm, ATP_c, ADP_c, degavg
+## using MitochondrialDynamics: GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC, J_ANT, J_HL
+## using MitochondrialDynamics: G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ΔΨm, ATP_c, ADP_c, degavg
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 import PyPlot as plt
 rcParams = plt.PyDict(plt.matplotlib."rcParams")
@@ -20,7 +20,7 @@ glc = 3.0:0.5:30.0
 @named sys = make_model()
 prob = SteadyStateProblem(sys, [])
 
-# Parameters to be tweaked
+# Parameters
 
 @unpack GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC = sys
 
@@ -64,20 +64,17 @@ function prob_func_glc(prob, i, repeat)
     prob
 end
 
-# Problem forDM cells
+# DM cells
 
 prob_dm = remake_dm(prob)
-
-#---
 alg = DynamicSS(Rodas5())
 prob_func=prob_func_glc
 trajectories=length(glc)
 
 sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
 solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories);
-#---
 
-## TODO: less information
+#---
 
 function plot_fig6(sols, solsDM, glc; figsize=(10, 10), labels=["Baseline", "Diabetic"])
 
@@ -154,7 +151,7 @@ fig6 = plot_fig6(sols, solsDM, glc)
 fig6
 
 # Export figure
-fig6.savefig("Fig6.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+## fig6.savefig("Fig6.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
 
 # ## Figure 7
 
@@ -163,6 +160,7 @@ prob_rotenone = remake_rotenone(prob)
 prob_oligomycin = remake_oligomycin(prob)
 
 #---
+
 sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
 solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories)
 solsFCCP = solve(EnsembleProblem(prob_fccp; prob_func), alg; trajectories)
@@ -227,4 +225,4 @@ fig7 = plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc)
 fig7
 
 # Export figure
-fig7.savefig("Fig7.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+## fig7.savefig("Fig7.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
