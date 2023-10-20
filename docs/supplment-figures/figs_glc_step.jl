@@ -1,6 +1,5 @@
-# # Supplimentary figures
-# ## FigS1
-# Response to elevated glucose concentrations in steps
+# # Step Response to elevated glucose concentrations
+# ## Step Response to elevated glucose concentrations
 
 using DifferentialEquations
 using ModelingToolkit
@@ -94,23 +93,21 @@ end
 
 #---
 
-figs1 = plot_figs1(sol)
-figs1
+fig = plot_figs1(sol)
+fig
 
 # Export figure
-figs1.savefig("FigS1.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+## figs1.savefig("FigS_glc_step.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
 
 #===
-## Figure S2
+## Step sesponse to glucose addition in healthy and DM cells.
 
-Response to adding glucose in healthy and DM cells.
+In the diabetic parameter set. We
 
-In the diabetic parameter set. We adjusted
-
-- PDH capacity
-- ETC capacity
-- F1 synthase capacity
-- Proton leak rate
+- decreased PDH capacity
+- decreased ETC capacity
+- decreased ATP synthase capacity
+- increases proton leak rate
 ===#
 
 @named sys = make_model(; glceq=Glc~glc_step(t))
@@ -134,7 +131,6 @@ end
 prob_dm = remake_dm(prob)
 
 #---
-
 ts = range(0, 60minute; step=0.5minute)
 solDM = solve(prob_dm, tstops=[20minute, 40minute], saveat=ts);
 

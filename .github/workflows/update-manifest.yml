@@ -15,7 +15,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  PYTHON_VER: '3.11'
   APP_ID: '189113' # https://github.com/apps/wen-wei-s-pr-bot
 
 jobs:
@@ -27,17 +26,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ env.PYTHON_VER }}
       - name: Setup Julia
         uses: julia-actions/setup-julia@v1
       - name: Update Julia dependencies
         env:
-          PYTHON: ${{ env.pythonLocation }}/python
-          JULIA_PYTHONCALL_EXE: ${{ env.pythonLocation }}/python
-          JULIA_CONDAPKG_BACKEND: 'Null'
           JULIA_PKG_PRECOMPILE_AUTO: '0'
           JULIA_NUM_THREADS: 'auto'
         run: julia --color=yes --project=@. -e "import Pkg; Pkg.update()"

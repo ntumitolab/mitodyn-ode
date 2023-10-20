@@ -1,10 +1,6 @@
 #===
-# Supplimentary figures
-## Figure S5
-
-Changes in response to both glucose stimulation and chemical agents.
-
-Baseline vs. Diabetic models using Glucose-Oligomycin-Rotenone protocol.
+# Glucose-Oligomycin-Rotenone
+## Step responses to both glucose stimulation and chemical agents
 ===#
 
 using DifferentialEquations
@@ -165,4 +161,4 @@ figs5 = plot_figs2(sols5, sols5DM)
 figs5
 
 # TIFF file
-figs5.savefig("FigS5-Glucose-Oligomycin-Rotenone.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+## figs5.savefig("FigS5-Glucose-Oligomycin-Rotenone.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))

@@ -1,10 +1,6 @@
 #===
-# Supplimentary figures
-## Figure S3
-
-Changes in response to both glucose stimulation and chemical agents.
-
-Using the Glucose-Oligomycin-FCCP protocol.
+# Glucose-Oligomycin-FCCP protocol
+## Step responses to both glucose stimulation and chemical agents (I)
 ===#
 
 using DifferentialEquations
@@ -166,4 +162,4 @@ figs3 = plot_figs2(sols3, solDMs3)
 figs3
 
 # TIFF file
-figs3.savefig("FigS3-Glucose-Oligomycin-FCCP.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+## figs3.savefig("FigS3-Glucose-Oligomycin-FCCP.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
