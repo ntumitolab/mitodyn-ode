@@ -13,25 +13,25 @@ rcParams["font.size"] = 14
 ## rcParams["font.sans-serif"] = "Arial"
 ## rcParams["font.family"] = "sans-serif"
 
-using MitochondrialDynamics: μM, cac_atp
+using MitochondrialDynamics: μM
 
 # Default model
 @named sys = make_model()
-prob = SteadyStateProblem(sys, []) ## Use default u0
+prob = SteadyStateProblem(sys, [], jac=true) ## Use default u0
 alg = DynamicSS(Rodas5())
 sol = solve(prob, alg)
 
 # High calcium model
 @unpack RestingCa, ActivatedCa = sys
-prob_ca5 = SteadyStateProblem(sys, [], [RestingCa=>0.45μM, ActivatedCa=>1.25μM])
-prob_ca10 = SteadyStateProblem(sys, [], [RestingCa=>0.9μM, ActivatedCa=>2.5μM])
+prob_ca5 = SteadyStateProblem(sys, [], [RestingCa=>0.45μM, ActivatedCa=>1.25μM], jac=true)
+prob_ca10 = SteadyStateProblem(sys, [], [RestingCa=>0.9μM, ActivatedCa=>2.5μM], jac=true)
 
 # Simulating on a range of glucose
 @unpack GlcConst = sys
 idxGlc = findfirst(isequal(GlcConst), parameters(sys))
 
 # Test on a range of glucose
-glc = 3.0:0.3:30.0
+glc = 3.5:0.5:30.0
 prob_func = function (prob, i, repeat)
     prob.p[idxGlc] = glc[i]
     prob
@@ -111,8 +111,8 @@ end
 fig_glc_default = plot_steady_state(glc, sim, sys, title="Default parameters")
 
 # High calcium
-fig_ca5 = plot_steady_state(glc, sim_ca5, sys_ca, title="Calcium 5X")
-fig_ca10 = plot_steady_state(glc, sim_ca10, sys_ca, title="Calcium 10X")
+fig_ca5 = plot_steady_state(glc, sim_ca5, sys, title="Calcium 5X")
+fig_ca10 = plot_steady_state(glc, sim_ca10, sys, title="Calcium 10X")
 
 # ## Comparing default and high calcium models
 
