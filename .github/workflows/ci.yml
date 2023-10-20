@@ -1,11 +1,9 @@
 name: Build notebooks and publish
 
+# Using SSH deploy key for automerge, so there is no `pull_request` event
 on:
   workflow_dispatch:
   push:
-    branches: [main]
-  pull_request:
-    branches: [main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -13,7 +11,6 @@ concurrency:
 
 env:
   NPROC: '2' # Number of Julia processes to run the notebooks
-  PYTHON_VER: '3.11'
 
 jobs:
   setup:
@@ -51,46 +48,14 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/${{ github.repository }}:${{ needs.setup.outputs.hash }}
+    # store success output flag for the ci job
+    outputs:
+      success: ${{ steps.setoutput.outputs.success }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Build notebooks with ${{ env.NPROC }} processes
         run: JULIA_PROJECT=@. julia --color=yes -p ${{ env.NPROC }} literate.jl
-      - name: Upload notebooks
-        uses: actions/upload-artifact@v3
-        with:
-          name: notebooks
-          path: docs
-          retention-days: 1
-
-  render:
-    needs: execute
-    runs-on: ubuntu-latest
-    # store success output flag for the ci job
-    outputs:
-      success: ${{ steps.setoutput.outputs.success }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Download notebooks
-        uses: actions/download-artifact@v3
-        with:
-          name: notebooks
-          path: out/
-      - name: Display structure of downloaded files
-        run: ls -R
-        working-directory: out
-      - name: Copy back built notebooks
-        run: cp --verbose -rf out/* docs/
-      - name: Setup Python ${{ env.PYTHON_VER }}
-        uses: actions/setup-python@v4
-        id: python
-        with:
-          python-version: ${{ env.PYTHON_VER }}
-          cache: 'pip'
-          cache-dependency-path: '.github/requirements.txt'
-      - name: Install Python dependencies
-        run: pip install -r .github/requirements.txt
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v3
@@ -112,7 +77,7 @@ jobs:
   # CI conclusion for GitHub status check
   # https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
   CI:
-    needs: render
+    needs: execute
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -120,7 +85,7 @@ jobs:
       # in case at least one of the execution fails, render is skipped
       # and the output will not be set, which will then cause the ci job to fail
       - run: |
-          passed="${{ needs.render.outputs.success }}"
+          passed="${{ needs.execute.outputs.success }}"
           if [[ $passed == "true" ]]; then
             echo "Tests passed"
             exit 0
@@ -131,7 +96,7 @@ jobs:
 
   deploy:
     name: Deploy to GitHub pages
-    needs: render
+    needs: execute
     if: ${{ github.ref == 'refs/heads/main'}}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
