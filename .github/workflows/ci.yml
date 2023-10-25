@@ -1,6 +1,6 @@
 name: Build notebooks and publish
 
-# Using SSH deploy key for automerge, so there is no `pull_request` event
+# Using SSH deploy keys for automerge, so `push` events only
 on:
   workflow_dispatch:
   push:
@@ -13,12 +13,10 @@ env:
   NPROC: '2' # Number of Julia processes to run the notebooks
 
 jobs:
-  setup:
+  CI:
     runs-on: ubuntu-latest
     permissions:
       packages: write
-    outputs:
-      hash: ${{ steps.hash.outputs.id }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -32,34 +30,45 @@ jobs:
           password: ${{ github.token	}}
       - name: Get docker image hash
         id: hash
-        run: echo "id=${{ hashFiles('requirements.txt', 'Project.toml', 'Manifest.toml', 'src/**', '.github/Dockerfile') }}" >> "$GITHUB_OUTPUT"
-      - name: Build and cache Docker container
+        run: echo "id=${{ hashFiles('requirements.txt', 'Project.toml', 'Manifest.toml', 'src/**', 'env.Dockerfile') }}" >> "$GITHUB_OUTPUT"
+      - name: Set image name
+        run: echo "IMG=ghcr.io/${{ github.repository }}:${{ steps.hash.outputs.id }}" >> "$GITHUB_ENV"
+      - name: Build and load Docker container
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: '.github/Dockerfile'
-          tags: ghcr.io/${{ github.repository }}:${{ steps.hash.outputs.id }}
+          file: 'env.Dockerfile'
+          tags: ${{ env.IMG }}
+          load: true
+          cache-from: type=registry,ref=${{ env.IMG }}
+      - name: Push Docker container
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: 'env.Dockerfile'
+          tags: ${{ env.IMG }}
           push: true
-          cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:${{ steps.hash.outputs.id }}
+          cache-from: type=registry,ref=${{ env.IMG }}
           cache-to: type=inline
-
-  execute:
-    needs: setup
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/${{ github.repository }}:${{ needs.setup.outputs.hash }}
-    # store success output flag for the ci job
-    outputs:
-      success: ${{ steps.setoutput.outputs.success }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
       - name: Build notebooks with ${{ env.NPROC }} processes
-        run: JULIA_PROJECT=@. julia --color=yes -p ${{ env.NPROC }} literate.jl
+        run: >
+          docker run --rm -e JULIA_PROJECT=@. -w /tmp -v ${{ github.workspace }}:/tmp
+          ${{ env.IMG }}
+          julia --color=yes -p ${{ env.NPROC }} literate.jl
+      - name: Retake ownership
+        run: sudo chown -R $USER docs/
+      - name: Setup micromamba
+        uses: mamba-org/setup-micromamba@v1
+        with:
+          environment-file: conda.yml
+          init-shell: bash
+          cache-environment: true
+          post-cleanup: all
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v3
       - name: Build website
+        shell: micromamba-shell {0}
         env:
           SITE_URL: ${{ steps.pages.outputs.base_url }}
           REPO_URL: ${{ github.server_url	}}/${{ github.repository }}
@@ -70,33 +79,10 @@ jobs:
         uses: actions/upload-pages-artifact@v2
         with:
           path: ./site
-      - name: Set output flag
-        id: setoutput
-        run: echo "success=true" >> $GITHUB_OUTPUT
-
-  # CI conclusion for GitHub status check
-  # https://brunoscheufler.com/blog/2022-04-09-the-required-github-status-check-that-wasnt
-  CI:
-    needs: execute
-    if: always()
-    runs-on: ubuntu-latest
-    steps:
-      # pass step only when output of previous render job is set
-      # in case at least one of the execution fails, render is skipped
-      # and the output will not be set, which will then cause the ci job to fail
-      - run: |
-          passed="${{ needs.execute.outputs.success }}"
-          if [[ $passed == "true" ]]; then
-            echo "Tests passed"
-            exit 0
-          else
-            echo "Tests failed"
-            exit 1
-          fi
 
   deploy:
     name: Deploy to GitHub pages
-    needs: execute
+    needs: CI
     if: ${{ github.ref == 'refs/heads/main'}}
     # Grant GITHUB_TOKEN the permissions required to make a Pages deployment
     permissions:
