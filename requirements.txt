@@ -1,2 +1,1 @@
 matplotlib==3.8.0
-mkdocs-material==9.4.6
