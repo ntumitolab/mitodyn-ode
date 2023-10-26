@@ -14,6 +14,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  APP_ID: '189113' # https://github.com/apps/wen-wei-s-pr-bot
+
 jobs:
   update-manifest:
     permissions:
@@ -23,16 +26,23 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
       - name: Setup Julia
         uses: julia-actions/setup-julia@v1
       - name: Update Julia dependencies
         run: julia --color=yes --project=@. -e 'import Pkg; Pkg.update()'
+      # Authenticate with a custom GitHub APP
+      # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
+      - name: Generate token for PR
+        uses: tibdex/github-app-token@v2
+        id: generate-token
+        with:
+          app_id: ${{ env.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v5
         with:
-          commit-message: Julia update
+          title: Julia Dependency Update
+          token: ${{ steps.generate-token.outputs.token }}
           labels: |
             automerge

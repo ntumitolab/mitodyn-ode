@@ -4,6 +4,9 @@ name: Build notebooks and publish
 on:
   workflow_dispatch:
   push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
