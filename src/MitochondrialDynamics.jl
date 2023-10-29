@@ -1,5 +1,3 @@
-
-
 module MitochondrialDynamics
 
 using ModelingToolkit
