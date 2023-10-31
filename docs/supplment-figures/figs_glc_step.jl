@@ -1,5 +1,4 @@
 # # Step Response to elevated glucose concentrations
-# ## Step Response to elevated glucose concentrations
 
 using DifferentialEquations
 using ModelingToolkit
@@ -12,7 +11,7 @@ rcParams["font.size"] = 14
 ## rcParams["font.sans-serif"] = "Arial"
 ## rcParams["font.family"] = "sans-serif"
 
-#---
+# ## Step Response to elevated glucose concentrations
 
 @variables t, Glc(t)
 glc_step(t) = 5.0mM * (1 + (t >= 20minute) + (t >= 40minute))
