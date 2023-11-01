@@ -108,7 +108,7 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
 end
 
 # Default model
-fig_glc_default = plot_steady_state(glc, sim, sys, title="Default parameters")
+fig_glc_default = plot_steady_state(glc, sim, sys, title="Calcium 1X")
 
 # High calcium
 fig_ca5 = plot_steady_state(glc, sim_ca5, sys, title="Calcium 5X")
@@ -117,7 +117,7 @@ fig_ca10 = plot_steady_state(glc, sim_ca10, sys, title="Calcium 10X")
 # ## Comparing default and high calcium models
 
 function plot_comparision(glc, sim, sim_ca5, sim_ca10, sys;
-    figsize=(8, 8), title="", labels=["Default", "Ca 5X", "Ca 10X"]
+    figsize=(8, 8), title="", labels=["Ca 1X", "Ca 5X", "Ca 10X"]
 )
 
     extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
@@ -182,7 +182,7 @@ figcomp = plot_comparision(glc, sim, sim_ca5, sim_ca10, sys)
 
 # ## mitochondria membrane potential vs average node degree
 
-function plot_dpsi_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=["Default", "Ca 5X", "Ca 10X"])
+function plot_dpsi_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=["Ca 1X", "Ca 5X", "Ca 10X"])
     extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
     @unpack ΔΨm, degavg = sys
 
@@ -202,7 +202,7 @@ fig = plot_dpsi_k(sim, sim_ca5, sim_ca10, sys)
 
 # ## x-axis as Ca2+ and y-axis as average node
 
-function plot_ca_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=["Default", "Ca 5X", "Ca 10X"])
+function plot_ca_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=["Ca 1X", "Ca 5X", "Ca 10X"])
     extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
     @unpack Ca_m, degavg = sys
 
@@ -219,3 +219,23 @@ function plot_ca_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=
 end
 
 fig = plot_ca_k(sim, sim_ca5, sim_ca10, sys)
+
+function plot_atp_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=["Ca 1X", "Ca 5X", "Ca 10X"])
+    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
+    @unpack ATP_c, ADP_c, degavg = sys
+
+    k = ATP_c / ADP_c
+
+    fig, ax = plt.subplots(1, 1; figsize)
+
+    ax.plot(extract(sim, k), extract(sim, degavg), "v", label=labels[1])
+    ax.plot(extract(sim_ca5, k), extract(sim_ca5, degavg), "o", label=labels[2])
+    ax.plot(extract(sim_ca10, k), extract(sim_ca10, degavg), "x", label=labels[3])
+    ax.set(xlabel="ATP:ADP ratio", ylabel="Average node degree", title=title)
+    ax.legend()
+    ax.grid()
+
+    return fig
+end
+
+fig = plot_atp_k(sim, sim_ca5, sim_ca10, sys)
