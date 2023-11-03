@@ -95,7 +95,7 @@ jobs:
         with:
           environment-name: mkdocs
           create-args: >-
-            python=3.11
+            python=${{ env.PYTHON_VER }}
             mkdocs-material
           cache-environment: true
           post-cleanup: all
