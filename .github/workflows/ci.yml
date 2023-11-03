@@ -90,11 +90,13 @@ jobs:
         working-directory: out
       - name: Copy back built notebooks
         run: cp --verbose -rf out/* docs/
-      - name: Setup micromamba
+      - name: Setup micromamba for mkdocs-material
         uses: mamba-org/setup-micromamba@v1
         with:
-          environment-file: conda.yml
-          init-shell: bash
+          environment-name: mkdocs
+          create-args: >-
+            python=3.11
+            mkdocs-material
           cache-environment: true
           post-cleanup: all
       - name: Setup Pages
