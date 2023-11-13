@@ -8,7 +8,7 @@ chapters:
   - file: fig3
   - file: fig5
   - file: fig6_7
-  - file: figs_ca_overload
-  - file: figs_glc_step
-  - file: figs3
-  - file: figs5
+  - file: supplment-figures/figs_ca_overload
+  - file: supplment-figures/figs_glc_step
+  - file: supplment-figures/figs3
+  - file: supplment-figures/figs5
