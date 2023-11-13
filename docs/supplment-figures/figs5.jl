@@ -139,10 +139,10 @@ function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"
     ax[2, 1].set(ylabel="ΔΨm (mV)")
     ax[2, 1].set_title("(H)", loc="left")
 
-    ax[2, 3].plot(tsm, k, label=labels[1])
-    ax[2, 3].plot(tsm, kDM, label=labels[2])
-    ax[2, 3].set(ylabel="Average Node Degree")
-    ax[2, 3].set_title("(I)", loc="left")
+    ax[2, 2].plot(tsm, k, label=labels[1])
+    ax[2, 2].plot(tsm, kDM, label=labels[2])
+    ax[2, 2].set(ylabel="Average Node Degree")
+    ax[2, 2].set_title("(I)", loc="left")
 
     for i in 0:numrows-1, j in 0:numcols-1
         ax[i, j].legend()
