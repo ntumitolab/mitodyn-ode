@@ -25,4 +25,4 @@ RUN pip install --no-cache-dir nbconvert -r requirements.txt
 # Julia environment
 COPY Project.toml Manifest.toml ./
 COPY src/ src
-RUN julia --color=yes -e 'using Pkg; Pkg.add(["PrettyTables", "Literate"]); Pkg.activate("."); Pkg.instantiate(); Pkg.precompile()'
+RUN julia --color=yes -e 'using Pkg; Pkg.add(["PrettyTables", "Literate"]); Pkg.activate("."); Pkg.instantiate(); Pkg.resolve(); Pkg.precompile()'
