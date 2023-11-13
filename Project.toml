@@ -1,10 +1,11 @@
 name = "MitochondrialDynamics"
 uuid = "1a231dcf-63c2-466e-8f46-4027ba595b90"
 authors = ["Wen-Wei Tseng <sosiristseng@gmail.com>"]
-version = "0.2.0"
+version = "0.3.0"
 
 [deps]
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
 Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
-PyPlot = "d330b81b-6aea-500a-939a-2ce795aea3ee"
+PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
+PythonPlot = "274fc56d-3b97-40fa-a1cd-1b4a50311bf9"

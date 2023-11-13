@@ -8,11 +8,11 @@ using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
-import PyPlot as plt
-rcParams = plt.PyDict(plt.matplotlib."rcParams")
-rcParams["font.size"] = 14
-## rcParams["font.sans-serif"] = "Arial"
-## rcParams["font.family"] = "sans-serif"
+using PythonCall
+import PythonPlot as plt
+plt.matplotlib.rcParams["font.size"] = 14
+## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
+## plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
 #---
 
@@ -49,28 +49,28 @@ function plot_fig5(sol, figsize=(10, 10))
     @unpack Ca_c, Ca_m, ATP_c, ADP_c, ΔΨm, degavg, J_ANT, J_HL = sys
     fig, ax = plt.subplots(5, 1; figsize)
 
-    ax[1].plot(tsm, sol[Ca_c * 1000], label="Cyto. Ca (μM)")
-    ax[1].plot(tsm, sol[Ca_m * 1000], label="Mito. Ca (μM)")
-    ax[1].set_title("A", loc="left")
+    ax[0].plot(tsm, sol[Ca_c * 1000], label="Cyto. Ca (μM)")
+    ax[0].plot(tsm, sol[Ca_m * 1000], label="Mito. Ca (μM)")
+    ax[0].set_title("A", loc="left")
 
-    ax[2].plot(tsm, sol[ATP_c / ADP_c], label="ATP:ADP")
-    ax[2].set_title("B", loc="left")
+    ax[1].plot(tsm, sol[ATP_c / ADP_c], label="ATP:ADP")
+    ax[1].set_title("B", loc="left")
 
-    ax[3].plot(tsm, sol[ΔΨm * 1000], label="ΔΨm (mV)")
-    ax[3].set_title("C", loc="left")
+    ax[2].plot(tsm, sol[ΔΨm * 1000], label="ΔΨm (mV)")
+    ax[2].set_title("C", loc="left")
 
-    ax[4].plot(tsm, sol[degavg], label="<k>")
-    ax[4].set_title("D", loc="left")
+    ax[3].plot(tsm, sol[degavg], label="<k>")
+    ax[3].set_title("D", loc="left")
 
-    ax[5].plot(tsm, sol[J_ANT], label="ANT (mM/s)")
-    ax[5].plot(tsm, sol[J_HL], label="H leak (mM/s)")
-    ax[5].set_title("E", loc="left")
-    ax[5].set(xlabel="Time (minute)")
+    ax[4].plot(tsm, sol[J_ANT], label="ANT (mM/s)")
+    ax[4].plot(tsm, sol[J_HL], label="H leak (mM/s)")
+    ax[4].set_title("E", loc="left")
+    ax[4].set(xlabel="Time (minute)")
 
-    for a in ax
-        a.grid()
-        a.legend(loc="center left")
-        a.set_xlim(tsm[begin], tsm[end])
+    for i in 0:4
+        ax[i].grid()
+        ax[i].legend(loc="center left")
+        ax[i].set_xlim(tsm[begin], tsm[end])
     end
 
     plt.tight_layout()
@@ -80,7 +80,6 @@ end
 #---
 
 fig5 = plot_fig5(sol)
-fig5
 
 # Export figure
-fig5.savefig("Fig5.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+fig5.savefig("Fig5.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))

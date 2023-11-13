@@ -6,11 +6,11 @@ Steady-state solutions across a range of glucose levels.
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-import PyPlot as plt
-rcParams = plt.PyDict(plt.matplotlib."rcParams")
-rcParams["font.size"] = 14
-## rcParams["font.sans-serif"] = "Arial"
-## rcParams["font.family"] = "sans-serif"
+using PythonCall
+import PythonPlot as plt
+plt.matplotlib.rcParams["font.size"] = 14
+## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
+## plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
 # Default model
 @named sys = make_model()
@@ -72,39 +72,42 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     x3 = extract(sols, x[3])
     deg = extract(sols, degavg)
 
-    fig, ax = plt.subplots(3, 3; figsize)
 
-    ax[1, 1].plot(glc5, g3p)
-    ax[1, 1].set(title="(A) G3P (μM)", ylim=(0.0, 10.0))
-    ax[1, 2].plot(glc5, pyr)
-    ax[1, 2].set(title="(B) Pyruvate (μM)")
-    ax[1, 3].plot(glc5, ca_c, label="cyto")
-    ax[1, 3].plot(glc5, ca_m, label="mito")
-    ax[1, 3].legend()
-    ax[1, 3].set(title="(C) Calcium (μM)", ylim=(0.0, 1.5))
-    ax[2, 1].plot(glc5, nad_ratio_c, label="cyto")
-    ax[2, 1].plot(glc5, nad_ratio_m, label="mito")
-    ax[2, 1].legend()
-    ax[2, 1].set(title="(D) NADH:NAD")
-    ax[2, 2].plot(glc5, atp_c, label="ATP")
-    ax[2, 2].plot(glc5, adp_c, label="ADP")
-    ax[2, 2].plot(glc5, amp_c, label="AMP")
-    ax[2, 2].legend()
-    ax[2, 2].set(title="(E) Adenylates (μM)")
-    ax[2, 3].plot(glc5, td)
-    ax[2, 3].set(title="(F) ATP:ADP")
-    ax[3, 1].plot(glc5, dpsi, label="cyto")
-    ax[3, 1].set(title="(G) ΔΨ (mV)", xlabel="Glucose (X)")
-    ax[3, 2].plot(glc5, x1, label="X1")
-    ax[3, 2].plot(glc5, x2, label="X2")
-    ax[3, 2].plot(glc5, x3, label="X3")
-    ax[3, 2].set(title="(H) Mitochondrial nodes", xlabel="Glucose (X)")
-    ax[3, 3].plot(glc5, deg)
-    ax[3, 3].set(title="(I) Average Node Degree", xlabel="Glucose (X)")
+    numrows = 3
+    numcols = 3
+    fig, axs = plt.subplots(numrows, numcols; figsize)
 
-    for a in ax
-        a.set_xticks(1:6)
-        a.grid()
+    axs[0, 0].plot(glc5, g3p)
+    axs[0, 0].set(title="(A) G3P (μM)", ylim=(0.0, 10.0))
+    axs[0, 1].plot(glc5, pyr)
+    axs[0, 1].set(title="(B) Pyruvate (μM)")
+    axs[0, 2].plot(glc5, ca_c, label="cyto")
+    axs[0, 2].plot(glc5, ca_m, label="mito")
+    axs[0, 2].legend()
+    axs[0, 2].set(title="(C) Calcium (μM)", ylim=(0.0, 1.5))
+    axs[1, 0].plot(glc5, nad_ratio_c, label="cyto")
+    axs[1, 0].plot(glc5, nad_ratio_m, label="mito")
+    axs[1, 0].legend()
+    axs[1, 0].set(title="(D) NADH:NAD")
+    axs[1, 1].plot(glc5, atp_c, label="ATP")
+    axs[1, 1].plot(glc5, adp_c, label="ADP")
+    axs[1, 1].plot(glc5, amp_c, label="AMP")
+    axs[1, 1].legend()
+    axs[1, 1].set(title="(E) Adenylates (μM)")
+    axs[1, 2].plot(glc5, td)
+    axs[1, 2].set(title="(F) ATP:ADP")
+    axs[2, 0].plot(glc5, dpsi, label="cyto")
+    axs[2, 0].set(title="(G) ΔΨ (mV)", xlabel="Glucose (X)")
+    axs[2, 1].plot(glc5, x1, label="X1")
+    axs[2, 1].plot(glc5, x2, label="X2")
+    axs[2, 1].plot(glc5, x3, label="X3")
+    axs[2, 1].set(title="(H) Mitochondrial nodes", xlabel="Glucose (X)")
+    axs[2, 2].plot(glc5, deg)
+    axs[2, 2].set(title="(I) Average Node Degree", xlabel="Glucose (X)")
+
+    for i in 0:numrows-1, j in 0:numcols-1
+        axs[i, j].set_xticks(1:6)
+        axs[i, j].grid()
     end
     fig.suptitle(title)
     fig.tight_layout()
@@ -115,7 +118,7 @@ end
 fig_glc_default = plot_steady_state(glc, sim, sys, title="")
 
 # Default parameters
-fig_glc_default.savefig("Fig2.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+fig_glc_default.savefig("Fig2.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
 
 # Adding free fatty acids
 fig_glc_ffa = plot_steady_state(glc, sim_ffa, sys_ffa, title="FFA parameters")
@@ -125,58 +128,59 @@ fig_glc_gal = plot_steady_state(glc, sim_gal, sys_gal, title="Galactose paramete
 
 # ## Comparing default, FFA, and galactose models
 
-function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(8, 8), title="", labels=["Default", "Gal", "FFA"])
+function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="", labels=["Default", "Gal", "FFA"])
 
     extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
 
     @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, degavg, J_O2 = sys
 
     glc5 = glc ./ 5
-    fig, ax = plt.subplots(3, 2; figsize)
+    numcol = 2
+    numrow = 3
+    fig, axs = plt.subplots(numrow, numcol; figsize)
 
-    ax[1, 1].set(title="(A) Cytosolic NADH:NAD")
+    axs[0, 0].set(title="(A) Cytosolic NADH:NAD")
     k = NADH_c/NAD_c
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
-    lines = ax[1, 1].plot(glc5, yy)
-    ax[1, 1].legend(lines, labels)
+    lines = axs[0, 0].plot(glc5, yy)
+    axs[0, 0].legend(lines, labels)
 
-    ax[1, 2].set(title="(B) Mitochondrial NADH:NAD")
+    axs[0, 1].set(title="(B) Mitochondrial NADH:NAD")
     k = NADH_m/NAD_m
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
-    lines = ax[1, 2].plot(glc5, yy)
-    ax[1, 2].legend(lines, labels)
+    lines = axs[0, 1].plot(glc5, yy)
+    axs[0, 1].legend(lines, labels)
 
-    ax[2, 1].set(title="(C) ATP:ADP")
+    axs[1, 0].set(title="(C) ATP:ADP")
     k = ATP_c/ADP_c
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
-    lines = ax[2, 1].plot(glc5, yy)
-    ax[2, 1].legend(lines, labels)
+    lines = axs[1, 0].plot(glc5, yy)
+    axs[1, 0].legend(lines, labels)
 
-    ax[2, 2].set(title="(D) ΔΨm (mV)")
+    axs[1, 1].set(title="(D) ΔΨm (mV)")
     k = ΔΨm
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)] .* 1000
-    lines = ax[2, 2].plot(glc5, yy)
-    ax[2, 2].legend(lines, labels)
+    lines = axs[1, 1].plot(glc5, yy)
+    axs[1, 1].legend(lines, labels)
 
-    ax[3, 1].set(title="(E) Average node degree")
+    axs[2, 0].set(title="(E) Average node degree")
     k = degavg
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
-    lines = ax[3, 1].plot(glc5, yy)
-    ax[3, 1].legend(lines, labels)
-    ax[3, 1].set(xlabel="Glucose (X)")
+    lines = axs[2, 0].plot(glc5, yy)
+    axs[2, 0].legend(lines, labels)
+    axs[2, 0].set(xlabel="Glucose (X)")
 
-    ax[3, 2].set(title="(F) Oxygen consumption")
+    axs[2, 1].set(title="(F) Oxygen consumption")
     k = J_O2
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
-    lines = ax[3, 2].plot(glc5, yy)
-    ax[3, 2].legend(lines, labels)
-    ax[3, 2].set(xlabel="Glucose (X)", ylabel="mM/s")
+    lines = axs[2, 1].plot(glc5, yy)
+    axs[2, 1].legend(lines, labels)
+    axs[2, 1].set(xlabel="Glucose (X)", ylabel="mM/s")
 
-    for a in ax
-        a.set_xticks(1:6)
-        a.grid()
+    for i in 0:numrow-1, j in 0:numcol-1
+        axs[i, j].set_xticks(1:6)
+        axs[i, j].grid()
     end
-
     fig.suptitle(title)
     fig.tight_layout()
     return fig
@@ -185,4 +189,4 @@ end
 figFFAGal = plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys)
 
 # Export figure
-figFFAGal.savefig("S1Fig1.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+figFFAGal.savefig("s1-fig1.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))

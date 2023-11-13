@@ -7,24 +7,24 @@ Steady-state solutions across a range of glucose levels.
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-import PyPlot as plt
-rcParams = plt.PyDict(plt.matplotlib."rcParams")
-rcParams["font.size"] = 14
-## rcParams["font.sans-serif"] = "Arial"
-## rcParams["font.family"] = "sans-serif"
+using PythonCall
+import PythonPlot as plt
+plt.matplotlib.rcParams["font.size"] = 14
+## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
+## plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
-using MitochondrialDynamics: μM
+import MitochondrialDynamics: μM
 
 # Default model
 @named sys = make_model()
-prob = SteadyStateProblem(sys, [], jac=true) ## Use default u0
+prob = SteadyStateProblem(sys, []) ## Use default u0
 alg = DynamicSS(Rodas5())
 sol = solve(prob, alg)
 
 # High calcium model
 @unpack RestingCa, ActivatedCa = sys
-prob_ca5 = SteadyStateProblem(sys, [], [RestingCa=>0.45μM, ActivatedCa=>1.25μM], jac=true)
-prob_ca10 = SteadyStateProblem(sys, [], [RestingCa=>0.9μM, ActivatedCa=>2.5μM], jac=true)
+prob_ca5 = SteadyStateProblem(sys, [], [RestingCa=>0.45μM, ActivatedCa=>1.25μM])
+prob_ca10 = SteadyStateProblem(sys, [], [RestingCa=>0.9μM, ActivatedCa=>2.5μM])
 
 # Simulating on a range of glucose
 @unpack GlcConst = sys
@@ -68,39 +68,42 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     x3 = extract(sols, x[3])
     deg = extract(sols, degavg)
 
-    fig, ax = plt.subplots(3, 3; figsize)
+    numrows = 3
+    numcols = 3
 
-    ax[1, 1].plot(glc5, g3p)
-    ax[1, 1].set(title="(A) G3P (μM)")
-    ax[1, 2].plot(glc5, pyr)
-    ax[1, 2].set(title="(B) Pyruvate (μM)")
-    ax[1, 3].plot(glc5, ca_c, label="cyto")
-    ax[1, 3].plot(glc5, ca_m, label="mito")
-    ax[1, 3].legend()
-    ax[1, 3].set(title="(C) Calcium (μM)")
-    ax[2, 1].plot(glc5, nad_ratio_c, label="cyto")
-    ax[2, 1].plot(glc5, nad_ratio_m, label="mito")
-    ax[2, 1].legend()
-    ax[2, 1].set(title="(D) NADH:NAD")
-    ax[2, 2].plot(glc5, atp_c, label="ATP")
-    ax[2, 2].plot(glc5, adp_c, label="ADP")
-    ax[2, 2].plot(glc5, amp_c, label="AMP")
-    ax[2, 2].legend()
-    ax[2, 2].set(title="(E) Adenylates (μM)")
-    ax[2, 3].plot(glc5, td)
-    ax[2, 3].set(title="(F) ATP:ADP")
-    ax[3, 1].plot(glc5, dpsi, label="cyto")
-    ax[3, 1].set(title="(G) ΔΨ (mV)", xlabel="Glucose (X)")
-    ax[3, 2].plot(glc5, x1, label="X1")
-    ax[3, 2].plot(glc5, x2, label="X2")
-    ax[3, 2].plot(glc5, x3, label="X3")
-    ax[3, 2].set(title="(H) Mitochondrial nodes", xlabel="Glucose (X)")
-    ax[3, 3].plot(glc5, deg)
-    ax[3, 3].set(title="(I) Average Node Degree", xlabel="Glucose (X)")
+    fig, ax = plt.subplots(numrows, numcols; figsize)
 
-    for a in ax
-        a.set_xticks(1:6)
-        a.grid()
+    ax[0, 0].plot(glc5, g3p)
+    ax[0, 0].set(title="(A) G3P (μM)")
+    ax[0, 1].plot(glc5, pyr)
+    ax[0, 1].set(title="(B) Pyruvate (μM)")
+    ax[0, 2].plot(glc5, ca_c, label="cyto")
+    ax[0, 2].plot(glc5, ca_m, label="mito")
+    ax[0, 2].legend()
+    ax[0, 2].set(title="(C) Calcium (μM)")
+    ax[1, 0].plot(glc5, nad_ratio_c, label="cyto")
+    ax[1, 0].plot(glc5, nad_ratio_m, label="mito")
+    ax[1, 0].legend()
+    ax[1, 0].set(title="(D) NADH:NAD")
+    ax[1, 1].plot(glc5, atp_c, label="ATP")
+    ax[1, 1].plot(glc5, adp_c, label="ADP")
+    ax[1, 1].plot(glc5, amp_c, label="AMP")
+    ax[1, 1].legend()
+    ax[1, 1].set(title="(E) Adenylates (μM)")
+    ax[1, 2].plot(glc5, td)
+    ax[1, 2].set(title="(F) ATP:ADP")
+    ax[2, 0].plot(glc5, dpsi, label="cyto")
+    ax[2, 0].set(title="(G) ΔΨ (mV)", xlabel="Glucose (X)")
+    ax[2, 1].plot(glc5, x1, label="X1")
+    ax[2, 1].plot(glc5, x2, label="X2")
+    ax[2, 1].plot(glc5, x3, label="X3")
+    ax[2, 1].set(title="(H) Mitochondrial nodes", xlabel="Glucose (X)")
+    ax[2, 2].plot(glc5, deg)
+    ax[2, 2].set(title="(I) Average Node Degree", xlabel="Glucose (X)")
+
+    for i in 0:numrows-1, j in 0:numcols-1
+        ax[i, j].set_xticks(1:6)
+        ax[i, j].grid()
     end
     fig.suptitle(title)
     fig.tight_layout()
@@ -117,7 +120,7 @@ fig_ca10 = plot_steady_state(glc, sim_ca10, sys, title="Calcium 10X")
 # ## Comparing default and high calcium models
 
 function plot_comparision(glc, sim, sim_ca5, sim_ca10, sys;
-    figsize=(8, 8), title="", labels=["Ca 1X", "Ca 5X", "Ca 10X"]
+    figsize=(8, 10), title="", labels=["Ca 1X", "Ca 5X", "Ca 10X"]
 )
 
     extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
@@ -125,49 +128,52 @@ function plot_comparision(glc, sim, sim_ca5, sim_ca10, sys;
     @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, degavg, J_O2 = sys
 
     glc5 = glc ./ 5
-    fig, ax = plt.subplots(3, 2; figsize)
 
-    ax[1, 1].set(title="(A) Cytosolic NADH:NAD")
+    numrows = 3
+    numcols = 2
+    fig, ax = plt.subplots(numrows, numcols; figsize)
+
+    ax[0, 0].set(title="(A) Cytosolic NADH:NAD")
     k = NADH_c/NAD_c
     yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
+    lines = ax[0, 0].plot(glc5, yy)
+    ax[0, 0].legend(lines, labels)
+
+    ax[0, 1].set(title="(B) Mitochondrial NADH:NAD")
+    k = NADH_m/NAD_m
+    yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
+    lines = ax[0, 1].plot(glc5, yy)
+    ax[0, 1].legend(lines, labels)
+
+    ax[1, 0].set(title="(C) ATP:ADP")
+    k = ATP_c/ADP_c
+    yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
+    lines = ax[1, 0].plot(glc5, yy)
+    ax[1, 0].legend(lines, labels)
+
+    ax[1, 1].set(title="(D) ΔΨm (mV)")
+    k = ΔΨm
+    yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)] .* 1000
     lines = ax[1, 1].plot(glc5, yy)
     ax[1, 1].legend(lines, labels)
 
-    ax[1, 2].set(title="(B) Mitochondrial NADH:NAD")
-    k = NADH_m/NAD_m
+    ax[2, 0].set(title="(E) Average node degree")
+    k = degavg
     yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
-    lines = ax[1, 2].plot(glc5, yy)
-    ax[1, 2].legend(lines, labels)
+    lines = ax[2, 0].plot(glc5, yy)
+    ax[2, 0].legend(lines, labels, loc="lower right")
+    ax[2, 0].set(xlabel="Glucose (X)")
 
-    ax[2, 1].set(title="(C) ATP:ADP")
-    k = ATP_c/ADP_c
+    ax[2, 1].set(title="(F) Oxygen consumption")
+    k = J_O2
     yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
     lines = ax[2, 1].plot(glc5, yy)
     ax[2, 1].legend(lines, labels)
+    ax[2, 1].set(xlabel="Glucose (X)", ylabel="mM/s")
 
-    ax[2, 2].set(title="(D) ΔΨm (mV)")
-    k = ΔΨm
-    yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)] .* 1000
-    lines = ax[2, 2].plot(glc5, yy)
-    ax[2, 2].legend(lines, labels)
-
-    ax[3, 1].set(title="(E) Average node degree")
-    k = degavg
-    yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
-    lines = ax[3, 1].plot(glc5, yy)
-    ax[3, 1].legend(lines, labels, loc="lower right")
-    ax[3, 1].set(xlabel="Glucose (X)")
-
-    ax[3, 2].set(title="(F) Oxygen consumption")
-    k = J_O2
-    yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
-    lines = ax[3, 2].plot(glc5, yy)
-    ax[3, 2].legend(lines, labels)
-    ax[3, 2].set(xlabel="Glucose (X)", ylabel="mM/s")
-
-    for a in ax
-        a.set_xticks(1:6)
-        a.grid()
+    for i in 0:numrows-1, j in 0:numcols-1
+        ax[i, j].set_xticks(1:6)
+        ax[i, j].grid()
     end
 
     fig.suptitle(title)
@@ -178,7 +184,7 @@ end
 figcomp = plot_comparision(glc, sim, sim_ca5, sim_ca10, sys)
 
 # Export figure
-## figcomp.savefig("S1_HighCa.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+figcomp.savefig("S1_HighCa.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
 
 # ## mitochondria membrane potential vs average node degree
 
@@ -199,8 +205,9 @@ function plot_dpsi_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", label
 end
 
 fig = plot_dpsi_k(sim, sim_ca5, sim_ca10, sys)
+fig.savefig("S1_HighCa_dpsi_k.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
 
-# ## x-axis as Ca2+ and y-axis as average node
+# ## x-axis as Ca2+ and y-axis as average node degree
 
 function plot_ca_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=["Ca 1X", "Ca 5X", "Ca 10X"])
     extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
@@ -219,7 +226,9 @@ function plot_ca_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=
 end
 
 fig = plot_ca_k(sim, sim_ca5, sim_ca10, sys)
+fig.savefig("S1_HighCa_ca_k.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
 
+# ## x-axis as ATP and y-axis as average node degree
 function plot_atp_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=["Ca 1X", "Ca 5X", "Ca 10X"])
     extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
     @unpack ATP_c, ADP_c, degavg = sys
@@ -239,3 +248,4 @@ function plot_atp_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels
 end
 
 fig = plot_atp_k(sim, sim_ca5, sim_ca10, sys)
+fig.savefig("S1_HighCa_atp_k.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))

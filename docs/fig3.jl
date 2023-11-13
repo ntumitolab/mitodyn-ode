@@ -7,9 +7,9 @@ Steady-state solutions for a range of glucose concentrations and OXPHOS capaciti
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-import PyPlot as plt
-rcParams = plt.PyDict(plt.matplotlib."rcParams")
-rcParams["font.size"] = 14
+using PythonCall
+import PythonPlot as plt
+plt.matplotlib.rcParams["font.size"] = 14
 ## rcParams["font.sans-serif"] = "Arial"
 ## rcParams["font.family"] = "sans-serif"
 
@@ -79,7 +79,7 @@ function plot_fig3(;
             xx = xxs[row] ./ xscale
             yy = yys[row]
             z = zs[row]
-            ax = axes[row, col]
+            ax = axes[row-1, col-1]
 
             ylabel = ylabels[row]
 
@@ -114,7 +114,6 @@ end
 #---
 
 fig3 = plot_fig3(figsize=(13, 10))
-fig3
 
 # Export figure
-fig3.savefig("Fig3.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+fig3.savefig("Fig3.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
