@@ -4,5 +4,11 @@
 format: jb-book
 root: index
 chapters:
-  - file: pyplot
-  - file: plots/plotsjl
+  - file: fig2
+  - file: fig3
+  - file: fig5
+  - file: fig6_7
+  - file: figs_ca_overload
+  - file: figs_glc_step
+  - file: figs3
+  - file: figs5
