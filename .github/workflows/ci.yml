@@ -17,6 +17,7 @@ env:
   JULIA_NUM_THREADS: 'auto'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
+  JULIA_CPU_TARGET: 'generic;znver3,clone_all'
 
 jobs:
   CI:
