@@ -13,11 +13,11 @@ concurrency:
 
 env:
   NPROC: '2' # Number of Julia processes to run the notebooks
-  CACHE_NUM: '2'
+  CACHE_NUM: '1'
   JULIA_NUM_THREADS: 'auto'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
-  PY_VER: '3.12'
+  JULIA_CPU_TARGET: 'generic;znver3,clone_all'
 
 jobs:
   CI:
@@ -25,13 +25,12 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-    - name: Setup Python
-      uses: actions/setup-python@v4
+    - name: Setup micromamba
+      uses: mamba-org/setup-micromamba@v1
       with:
-        python-version: ${{ env.PY_VER }}
-        cache: 'pip'
-    - name: Install python packages
-      run: pip install -r requirements.txt
+        environment-file: environment.yml
+        cache-environment: true
+        post-cleanup: all
     - name: Read Julia version
       uses: SebRollen/toml-action@v1.0.2
       id: read_toml
@@ -54,15 +53,10 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
     - name: Install Julia packages
-      shell: julia --color=yes {0}
+      shell: micromamba-shell {0}
       run: |
-        using Pkg, Dates
-        Pkg.add(["PrettyTables", "Literate"])
-        Pkg.activate(".")
-        Pkg.instantiate()
-        Pkg.resolve()
-        Pkg.precompile()
-        Pkg.gc(collect_delay=Day(1))
+        julia --color=yes -e 'using Pkg; Pkg.add(["PrettyTables", "Literate"])'
+        julia --project=@. --color=yes -e 'using Pkg, Dates; Pkg.instantiate(); Pkg.gc(collect_delay=Day(1))'
     - name: Save Julia packages
       uses: actions/cache/save@v3
       if: ${{ steps.cache.outputs.cache-hit != 'true' }}
@@ -72,6 +66,7 @@ jobs:
           !~/.julia/registries
         key: ${{ steps.cache.outputs.cache-primary-key }}
     - name: Run program
+      shell: micromamba-shell {0}
       env:
         JULIA_PROJECT: '@.'
         GKSwstype: '100'
@@ -80,6 +75,7 @@ jobs:
       id: pages
       uses: actions/configure-pages@v3
     - name: Build website
+      shell: micromamba-shell {0}
       env:
         SITE_URL: ${{ steps.pages.outputs.base_url }}
         REPO_URL: ${{ github.server_url	}}/${{ github.repository }}
