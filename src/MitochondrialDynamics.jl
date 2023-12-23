@@ -3,6 +3,7 @@ module MitochondrialDynamics
 using ModelingToolkit
 
 export make_model
+export indexof, change_params
 
 ##
 ## Units and physical constants
@@ -33,6 +34,12 @@ const iVT = inv(VT)        # Reciprocal of thermal voltage
 ## Convineince function
 hil(x, k=one(x)) = x / (x + k)
 hil(x, k, n) = hil(x^n, k^n)
+indexof(sym, syms) = findfirst(isequal(sym), syms)
+
+"""Change parameter(s) from an ODESystem and returns a parameter vector."""
+function change_params(sys, ps...)
+    ModelingToolkit.varmap_to_vars(Dict(ps), parameters(sys); defaults = sys.defaults)
+end
 
 "Average cytosolic calcium level based on the ATP:ADP ratio"
 function cac_atp(; ca_base = 0.09μM, ca_act = 0.25μM, n=4, katp=25)

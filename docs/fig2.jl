@@ -29,20 +29,17 @@ prob_gal = SteadyStateProblem(sys_gal, [])
 prob_ffa = SteadyStateProblem(sys_ffa, [], [J_FFA => sol[J_CAC] * 0.5])
 
 # Simulating on a range of glucose
-@unpack GlcConst = sys
-idxGlc = findfirst(isequal(GlcConst), parameters(sys))
-
-# Test on a range of glucose
-
-glc = range(3.0, 30.0, length=101)  # Range of glucose
+# Test on a range of glucose (3 mM to 30 mM)
+idxGlc = indexof(sys.GlcConst, parameters(sys))
+glc = range(3.0, 30.0, length=101)
 
 prob_func = function (prob, i, repeat)
-    prob.p[idxGlc] = glc[i]
-    prob
+    sys = prob.f.sys
+    remake(prob, p=change_params(sys, sys.GlcConst => glc[i]))
 end
 
 alg = DynamicSS(Rodas5())
-trajectories=length(glc)
+trajectories = length(glc)
 
 sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
 sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; trajectories)
@@ -52,7 +49,7 @@ sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories);
 
 function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
 
-    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
+    extract(sols, k, scale=1) = map(s -> s[k] * scale, sols)
     @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x, degavg = sys
 
     glc5 = glc ./ 5
@@ -60,8 +57,8 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     pyr = extract(sols, Pyr, 1000)
     ca_c = extract(sols, Ca_c, 1000)
     ca_m = extract(sols, Ca_m, 1000)
-    nad_ratio_c = extract(sols, NADH_c/NAD_c)
-    nad_ratio_m = extract(sols, NADH_m/NAD_m)
+    nad_ratio_c = extract(sols, NADH_c / NAD_c)
+    nad_ratio_m = extract(sols, NADH_m / NAD_m)
     atp_c = extract(sols, ATP_c, 1000)
     adp_c = extract(sols, ADP_c, 1000)
     amp_c = extract(sols, AMP_c, 1000)
@@ -101,6 +98,7 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     axs[2, 1].plot(glc5, x1, label="X1")
     axs[2, 1].plot(glc5, x2, label="X2")
     axs[2, 1].plot(glc5, x3, label="X3")
+    axs[2, 1].legend()
     axs[2, 1].set(title="(H) Mitochondrial nodes", xlabel="Glucose (X)")
     axs[2, 2].plot(glc5, deg)
     axs[2, 2].set(title="(I) Average Node Degree", xlabel="Glucose (X)")
@@ -130,7 +128,7 @@ fig_glc_gal = plot_steady_state(glc, sim_gal, sys_gal, title="Galactose paramete
 
 function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="", labels=["Default", "Gal", "FFA"])
 
-    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
+    extract(sols, k, scale=1) = map(s -> s[k] * scale, sols)
 
     @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, degavg, J_O2 = sys
 
@@ -140,19 +138,19 @@ function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="
     fig, axs = plt.subplots(numrow, numcol; figsize)
 
     axs[0, 0].set(title="(A) Cytosolic NADH:NAD")
-    k = NADH_c/NAD_c
+    k = NADH_c / NAD_c
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = axs[0, 0].plot(glc5, yy)
     axs[0, 0].legend(lines, labels)
 
     axs[0, 1].set(title="(B) Mitochondrial NADH:NAD")
-    k = NADH_m/NAD_m
+    k = NADH_m / NAD_m
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = axs[0, 1].plot(glc5, yy)
     axs[0, 1].legend(lines, labels)
 
     axs[1, 0].set(title="(C) ATP:ADP")
-    k = ATP_c/ADP_c
+    k = ATP_c / ADP_c
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = axs[1, 0].plot(glc5, yy)
     axs[1, 0].legend(lines, labels)
