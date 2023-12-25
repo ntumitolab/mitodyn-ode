@@ -9,21 +9,21 @@ using MitochondrialDynamics
 using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
-## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
-## plt.matplotlib.rcParams["font.family"] = "sans-serif"
+plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
 # Default model
 @named sys = make_model()
 prob = SteadyStateProblem(sys, []) ## Use default u0
 alg = DynamicSS(Rodas5())
-sol = solve(prob, alg)
+sol = solve(prob, alg) ## Warm up
 
 # Galactose model: glycolysis produces zero net ATP
 # By increasing the ATP consumed in the first part of glycolysis from 2 to 4
 @named sys_gal = make_model(gk_atp_stoich=4)
 prob_gal = SteadyStateProblem(sys_gal, [])
 
-# FFA model: Additional flux producing mitochondrial NADH
+# FFA model: Additional flux reducing mitochondrial NAD/NADH couple
+# A 50% increase w.r.t baseline CAC flux
 @named sys_ffa = make_model()
 @unpack J_CAC, J_FFA = sys_ffa
 prob_ffa = SteadyStateProblem(sys_ffa, [], [J_FFA => sol[J_CAC] * 0.5])
@@ -41,15 +41,15 @@ end
 alg = DynamicSS(Rodas5())
 trajectories = length(glc)
 
+# Run the simulations
 sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
 sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; trajectories)
 sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories);
 
 # ## Steady states for a range of glucose
-
 function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
 
-    extract(sols, k, scale=1) = map(s -> s[k] * scale, sols)
+    extract(sols, k, scale=1) = getindex.(sols.u, k * scale)
     @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x, degavg = sys
 
     glc5 = glc ./ 5

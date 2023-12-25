@@ -8,6 +8,7 @@ chapters:
   - file: fig3
   - file: fig5
   - file: fig6_7
+  - file: steady-states
   - file: supp/figs_ca_overload
   - file: supp/figs_glc_step
   - file: supp/figs3
