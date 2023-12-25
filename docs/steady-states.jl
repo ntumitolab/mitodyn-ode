@@ -49,12 +49,12 @@ prob_hl = SteadyStateProblem(sys, [], [pHleak => pHleak_val * 5])
 
 # Simulating on a range of glucose
 # Test on a range of glucose (3 mM to 30 mM)
-idxGlc = indexof(sys.GlcConst, parameters(sys))
-glc = range(3.0, 30.0, length=101)
 
+glc = range(3.0, 30.0, length=101)
 prob_func = function (prob, i, repeat)
-    prob.p[idxGlc] = glc[i]
-    return prob
+    sys = prob.f.sys
+    idxGlc = indexof(sys.GlcConst, parameters(sys))
+    return remake(prob, p = replace(prob.p, idxGlc => glc[i]))
 end
 
 alg = DynamicSS(Rodas5())
@@ -68,19 +68,24 @@ sim_f1 = solve(EnsembleProblem(prob_f1; prob_func), alg; trajectories)
 sim_etc = solve(EnsembleProblem(prob_etc; prob_func), alg; trajectories)
 sim_hl = solve(EnsembleProblem(prob_hl; prob_func), alg; trajectories)
 
-@unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x, degavg = sys
+@unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x, degavg, J_O2 = sys
 
 ## Plot results
-function plot_comparisions(k)
-    plt.figure()
-    plt.plot(glc, extract(sim, k), color="black", label="Default")
-    plt.plot(glc, extract(sim_gal,k), label="Galactose")
-    plt.plot(glc, extract(sim_ffa, k), label="FFA")
-    plt.plot(glc, extract(sim_f1, k), label="Oligo")
-    plt.plot(glc[5:end], extract(sim_hl, k)[5:end], label="FCCP")
-    plt.plot(glc, extract(sim_etc, k), label="Rote")
-    plt.legend()
-    plt.gcf()
+function plot_comparisions(k; figsize=(8, 8), title="", ylabel="")
+    fig, ax = plt.subplots(; figsize)
+    ax.plot(glc, extract(sim, k), color="black", label="Default")
+    ax.plot(glc, extract(sim_gal,k), label="Galactose")
+    ax.plot(glc, extract(sim_ffa, k), label="FFA")
+    ax.plot(glc, extract(sim_f1, k), label="Oligo")
+    ax.plot(glc[5:end], extract(sim_hl, k)[5:end], label="FCCP")
+    ax.plot(glc, extract(sim_etc, k), label="Rote")
+    ax.set_title(title)
+    ax.set_xlabel("Glucose (mM)")
+    ax.set_ylabel(ylabel)
+    ax.legend()
+    ax.grid()
+    fig.tight_layout()
+    return fig
 end
 
 # Mitochondrial membrane potential
@@ -103,3 +108,6 @@ plot_comparisions(degavg)
 
 # Mitochondrial calcium
 plot_comparisions(Ca_m)
+
+# Oxygen consumption rate
+plot_comparisions(J_O2)
