@@ -3,7 +3,7 @@ module MitochondrialDynamics
 using ModelingToolkit
 
 export make_model
-export indexof, change_params
+export indexof, change_params, extract
 
 ##
 ## Units and physical constants
@@ -31,10 +31,13 @@ const R = 8.314            # Ideal gas constant (K/mol)
 const VT = R * T0 / F      # Default thermal voltage (Volts)
 const iVT = inv(VT)        # Reciprocal of thermal voltage
 
-## Convineince function
+## Convineince functions
 hil(x, k=one(x)) = x / (x + k)
 hil(x, k, n) = hil(x^n, k^n)
 indexof(sym, syms) = findfirst(isequal(sym), syms)
+
+"""Extract values from ensemble simulations by a symbol"""
+extract(sims, k) = getindex.(sims.u, k)
 
 """Change parameter(s) from an ODESystem and returns a parameter vector."""
 function change_params(sys, ps...)
