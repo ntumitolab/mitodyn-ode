@@ -14,7 +14,7 @@ plt.matplotlib.rcParams["font.family"] = "sans-serif"
 # Default model
 @named sys = make_model()
 prob = SteadyStateProblem(sys, []) ## Use default u0
-alg = DynamicSS(Rodas5())
+alg = DynamicSS(TRBDF2())
 sol = solve(prob, alg) ## Warm up
 
 # Galactose model: glycolysis produces zero net ATP
@@ -35,10 +35,12 @@ glc = range(3.0, 30.0, length=101)
 
 prob_func = function (prob, i, repeat)
     sys = prob.f.sys
-    remake(prob, p=change_params(sys, sys.GlcConst => glc[i]))
+    idxGlc = indexof(sys.GlcConst, parameters(sys))
+    prob.p[idxGlc] = glc[i]
+    return prob
 end
 
-alg = DynamicSS(Rodas5())
+alg = DynamicSS(TRBDF2())
 trajectories = length(glc)
 
 # Run the simulations
