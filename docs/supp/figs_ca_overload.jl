@@ -18,7 +18,7 @@ import MitochondrialDynamics: μM
 # Default model
 @named sys = make_model()
 prob = SteadyStateProblem(sys, []) ## Use default u0
-alg = DynamicSS(Rodas5())
+alg = DynamicSS(TRBDF2())
 sol = solve(prob, alg)
 
 # High calcium model
@@ -37,7 +37,7 @@ prob_func = function (prob, i, repeat)
     prob
 end
 
-alg = DynamicSS(Rodas5())
+alg = DynamicSS(TRBDF2())
 trajectories=length(glc)
 
 sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)

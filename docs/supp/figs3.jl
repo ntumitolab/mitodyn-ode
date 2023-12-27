@@ -71,8 +71,8 @@ end
 add_fccp_cb = PresetTimeCallback(60minute, add_fccp!)
 
 cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_fccp_cb)
-sols3 = solve(prob; callback=cbs, saveat=ts)
-solDMs3 = solve(prob_dm; callback=cbs, saveat=ts);
+sols3 = solve(prob, TRBDF2(); callback=cbs, saveat=ts)
+solDMs3 = solve(prob_dm, TRBDF2(); callback=cbs, saveat=ts);
 
 #---2]ax[0, 0]
 function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"])

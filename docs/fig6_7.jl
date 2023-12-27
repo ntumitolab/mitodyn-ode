@@ -67,7 +67,7 @@ end
 # DM cells
 
 prob_dm = remake_dm(prob)
-alg = DynamicSS(Rodas5())
+alg = DynamicSS(TRBDF2())
 prob_func=prob_func_glc
 trajectories=length(glc)
 

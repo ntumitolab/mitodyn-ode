@@ -157,8 +157,8 @@ end
 # Start simulations
 
 cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_rotenone_cb)
-sols5 = solve(probs5; callback=cbs, saveat=ts)
-sols5DM = solve(prob_dmS5; callback=cbs, saveat=ts)
+sols5 = solve(probs5, TRBDF2(); callback=cbs, saveat=ts)
+sols5DM = solve(prob_dmS5, TRBDF2(); callback=cbs, saveat=ts)
 figs5 = plot_figs2(sols5, sols5DM)
 
 # TIFF file

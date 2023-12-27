@@ -32,7 +32,7 @@ rF1 = range(0.1, 2.0, 51)
 rETC = range(0.1, 2.0, 51)
 rHL = range(0.1, 5.0, 51)
 
-function solve_fig3(glc, r, protein, prob; alg=DynamicSS(Rodas5()))
+function solve_fig3(glc, r, protein, prob; alg=DynamicSS(TRBDF2()))
     idx = findfirst(isequal(protein), parameters(sys))
     p = copy(prob.p)
     p[iGlc] = glc
