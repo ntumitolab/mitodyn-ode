@@ -2,6 +2,7 @@
 
 using DifferentialEquations
 using ModelingToolkit
+using MKL
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 using PythonCall
