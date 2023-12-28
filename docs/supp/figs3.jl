@@ -3,9 +3,9 @@
 ## Step responses to both glucose stimulation and chemical agents (I)
 ===#
 
+using MKL
 using DifferentialEquations
 using ModelingToolkit
-using MKL
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 using PythonCall
