@@ -61,3 +61,4 @@ LocalPreferences.toml
 # Generated files
 *.ipynb
 *.tif
+*.png
