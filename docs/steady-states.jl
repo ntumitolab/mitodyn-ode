@@ -9,7 +9,7 @@ using ModelingToolkit
 using MitochondrialDynamics
 using PythonCall
 import PythonPlot as plt
-plt.matplotlib.rcParams["font.size"] = 14
+plt.matplotlib.rcParams["font.size"] = 12
 plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
 # Default model
@@ -68,7 +68,7 @@ sim_etc = solve(EnsembleProblem(prob_etc; prob_func), alg; trajectories)
 sim_hl = solve(EnsembleProblem(prob_hl; prob_func), alg; trajectories)
 
 # Plot results
-function plot_comparisions(k; figsize=(8, 8), title="", ylabel="", legend_loc="best")
+function plot_comparisions(k; figsize=(6, 6), title="", ylabel="", legend_loc="best")
     fig, ax = plt.subplots(; figsize)
     ax.plot(glc, extract(sim, k), color="black", label="Default")
     ax.plot(glc, extract(sim_gal,k), label="Galactose")
@@ -88,25 +88,25 @@ end
 @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x, degavg, J_O2 = sys
 
 # Mitochondrial membrane potential
-plot_comparisions(ΔΨm * 1000, title="Mitochondrial membrane potential", ylabel="ΔΨm (mV)")
+fig = plot_comparisions(ΔΨm * 1000, title="(A) Mitochondrial membrane potential", ylabel="ΔΨm (mV)")
 
 # ATP:ADP ratio
-plot_comparisions(ATP_c / ADP_c, title="ATP-to-ADP ratio", ylabel="ATP:ADP")
+fig = plot_comparisions(ATP_c / ADP_c, title="(B) ATP-to-ADP ratio", ylabel="ATP:ADP")
 
 # Mitochondrial NADH:NAD ratio
-plot_comparisions(NADH_m / NAD_m, title="Mito. NADH-to-NAD ratio", ylabel="NADH:NAD (mito)", legend_loc="upper left")
+fig = plot_comparisions(NADH_m / NAD_m, title="(C) Mito. NADH-to-NAD ratio", ylabel="NADH:NAD (mito)", legend_loc="upper left")
 
 # Cytosolic NADH:NAD ratio
-plot_comparisions(NADH_c / NAD_c, title="Cyto. NADH-to-NAD ratio", ylabel="NADH:NAD (cyto)", legend_loc="upper left")
+fig = plot_comparisions(NADH_c / NAD_c, title="(D) Cyto. NADH-to-NAD ratio", ylabel="NADH:NAD (cyto)", legend_loc="upper left")
 
 # Mitochondrial calcium
-plot_comparisions(Ca_m * 1000, title="Mito. calcium", ylabel="[Ca]m (μM)")
+fig = plot_comparisions(Ca_m * 1000, title="(E) Mito. calcium", ylabel="[Ca]m (μM)")
 
 # Oxygen consumption rate
-plot_comparisions(J_O2, title="Oxygen consumption", ylabel="VO2 (mM/s)")
+fig = plot_comparisions(J_O2, title="(F) Oxygen consumption", ylabel="VO2 (mM/s)")
 
 # Average node degree
-plot_comparisions(degavg, title="Average node degree")
+fig = plot_comparisions(degavg, title="(G) Average node degree")
 
 # Node ratio
-plot_comparisions(x[3] / x[1], title="Degree-3 to drgree-1 ratio")
+fig = plot_comparisions(x[3] / x[1], title="(H) Degree-3 to drgree-1 ratio")
