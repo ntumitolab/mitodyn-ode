@@ -1,3 +1,5 @@
+using PythonCall
+
 ## Units and physical constants
 const second = float(1)    # second
 const minute = 60second    # minute
@@ -37,3 +39,6 @@ extract(sims, k) = getindex.(sims.u, k)
 function change_params(sys, ps...)
     ModelingToolkit.varmap_to_vars(Dict(ps), parameters(sys); defaults = sys.defaults)
 end
+
+"""Export publication-ready TIFF file from a figure"""
+exportTIF(fig, name; dpi=300) = fig.savefig(name, dpi=dpi, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))

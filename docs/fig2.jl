@@ -9,7 +9,6 @@ using MitochondrialDynamics
 using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
-plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
 # Default model
 @named sys = make_model()
@@ -19,14 +18,11 @@ sol = solve(prob, alg) ## Warm up
 
 # Galactose model: glycolysis produces zero net ATP
 # By increasing the ATP consumed in the first part of glycolysis from 2 to 4
-@named sys_gal = make_model(gk_atp_stoich=4)
-prob_gal = SteadyStateProblem(sys_gal, [])
+prob_gal = SteadyStateProblem(sys, [], [sys.ATPstiochGK => 4])
 
 # FFA model: Additional flux reducing mitochondrial NAD/NADH couple
 # A 50% increase w.r.t baseline CAC flux
-@named sys_ffa = make_model()
-@unpack J_CAC, J_FFA = sys_ffa
-prob_ffa = SteadyStateProblem(sys_ffa, [], [J_FFA => sol[J_CAC] * 0.5])
+prob_ffa = SteadyStateProblem(sys, [], [sys.kFFA => sol[0.20 * sys.J_DH / sys.NAD_m]])
 
 # Simulating on a range of glucose
 # Test on a range of glucose (3 mM to 30 mM)
@@ -34,8 +30,6 @@ idxGlc = indexof(sys.GlcConst, parameters(sys))
 glc = range(3.0, 30.0, length=101)
 
 prob_func = function (prob, i, repeat)
-    sys = prob.f.sys
-    idxGlc = indexof(sys.GlcConst, parameters(sys))
     prob.p[idxGlc] = glc[i]
     return prob
 end

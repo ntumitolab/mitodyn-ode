@@ -11,8 +11,6 @@ using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
-## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
-## plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
 @named sys = make_model()
 
@@ -157,8 +155,8 @@ end
 # Start simulations
 
 cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_rotenone_cb)
-sols5 = solve(probs5, TRBDF2(); callback=cbs, saveat=ts)
-sols5DM = solve(prob_dmS5, TRBDF2(); callback=cbs, saveat=ts)
+sols5 = solve(probs5, Rodas5(); callback=cbs, saveat=ts)
+sols5DM = solve(prob_dmS5, Rodas5(); callback=cbs, saveat=ts)
 figs5 = plot_figs2(sols5, sols5DM)
 
 # TIFF file

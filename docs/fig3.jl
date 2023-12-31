@@ -10,8 +10,6 @@ using MitochondrialDynamics
 using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
-## rcParams["font.sans-serif"] = "Arial"
-## rcParams["font.family"] = "sans-serif"
 
 #---
 

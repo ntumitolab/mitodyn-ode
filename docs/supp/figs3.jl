@@ -10,8 +10,6 @@ using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
-## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
-## plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
 @named sys = make_model()
 
@@ -25,7 +23,7 @@ idxVmaxETC =  findfirst(isequal(VmaxETC), parameters(sys))
 
 tend = 80minute
 ts = range(0, tend, 401)
-
+alg = Rodas5()
 prob = ODEProblem(sys, [], ts[end])
 probs5 = ODEProblem(sys, [], ts[end])
 
@@ -71,8 +69,8 @@ end
 add_fccp_cb = PresetTimeCallback(60minute, add_fccp!)
 
 cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_fccp_cb)
-sols3 = solve(prob, TRBDF2(); callback=cbs, saveat=ts)
-solDMs3 = solve(prob_dm, TRBDF2(); callback=cbs, saveat=ts);
+sols3 = solve(prob, alg; callback=cbs, saveat=ts)
+solDMs3 = solve(prob_dm, alg; callback=cbs, saveat=ts);
 
 #---2]ax[0, 0]
 function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"])

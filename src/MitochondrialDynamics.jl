@@ -55,7 +55,7 @@ function make_model(;
     @parameters (VmaxLDH=1.2mM*Hz, KpyrLDH=47.5μM, KnadhLDH=1)
 
     # Pyruvate dehydrogenase (PDH)
-    @variables J_PDH(t) J_DH(t) J_CAC(t) NAD_m(t) NADH_m(t) Ca_m(t) J_FFA(t)
+    @variables J_PDH(t) J_DH(t) NAD_m(t) NADH_m(t) Ca_m(t) J_FFA(t)
     @parameters (VmaxPDH=300μM*Hz, KpyrPDH=47.5μM, KnadPDH=81, U1PDH=1.5, U2PDH=1.1, KcaPDH=0.05μM, kFFA=0Hz)
     pdheq = let
         c = (hil(KcaPDH, Ca_m))^2
@@ -122,9 +122,8 @@ function make_model(;
         J_GPD ~ VmaxGPD * hil(ADP_c, KadpGPD) * hil(NAD_c, NADH_c * KnadGPD) * hil(G3P, Kg3pGPD),
         J_LDH ~ VmaxLDH * hil(Pyr, KpyrLDH) * hil(NADH_c, NAD_c * KnadhLDH),
         pdheq,
-        J_CAC ~ J_PDH,
         J_FFA ~ kFFA * NAD_m,
-        J_DH ~ 4.6 * J_CAC + J_FFA,
+        J_DH ~ 4.6 * J_PDH + J_FFA,
         J_HR ~ VmaxETC * hil(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm),
         J_O2 ~ J_HR / 10,
         J_HL ~ pHleak * exp(kvHleak * ΔΨm),

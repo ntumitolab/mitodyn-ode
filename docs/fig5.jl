@@ -11,16 +11,14 @@ using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
-## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
-## plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
 #---
-
+alg = Rodas5()
 tend = 2000.0
 @named sys = make_model()
 @unpack GlcConst, Ca_c = sys
 prob = SteadyStateProblem(sys, [], [GlcConst => 10])
-sssol = solve(prob, DynamicSS(TRBDF2(), tspan=tend))
+sssol = solve(prob, DynamicSS(alg, tspan=tend))
 caavg = sssol[Ca_c]
 
 # Calcium wave independent to ATP:ADP ratio
@@ -40,7 +38,7 @@ end
 #---
 ts = range(1520.0, tend; step=2.0)
 prob = ODEProblem(sysosci, sssol.u, tend, [GlcConst => 10])
-sol = solve(prob, TRBDF2(), saveat=ts)
+sol = solve(prob, alg, saveat=ts)
 
 #---
 function plot_fig5(sol, figsize=(10, 10))

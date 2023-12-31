@@ -18,7 +18,8 @@ glc_step(t) = 5.0mM * (1 + (t >= 20minute) + (t >= 40minute))
 
 ts = range(0, 60minute; step=0.5minute)
 prob = ODEProblem(sys, [], ts[end])
-sol = solve(prob, TRBDF2(), tstops=[20minute, 40minute], saveat=ts);
+alg = Rodas5()
+sol = solve(prob, alg, tstops=[20minute, 40minute], saveat=ts);
 
 #---
 
@@ -130,7 +131,7 @@ prob_dm = remake_dm(prob)
 
 #---
 ts = range(0, 60minute; step=0.5minute)
-solDM = solve(prob_dm, TRBDF2(), tstops=[20minute, 40minute], saveat=ts);
+solDM = solve(prob_dm, alg, tstops=[20minute, 40minute], saveat=ts);
 
 #---
 function plot_figs2(sol, solDM; figsize=(10, 10), labels=["Baseline", "Diabetic"])
