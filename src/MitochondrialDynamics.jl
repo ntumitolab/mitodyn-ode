@@ -24,10 +24,8 @@ end
 
 function make_model(;
     name,
-    simplify=true,
     caceq=cac_atp(),
     glceq=const_glc(5mM),
-    gk_atp_stoich::Int=2
 )
     @constants begin
         C_MIT=1.812μM/mV # Mitochondrial membrane capacitance
@@ -46,7 +44,7 @@ function make_model(;
 
     # Glucokinase (GK)
     @variables Glc(t) J_GK(t)
-    @parameters (VmaxGK=0.011mM*Hz, KatpGK=0.5mM, KglcGK=7mM, nGK=1.7)
+    @parameters (VmaxGK=0.011mM*Hz, KatpGK=0.5mM, KglcGK=7mM, nGK=1.7, ATPstiochGK=2)
 
     # Glyceraldehydes 3-phosphate dehydrogenase (GPD)
     @variables J_GPD(t) G3P(t) NAD_c(t) NADH_c(t)
@@ -57,8 +55,8 @@ function make_model(;
     @parameters (VmaxLDH=1.2mM*Hz, KpyrLDH=47.5μM, KnadhLDH=1)
 
     # Pyruvate dehydrogenase (PDH)
-    @variables J_PDH(t) J_DH(t) J_CAC(t) NAD_m(t) NADH_m(t) Ca_m(t)
-    @parameters (VmaxPDH=300μM*Hz, KpyrPDH=47.5μM, KnadPDH=81, U1PDH=1.5, U2PDH=1.1, KcaPDH=0.05μM, J_FFA=0μM*Hz)
+    @variables J_PDH(t) J_DH(t) J_CAC(t) NAD_m(t) NADH_m(t) Ca_m(t) J_FFA(t)
+    @parameters (VmaxPDH=300μM*Hz, KpyrPDH=47.5μM, KnadPDH=81, U1PDH=1.5, U2PDH=1.1, KcaPDH=0.05μM, kFFA=0Hz)
     pdheq = let
         c = (hil(KcaPDH, Ca_m))^2
         fpCa = hil(1, U2PDH * (1 + U1PDH * c))
@@ -124,8 +122,9 @@ function make_model(;
         J_GPD ~ VmaxGPD * hil(ADP_c, KadpGPD) * hil(NAD_c, NADH_c * KnadGPD) * hil(G3P, Kg3pGPD),
         J_LDH ~ VmaxLDH * hil(Pyr, KpyrLDH) * hil(NADH_c, NAD_c * KnadhLDH),
         pdheq,
-        J_CAC ~ J_PDH + J_FFA,
-        J_DH ~ 4.6 * J_CAC,
+        J_CAC ~ J_PDH,
+        J_FFA ~ kFFA * NAD_m,
+        J_DH ~ 4.6 * J_CAC + J_FFA,
         J_HR ~ VmaxETC * hil(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm),
         J_O2 ~ J_HR / 10,
         J_HL ~ pHleak * exp(kvHleak * ΔΨm),
@@ -152,7 +151,7 @@ function make_model(;
         D(ΔΨm) ~ inv(C_MIT) * (J_HR - J_HF - J_HL - J_ANT - 2 * J_MCU),
         D(G3P) ~ inv(V_I) * (2J_GK - J_GPD) - kG3P * G3P,
         D(Pyr) ~ inv(V_I + V_MTX) * (J_GPD - J_PDH - J_LDH) - kPyr * Pyr,
-        D(ATP_c) ~ inv(V_I) * (-gk_atp_stoich * J_GK + 2 * J_GPD + J_ANT + J_ADK) - ATP_c * (kATP + kATPCa * Ca_c),
+        D(ATP_c) ~ inv(V_I) * (-ATPstiochGK * J_GK + 2 * J_GPD + J_ANT + J_ADK) - ATP_c * (kATP + kATPCa * Ca_c),
         D(AMP_c) ~ inv(V_I) * J_ADK,
         # D(ADP_c) ~ # Conserved
         # D(x[1]) ~ # Conserved
@@ -174,11 +173,7 @@ function make_model(;
         ]
     )
 
-    if simplify
-        sys = structural_simplify(sys)
-    end
-
-    return sys
+    return structural_simplify(sys)
 end
 
 end # Module
