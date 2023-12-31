@@ -20,7 +20,7 @@ env:
 
 jobs:
   CI:
-    runs-on: sel-hosted
+    runs-on: self-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
