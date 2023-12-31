@@ -43,22 +43,18 @@ function make_model(;
     # Adenylate kinase (AdK)
     @variables J_ADK(t) ATP_c(t) ADP_c(t) AMP_c(t)
     @parameters (kfAK=1000Hz/mM, kEqAK=0.931)
-    adkeq = J_ADK ~ kfAK * (ADP_c * ADP_c - ATP_c * AMP_c * kEqAK)
 
     # Glucokinase (GK)
     @variables Glc(t) J_GK(t)
     @parameters (VmaxGK=0.011mM*Hz, KatpGK=0.5mM, KglcGK=7mM, nGK=1.7)
-    gkeq = J_GK ~ VmaxGK * hil(ATP_c, KatpGK) * hil(Glc, KglcGK, nGK)
 
     # Glyceraldehydes 3-phosphate dehydrogenase (GPD)
     @variables J_GPD(t) G3P(t) NAD_c(t) NADH_c(t)
     @parameters (VmaxGPD=0.5mM*Hz, Kg3pGPD=0.2mM, KnadGPD=0.09, KadpGPD=2μM)
-    gpdeq = J_GPD ~ VmaxGPD * hil(ADP_c, KadpGPD) * hil(NAD_c, NADH_c * KnadGPD) * hil(G3P, Kg3pGPD)
 
     # Lactate dehydrogenase (LDH)
     @variables J_LDH(t) Pyr(t)
     @parameters (VmaxLDH=1.2mM*Hz, KpyrLDH=47.5μM, KnadhLDH=1)
-    ldheq = J_LDH ~ VmaxLDH * hil(Pyr, KpyrLDH) * hil(NADH_c, NAD_c * KnadhLDH)
 
     # Pyruvate dehydrogenase (PDH)
     @variables J_PDH(t) J_DH(t) J_CAC(t) NAD_m(t) NADH_m(t) Ca_m(t)
@@ -74,29 +70,22 @@ function make_model(;
     # Electron transport chain (ETC)
     @variables J_HR(t) J_O2(t) ΔΨm(t)
     @parameters (VmaxETC=22mM*Hz, KnadhETC=3mM, KaETC=-4.92E-3/mV, KbETC=-4.43E-3/mV)
-    hreq = J_HR ~ VmaxETC * hil(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm)
 
     # Proton leak
     @variables J_HL(t)
     @parameters (pHleak=2.4μM*Hz, kvHleak=0.0305/mV)
-    hkeq = J_HL ~ pHleak * exp(kvHleak * ΔΨm)
 
     # F1Fo ATPase (ATP synthase) lumped with ANT
     @variables J_HF(t) J_ANT(t)
     @parameters (VmaxF1=8mM*Hz, KadpF1=20μM, KvF1=131.4mV, KcaF1=0.165μM, FmgadpF1=0.055, nadpF1=2, nvF1=8)
-    hfeq = let
-        fADP = hil(FmgadpF1 * ADP_c, KadpF1, nadpF1)
-        fV = hil(ΔΨm, KvF1, nvF1)
-        fCa = 1 - exp(-Ca_m / KcaF1)
-        J_HF ~ VmaxF1 * fADP * fV * fCa
-    end
 
     # Mitochondrial calcium uniporter (MCU)
     @variables J_MCU(t) Ca_c(t)
     @parameters PcaMCU=4Hz
     mcueq = let
         zvfrt = 2 * iVT * ΔΨm
-        J_MCU ~ PcaMCU * (zvfrt / expm1(zvfrt)) * (0.341 * Ca_c * exp(zvfrt) - 0.200 * Ca_m)
+        em1 = expm1(zvfrt)
+        J_MCU ~ PcaMCU * (zvfrt / em1) * (0.341 * Ca_c * (em1 + 1) - 0.200 * Ca_m)
     end
 
     # Mitochondrial sodium calcium exchanger (NCLX)
@@ -115,7 +104,6 @@ function make_model(;
     # NADH shuttle
     @variables J_NADHT(t)
     @parameters (VmaxNADHT=50μM*Hz, Ktn_c=0.002, Ktn_m=16.78)
-    nadhteq = J_NADHT ~ VmaxNADHT * hil(NADH_c, NAD_c * Ktn_c) * hil(NAD_m, NADH_m, Ktn_m)
 
     # Baseline consumption rates
     @parameters (kNADHc=0.1Hz, kNADHm=0.1Hz, kATP=0.04Hz, kATPCa=90Hz/mM, kG3P=0.01Hz, kPyr=0.01Hz)
@@ -123,7 +111,7 @@ function make_model(;
     @parameters (ΣAc=4.5mM, Σn_c=2mM, Σn_m=2.2mM)
 
     # Fission-fusion rates
-    @variables (x(t))[1:3] degavg(t) v1(t) v2(t)
+    @variables (x(t))[1:3] degavg(t) tiptip(t) tipside(t)
     @parameters (kfiss1=inv(10minute), kfuse1=kfiss1, kfiss2=1.5*kfiss1, kfuse2=0.5*kfuse1)
 
     D = Differential(t)
@@ -131,23 +119,23 @@ function make_model(;
     eqs = [
         caceq,
         glceq,
-        adkeq,
-        gkeq,
-        gpdeq,
-        ldheq,
+        J_ADK ~ kfAK * (ADP_c * ADP_c - ATP_c * AMP_c * kEqAK),
+        J_GK ~ VmaxGK * hil(ATP_c, KatpGK) * hil(Glc, KglcGK, nGK),
+        J_GPD ~ VmaxGPD * hil(ADP_c, KadpGPD) * hil(NAD_c, NADH_c * KnadGPD) * hil(G3P, Kg3pGPD),
+        J_LDH ~ VmaxLDH * hil(Pyr, KpyrLDH) * hil(NADH_c, NAD_c * KnadhLDH),
         pdheq,
-        hreq,
-        hkeq,
-        hfeq,
-        mcueq,
-        nclxeq,
-        nadhteq,
         J_CAC ~ J_PDH + J_FFA,
         J_DH ~ 4.6 * J_CAC,
+        J_HR ~ VmaxETC * hil(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm),
         J_O2 ~ J_HR / 10,
+        J_HL ~ pHleak * exp(kvHleak * ΔΨm),
+        J_HF ~ VmaxF1 * hil(FmgadpF1 * ADP_c, KadpF1, nadpF1) * hil(ΔΨm, KvF1, nvF1) * (1 - exp(-Ca_m / KcaF1)),
         J_ANT ~ J_HF / 3,
-        v1 ~ kfuse1 * J_ANT / J_HL * x[1] * x[1] - kfiss1 * x[2],
-        v2 ~ kfuse2 * J_ANT / J_HL * x[1] * x[2] - kfiss2 * x[3],
+        mcueq,
+        nclxeq,
+        J_NADHT ~ VmaxNADHT * hil(NADH_c, NAD_c * Ktn_c) * hil(NAD_m, NADH_m, Ktn_m),
+        tiptip ~ kfuse1 * J_ANT / J_HL * x[1] * x[1] - kfiss1 * x[2],
+        tipside ~ kfuse2 * J_ANT / J_HL * x[1] * x[2] - kfiss2 * x[3],
         # Conservation relationships
         ΣAc ~ ATP_c + ADP_c + AMP_c,
         Σn_c ~ NADH_c + NAD_c,
@@ -168,8 +156,8 @@ function make_model(;
         D(AMP_c) ~ inv(V_I) * J_ADK,
         # D(ADP_c) ~ # Conserved
         # D(x[1]) ~ # Conserved
-        D(x[2]) ~ v1 - v2,
-        D(x[3]) ~ v2,
+        D(x[2]) ~ tiptip - tipside,
+        D(x[3]) ~ tipside,
     ]
     sys = ODESystem(eqs, t; name,
         defaults=[
