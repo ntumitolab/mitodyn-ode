@@ -1,6 +1,7 @@
 module MitochondrialDynamics
 
 using ModelingToolkit
+import NaNMath as nm
 
 export make_model
 export indexof, change_params, extract
@@ -33,7 +34,7 @@ const iVT = inv(VT)        # Reciprocal of thermal voltage
 
 ## Convineince functions
 hil(x, k=one(x)) = x / (x + k)
-hil(x, k, n) = hil(x^n, k^n)
+hil(x, k, n) = hil(nm.pow(x, n), nm.pow(k, n))
 indexof(sym, syms) = findfirst(isequal(sym), syms)
 
 """Extract values from ensemble simulations by a symbol"""
