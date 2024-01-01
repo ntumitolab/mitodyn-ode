@@ -11,6 +11,9 @@ using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 12
 
+# PNG output in Literate.jl
+PNG(fig) = display("image/png", fig)
+
 # Default model
 @named sys = make_model()
 prob = SteadyStateProblem(sys, []) ## Use default u0
@@ -78,24 +81,32 @@ end
 
 # Mitochondrial membrane potential
 fig = plot_comparisions(ΔΨm * 1000, title="(A) Mitochondrial membrane potential", ylabel="ΔΨm (mV)")
+fig |> PNG
 
 # ATP:ADP ratio
 fig = plot_comparisions(ATP_c / ADP_c, title="(B) ATP-to-ADP ratio", ylabel="ATP:ADP")
+fig |> PNG
 
 # Mitochondrial NADH:NAD ratio
 fig = plot_comparisions(NADH_m / NAD_m, title="(C) Mito. NADH-to-NAD ratio", ylabel="NADH:NAD (mito)", legend_loc="upper left")
+fig |> PNG
 
 # Cytosolic NADH:NAD ratio
 fig = plot_comparisions(NADH_c / NAD_c, title="(D) Cyto. NADH-to-NAD ratio", ylabel="NADH:NAD (cyto)", legend_loc="upper left")
+fig |> PNG
 
 # Mitochondrial calcium
 fig = plot_comparisions(Ca_m * 1000, title="(E) Mito. calcium", ylabel="[Ca]m (μM)")
+fig |> PNG
 
 # Oxygen consumption rate
 fig = plot_comparisions(J_O2, title="(F) Oxygen consumption", ylabel="VO2 (mM/s)")
+fig |> PNG
 
 # Average node degree
 fig = plot_comparisions(degavg, title="(G) Average node degree")
+fig |> PNG
 
 # Node ratio
 fig = plot_comparisions(x[3] / x[1], title="(H) Degree-3 to drgree-1 ratio")
+fig |> PNG
