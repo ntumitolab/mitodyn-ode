@@ -115,10 +115,10 @@ fig_glc_default = plot_steady_state(glc, sim, sys, title="")
 fig_glc_default.savefig("Fig2.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
 
 # Adding free fatty acids
-fig_glc_ffa = plot_steady_state(glc, sim_ffa, sys_ffa, title="FFA parameters")
+fig_glc_ffa = plot_steady_state(glc, sim_ffa, sys, title="FFA parameters")
 
 # Using galactose instead of glucose as the hydrocarbon source
-fig_glc_gal = plot_steady_state(glc, sim_gal, sys_gal, title="Galactose parameters")
+fig_glc_gal = plot_steady_state(glc, sim_gal, sys, title="Galactose parameters")
 
 # ## Comparing default, FFA, and galactose models
 
