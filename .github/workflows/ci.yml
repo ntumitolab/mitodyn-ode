@@ -43,12 +43,10 @@ jobs:
         bash /tmp/jill.sh --version ${{ steps.read_toml.outputs.value }} -y
         echo "$HOME/.local/bin" >> $GITHUB_PATH
     - name: Install Julia packages
-      run: |
-        julia --color=yes -e 'using Pkg; Pkg.add(["PrettyTables", "Literate"])'
-        julia --project=@. --color=yes -e 'using Pkg; Pkg.resolve(); Pkg.precompile()'
+      run: julia --project=@. --color=yes -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
     - name: Run program
-      run: julia --color=yes -p ${{ env.NPROC }} literate.jl
-    - name: Build website
+      run: julia --project=@. --color=yes --color=yes -p ${{ env.NPROC }} literate.jl
+    - name: Build website`
       run: jupyter-book build docs/
     - name: Upload page artifact
       if: ${{ github.ref == 'refs/heads/main' }}
