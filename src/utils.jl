@@ -1,4 +1,5 @@
 using PythonCall
+using DifferentialEquations
 
 ## Units and physical constants
 const second = float(1)    # second
@@ -33,7 +34,7 @@ hil(x, k, n) = hil(nm.pow(x, n), nm.pow(k, n))
 indexof(sym, syms) = findfirst(isequal(sym), syms)
 
 """Extract values from ensemble simulations by a symbol"""
-extract(sims, k) = getindex.(sims.u, k)
+extract(sim::EnsembleSolution, k) = map(s->s[k][end], sim)
 
 """Change parameter(s) from an ODESystem and returns a parameter vector."""
 function change_params(sys, ps...)
