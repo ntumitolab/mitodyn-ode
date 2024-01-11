@@ -19,7 +19,6 @@ PNG(fig) = display("image/png", fig)
 prob = ODEProblem(sys, [], Inf)
 alg = Rodas5()
 
-## Warm up
 sol = solve(prob, alg, save_everystep=false, callback=TerminateSteadyState())
 
 # Galactose model: glycolysis produces zero net ATP

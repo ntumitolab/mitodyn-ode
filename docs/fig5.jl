@@ -12,6 +12,9 @@ using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
+# PNG output in Literate.jl
+PNG(fig) = display("image/png", fig)
+
 #---
 alg = Rodas5()
 tend = 2000.0
