@@ -15,14 +15,15 @@ import MitochondrialDynamics: μM
 
 # Default model
 @named sys = make_model()
-prob = SteadyStateProblem(sys, [])
-alg = DynamicSS(Rodas5())
-sol = solve(prob, alg)
+prob = ODEProblem(sys, [], Inf)
+alg = Rodas5()
+callback=TerminateSteadyState()
+sol = solve(prob, alg; save_everystep=false, callback)
 
 # High calcium model
 @unpack RestingCa, ActivatedCa = sys
-prob_ca5 = SteadyStateProblem(sys, [], [RestingCa=>0.45μM, ActivatedCa=>1.25μM])
-prob_ca10 = SteadyStateProblem(sys, [], [RestingCa=>0.9μM, ActivatedCa=>2.5μM])
+prob_ca5 = ODEProblem(sys, [], Inf, [RestingCa=>0.45μM, ActivatedCa=>1.25μM])
+prob_ca10 = ODEProblem(sys, [], Inf, [RestingCa=>0.9μM, ActivatedCa=>2.5μM])
 
 # Simulating on a range of glucose
 @unpack GlcConst = sys
@@ -37,29 +38,28 @@ end
 
 trajectories=length(glc)
 
-sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
-sim_ca5 = solve(EnsembleProblem(prob_ca5; prob_func), alg; trajectories)
-sim_ca10 = solve(EnsembleProblem(prob_ca10; prob_func), alg; trajectories)
+sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories,save_everystep=false, callback)
+sim_ca5 = solve(EnsembleProblem(prob_ca5; prob_func), alg; trajectories,save_everystep=false, callback)
+sim_ca10 = solve(EnsembleProblem(prob_ca10; prob_func), alg; trajectories,save_everystep=false, callback)
 
 # ## Steady states for a range of glucose
 
 function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
 
-    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
     @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x, degavg = sys
 
     glc5 = glc ./ 5
-    g3p = extract(sols, G3P, 1000)
-    pyr = extract(sols, Pyr, 1000)
-    ca_c = extract(sols, Ca_c, 1000)
-    ca_m = extract(sols, Ca_m, 1000)
+    g3p = extract(sols, G3P * 1000)
+    pyr = extract(sols, Pyr * 1000)
+    ca_c = extract(sols, Ca_c * 1000)
+    ca_m = extract(sols, Ca_m * 1000)
     nad_ratio_c = extract(sols, NADH_c/NAD_c)
     nad_ratio_m = extract(sols, NADH_m/NAD_m)
-    atp_c = extract(sols, ATP_c, 1000)
-    adp_c = extract(sols, ADP_c, 1000)
-    amp_c = extract(sols, AMP_c, 1000)
+    atp_c = extract(sols, ATP_c * 1000)
+    adp_c = extract(sols, ADP_c * 1000)
+    amp_c = extract(sols, AMP_c * 1000)
     td = extract(sols, ATP_c / ADP_c)
-    dpsi = extract(sols, ΔΨm, 1000)
+    dpsi = extract(sols, ΔΨm * 1000)
     x1 = extract(sols, x[1])
     x2 = extract(sols, x[2])
     x3 = extract(sols, x[3])
@@ -110,18 +110,16 @@ end
 # Default model
 fig_glc_default = plot_steady_state(glc, sim, sys, title="Calcium 1X")
 
-# High calcium
+# High calcium (5X)
 fig_ca5 = plot_steady_state(glc, sim_ca5, sys, title="Calcium 5X")
+
+# High calcium (10X)
 fig_ca10 = plot_steady_state(glc, sim_ca10, sys, title="Calcium 10X")
 
 # ## Comparing default and high calcium models
-
 function plot_comparision(glc, sim, sim_ca5, sim_ca10, sys;
     figsize=(8, 10), title="", labels=["Ca 1X", "Ca 5X", "Ca 10X"]
 )
-
-    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
-
     @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, degavg, J_O2 = sys
 
     glc5 = glc ./ 5
@@ -149,8 +147,8 @@ function plot_comparision(glc, sim, sim_ca5, sim_ca10, sys;
     ax[1, 0].legend(lines, labels)
 
     ax[1, 1].set(title="(D) ΔΨm (mV)")
-    k = ΔΨm
-    yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)] .* 1000
+    k = ΔΨm * 1000
+    yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
     lines = ax[1, 1].plot(glc5, yy)
     ax[1, 1].legend(lines, labels)
 
@@ -181,19 +179,18 @@ end
 figcomp = plot_comparision(glc, sim, sim_ca5, sim_ca10, sys)
 
 # Export figure
-figcomp.savefig("S1_HighCa.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+exportTIF(figcomp, "S1_HighCa.tif")
 
 # ## mitochondria membrane potential vs average node degree
 
 function plot_dpsi_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=["Ca 1X", "Ca 5X", "Ca 10X"])
-    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
     @unpack ΔΨm, degavg = sys
 
     fig, ax = plt.subplots(1, 1; figsize)
 
-    ax.plot(extract(sim, ΔΨm, 1000), extract(sim, degavg), "v", label=labels[1])
-    ax.plot(extract(sim_ca5, ΔΨm, 1000), extract(sim_ca5, degavg), "o", label=labels[2])
-    ax.plot(extract(sim_ca10, ΔΨm, 1000), extract(sim_ca10, degavg), "x", label=labels[3])
+    ax.plot(extract(sim, ΔΨm * 1000), extract(sim, degavg), "v", label=labels[1])
+    ax.plot(extract(sim_ca5, ΔΨm * 1000), extract(sim_ca5, degavg), "o", label=labels[2])
+    ax.plot(extract(sim_ca10, ΔΨm * 1000), extract(sim_ca10, degavg), "x", label=labels[3])
     ax.set(xlabel="ΔΨm (mV)", ylabel="Average node degree", title=title)
     ax.legend()
     ax.grid()
@@ -202,32 +199,33 @@ function plot_dpsi_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", label
 end
 
 fig = plot_dpsi_k(sim, sim_ca5, sim_ca10, sys)
-fig.savefig("S1_HighCa_dpsi_k.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+
+#---
+exportTIF(fig, "S1_HighCa_dpsi_k.tif")
 
 # ## x-axis as Ca2+ and y-axis as average node degree
 
 function plot_ca_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=["Ca 1X", "Ca 5X", "Ca 10X"])
-    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
     @unpack Ca_m, degavg = sys
 
     fig, ax = plt.subplots(1, 1; figsize)
 
-    ax.plot(extract(sim, Ca_m, 1000), extract(sim, degavg), "v", label=labels[1])
-    ax.plot(extract(sim_ca5, Ca_m, 1000), extract(sim_ca5, degavg), "o", label=labels[2])
-    ax.plot(extract(sim_ca10, Ca_m, 1000), extract(sim_ca10, degavg), "x", label=labels[3])
+    ax.plot(extract(sim, Ca_m * 1000), extract(sim, degavg), "v", label=labels[1])
+    ax.plot(extract(sim_ca5, Ca_m * 1000), extract(sim_ca5, degavg), "o", label=labels[2])
+    ax.plot(extract(sim_ca10, Ca_m * 1000), extract(sim_ca10, degavg), "x", label=labels[3])
     ax.set(xlabel="Mitochondrial Ca (mM)", ylabel="Average node degree", title=title)
     ax.legend()
     ax.grid()
-
     return fig
 end
 
 fig = plot_ca_k(sim, sim_ca5, sim_ca10, sys)
-fig.savefig("S1_HighCa_ca_k.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+
+#---
+exportTIF(fig, "S1_HighCa_ca_k.tif")
 
 # ## x-axis as ATP and y-axis as average node degree
 function plot_atp_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=["Ca 1X", "Ca 5X", "Ca 10X"])
-    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
     @unpack ATP_c, ADP_c, degavg = sys
 
     k = ATP_c / ADP_c
@@ -245,4 +243,6 @@ function plot_atp_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels
 end
 
 fig = plot_atp_k(sim, sim_ca5, sim_ca10, sys)
-fig.savefig("S1_HighCa_atp_k.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+
+#---
+exportTIF(fig, "S1_HighCa_atp_k.tif")

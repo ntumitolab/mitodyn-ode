@@ -16,27 +16,27 @@ PNG(fig) = display("image/png", fig)
 
 # Default model
 @named sys = make_model()
-prob = SteadyStateProblem(sys, []) ## Use default u0
-alg = DynamicSS(Rodas5())
-## Warm up
-sol = solve(prob, alg)
+prob = ODEProblem(sys, [], Inf)
+alg = Rodas5()
+
+sol = solve(prob, alg, save_everystep=false, callback=TerminateSteadyState())
 
 # Galactose model: glycolysis produces zero net ATP
 # By increasing the ATP consumed in the first part of glycolysis from 2 to 4
-prob_gal = SteadyStateProblem(sys, [], [sys.ATPstiochGK => 4])
+prob_gal = ODEProblem(sys, [], Inf, [sys.ATPstiochGK => 4])
 
 # NAD reducing model: an additional reaction to reduce mitochondrial NAD
-prob_ffa = SteadyStateProblem(sys, [], [sys.kFFA => sol[0.10 * sys.J_DH / sys.NAD_m]])
+prob_ffa = ODEProblem(sys, [], Inf, [sys.kFFA => sol[0.10 * sys.J_DH / sys.NAD_m][end]])
 
 # ATP synthase-limiting model (Oligomycin)
-prob_f1 = SteadyStateProblem(sys, [], [sys.VmaxF1 => 0.1 * sys.defaults[sys.VmaxF1]])
+prob_f1 = ODEProblem(sys, [], Inf, [sys.VmaxF1 => 0.1 * sys.defaults[sys.VmaxF1]])
 
 # ETC-limiting model (Rotenone ?)
-prob_etc = SteadyStateProblem(sys, [], [sys.VmaxETC => 0.1 * sys.defaults[sys.VmaxETC]])
+prob_etc = ODEProblem(sys, [], Inf, [sys.VmaxETC => 0.1 * sys.defaults[sys.VmaxETC]])
 
 # Proton leak-increasing (FCCP) model
 # increase proton leak by 7X
-prob_hl = SteadyStateProblem(sys, [], [sys.pHleak => 10 * sys.defaults[sys.pHleak]])
+prob_hl = ODEProblem(sys, [], Inf, [sys.pHleak => 10 * sys.defaults[sys.pHleak]])
 
 # Simulating on a range of glucose
 # Test on a range of glucose (3 mM to 30 mM)
@@ -49,15 +49,16 @@ prob_func = function (prob, i, repeat)
 end
 
 trajectories = length(glc)
-alg = DynamicSS(Rodas5())
+alg = Rodas5()
+callback=TerminateSteadyState()
 
 # Run the simulations
-sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
-sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; trajectories)
-sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories)
-sim_f1 = solve(EnsembleProblem(prob_f1; prob_func), alg; trajectories)
-sim_etc = solve(EnsembleProblem(prob_etc; prob_func), alg; trajectories)
-sim_hl = solve(EnsembleProblem(prob_hl; prob_func), alg; trajectories);
+sim = solve(EnsembleProblem(prob; prob_func), alg; save_everystep=false, trajectories, callback)
+sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; save_everystep=false, trajectories, callback)
+sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; save_everystep=false, trajectories, callback)
+sim_f1 = solve(EnsembleProblem(prob_f1; prob_func), alg; save_everystep=false, trajectories, callback)
+sim_etc = solve(EnsembleProblem(prob_etc; prob_func), alg; save_everystep=false, trajectories, callback)
+sim_hl = solve(EnsembleProblem(prob_hl; prob_func), alg; save_everystep=false, trajectories, callback);
 
 # Plot results
 function plot_comparisions(k; figsize=(6, 6), title="", ylabel="", legend_loc="best")

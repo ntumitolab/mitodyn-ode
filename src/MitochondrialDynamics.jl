@@ -3,7 +3,7 @@ module MitochondrialDynamics
 using ModelingToolkit
 import NaNMath as nm
 
-export make_model, indexof, change_params, extract
+export make_model, indexof, extract, exportTIF
 
 include("utils.jl")
 

@@ -1,4 +1,5 @@
 using PythonCall
+using DifferentialEquations
 
 ## Units and physical constants
 const second = float(1)    # second
@@ -33,12 +34,7 @@ hil(x, k, n) = hil(nm.pow(x, n), nm.pow(k, n))
 indexof(sym, syms) = findfirst(isequal(sym), syms)
 
 """Extract values from ensemble simulations by a symbol"""
-extract(sims, k) = getindex.(sims.u, k)
-
-"""Change parameter(s) from an ODESystem and returns a parameter vector."""
-function change_params(sys, ps...)
-    ModelingToolkit.varmap_to_vars(Dict(ps), parameters(sys); defaults = sys.defaults)
-end
+extract(sim::EnsembleSolution, k) = map(s->s[k][end], sim)
 
 """Export publication-ready TIFF file from a figure"""
 exportTIF(fig, name; dpi=300) = fig.savefig(name, dpi=dpi, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))

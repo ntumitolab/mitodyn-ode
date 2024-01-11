@@ -12,14 +12,17 @@ using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
+# PNG output in Literate.jl
+PNG(fig) = display("image/png", fig)
+
 #---
-alg = Rodas5()
+alg = TRBDF2()
 tend = 2000.0
 @named sys = make_model()
 @unpack GlcConst, Ca_c = sys
-prob = SteadyStateProblem(sys, [], [GlcConst => 10])
-sssol = solve(prob, DynamicSS(alg, tspan=tend))
-caavg = sssol[Ca_c]
+prob = ODEProblem(sys, [], Inf, [GlcConst => 10])
+sssol = solve(prob, alg, save_everystep=false, callback=TerminateSteadyState())
+caavg = sssol[Ca_c][end]
 
 # Calcium wave independent to ATP:ADP ratio
 
@@ -37,8 +40,8 @@ end
 
 #---
 ts = range(1520.0, tend; step=2.0)
-prob = ODEProblem(sysosci, sssol.u, tend, [GlcConst => 10])
-sol = solve(prob, alg, saveat=ts)
+prob = ODEProblem(sysosci, [], tend, [GlcConst => 10])
+sol = solve(prob, TRBDF2(), saveat=ts)
 
 #---
 function plot_fig5(sol, figsize=(10, 10))
@@ -80,4 +83,4 @@ end
 fig5 = plot_fig5(sol)
 
 # Export figure
-fig5.savefig("Fig5.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+exportTIF(fig5, "Fig5.tif")

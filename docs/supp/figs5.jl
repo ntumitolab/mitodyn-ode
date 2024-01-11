@@ -7,7 +7,6 @@ using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
-
 using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
@@ -22,7 +21,7 @@ idxpHleak = findfirst(isequal(pHleak), parameters(sys))
 idxVmaxF1 =  findfirst(isequal(VmaxF1), parameters(sys))
 idxVmaxETC =  findfirst(isequal(VmaxETC), parameters(sys))
 
-tend = 80minute
+tend = 100minute
 ts = range(0, tend, 401)
 
 probs5 = ODEProblem(sys, [], ts[end])
@@ -160,4 +159,4 @@ sols5DM = solve(prob_dmS5, Rodas5(); callback=cbs, saveat=ts)
 figs5 = plot_figs2(sols5, sols5DM)
 
 # TIFF file
-## figs5.savefig("FigS5-Glucose-Oligomycin-Rotenone.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+exportTIF(figs5, "FigS1-Glucose-Oligomycin-Rotenone.tif")
