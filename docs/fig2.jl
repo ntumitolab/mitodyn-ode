@@ -114,7 +114,7 @@ end
 fig_glc_default = plot_steady_state(glc, sim, sys, title="")
 
 # Default parameters
-fig_glc_default.savefig("Fig2.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+exportTIF(fig_glc_default, "Fig2.tif")
 
 # Adding free fatty acids
 fig_glc_ffa = plot_steady_state(glc, sim_ffa, sys, title="FFA parameters")
@@ -183,4 +183,4 @@ end
 figFFAGal = plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys)
 
 # Export figure
-figFFAGal.savefig("s1-fig1.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+exportTIF(figFFAGal, "s1-fig1.tif")

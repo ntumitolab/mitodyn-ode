@@ -161,4 +161,4 @@ end
 figs3 = plot_figs2(sols3, solDMs3)
 
 # TIFF file
-figs3.savefig("FigS3-Glucose-Oligomycin-FCCP.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+exportTIF(figs3, "FigS3-Glucose-Oligomycin-FCCP.tif")

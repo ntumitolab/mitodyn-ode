@@ -143,8 +143,7 @@ end
 fig6 = plot_fig6(sols, solsDM, glc)
 
 # Export figure
-
-fig6.savefig("Fig6.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+exportTIF(fig6, "Fig6.tif")
 
 # ## Figure 7
 prob_fccp = remake_fccp(prob)
@@ -212,5 +211,4 @@ end
 fig7 = plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc)
 
 # Export figure
-
-fig7.savefig("Fig7.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+exportTIF(fig7, "Fig7.tif")

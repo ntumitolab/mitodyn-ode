@@ -115,4 +115,4 @@ end
 fig3 = plot_fig3(figsize=(13, 10))
 
 # Export figure
-fig3.savefig("Fig3.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+exportTIF(fig3, "Fig3.tif")

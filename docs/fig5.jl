@@ -83,4 +83,4 @@ end
 fig5 = plot_fig5(sol)
 
 # Export figure
-fig5.savefig("Fig5.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+exportTIF(fig5, "Fig5.tif")

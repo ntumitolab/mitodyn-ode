@@ -159,4 +159,4 @@ sols5DM = solve(prob_dmS5, Rodas5(); callback=cbs, saveat=ts)
 figs5 = plot_figs2(sols5, sols5DM)
 
 # TIFF file
-figs5.savefig("FigS1-Glucose-Oligomycin-Rotenone.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+exportTIF(figs5, "FigS1-Glucose-Oligomycin-Rotenone.tif")

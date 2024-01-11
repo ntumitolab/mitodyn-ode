@@ -95,7 +95,7 @@ end
 fig = plot_figs1(sol)
 
 # Export figure
-fig.savefig("FigS_glc_step.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+exportTIF(fig, "FigS_glc_step.tif")
 
 #===
 ## Step sesponse to glucose addition in healthy and DM cells.
