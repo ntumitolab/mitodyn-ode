@@ -36,10 +36,5 @@ indexof(sym, syms) = findfirst(isequal(sym), syms)
 """Extract values from ensemble simulations by a symbol"""
 extract(sim::EnsembleSolution, k) = map(s->s[k][end], sim)
 
-"""Change parameter(s) from an ODESystem and returns a parameter vector."""
-function change_params(sys, ps...)
-    ModelingToolkit.varmap_to_vars(Dict(ps), parameters(sys); defaults = sys.defaults)
-end
-
 """Export publication-ready TIFF file from a figure"""
 exportTIF(fig, name; dpi=300) = fig.savefig(name, dpi=dpi, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
