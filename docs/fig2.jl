@@ -6,12 +6,8 @@ Steady-state solutions across a range of glucose levels.
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
-
-# PNG output in Literate.jl
-PNG(fig) = display("image/png", fig)
 
 # Default model
 @named sys = make_model()
@@ -111,19 +107,21 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
 end
 
 #---
-fig_glc_default = plot_steady_state(glc, sim, sys, title="")
+fig = fig_glc_default = plot_steady_state(glc, sim, sys, title="");
+fig |> PNG
 
 # Default parameters
 exportTIF(fig_glc_default, "Fig2.tif")
 
 # Adding free fatty acids
-fig_glc_ffa = plot_steady_state(glc, sim_ffa, sys, title="FFA parameters")
+fig = plot_steady_state(glc, sim_ffa, sys, title="FFA parameters");
+fig |> PNG
 
 # Using galactose instead of glucose as the hydrocarbon source
-fig_glc_gal = plot_steady_state(glc, sim_gal, sys, title="Galactose parameters")
+fig = plot_steady_state(glc, sim_gal, sys, title="Galactose parameters");
+fig |> PNG
 
 # ## Comparing default, FFA, and galactose models
-
 function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="", labels=["Default", "Gal", "FFA"])
 
     @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, degavg, J_O2 = sys
@@ -180,7 +178,8 @@ function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="
     return fig
 end
 
-figFFAGal = plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys)
+figFFAGal = plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys);
+figFFAGal |> PNG
 
 # Export figure
 exportTIF(figFFAGal, "s1-fig1.tif")

@@ -11,8 +11,8 @@ using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
+#---
 @named sys = make_model()
-
 @unpack GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC = sys
 
 idxGlc = findfirst(isequal(GlcConst), parameters(sys))
@@ -159,6 +159,7 @@ end
 
 #---
 figs3 = plot_figs2(sols3, solDMs3)
+figs3 |> PNG
 
 # TIFF file
 exportTIF(figs3, "FigS3-Glucose-Oligomycin-FCCP.tif")

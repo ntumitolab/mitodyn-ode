@@ -5,7 +5,6 @@ using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
-using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
@@ -140,7 +139,8 @@ function plot_fig6(sols, solsDM, glc; figsize=(10, 10), labels=["Baseline", "Dia
 end
 
 #---
-fig6 = plot_fig6(sols, solsDM, glc)
+fig6 = plot_fig6(sols, solsDM, glc);
+fig6 |> PNG
 
 # Export figure
 exportTIF(fig6, "Fig6.tif")
@@ -209,6 +209,7 @@ end
 #---
 
 fig7 = plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc)
+fig7 |> PNG
 
 # Export figure
 exportTIF(fig7, "Fig7.tif")

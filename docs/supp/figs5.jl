@@ -7,7 +7,6 @@ using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
-using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
@@ -149,14 +148,14 @@ function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"
     fig.tight_layout()
     return fig
 end
-#---
 
 # Start simulations
-
 cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_rotenone_cb)
 sols5 = solve(probs5, Rodas5(); callback=cbs, saveat=ts)
 sols5DM = solve(prob_dmS5, Rodas5(); callback=cbs, saveat=ts)
-figs5 = plot_figs2(sols5, sols5DM)
+
+figs5 = plot_figs2(sols5, sols5DM);
+figs5 |> PNG
 
 # TIFF file
 exportTIF(figs5, "FigS1-Glucose-Oligomycin-Rotenone.tif")

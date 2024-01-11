@@ -4,7 +4,6 @@ using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
-using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 ## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
@@ -91,8 +90,8 @@ function plot_figs1( sol; figsize=(10, 10))
 end
 
 #---
-
-fig = plot_figs1(sol)
+fig = plot_figs1(sol);
+fig |> PNG
 
 # Export figure
 exportTIF(fig, "FigS_glc_step.tif")
@@ -215,4 +214,5 @@ function plot_figs2(sol, solDM; figsize=(10, 10), labels=["Baseline", "Diabetic"
     return fig
 end
 
-figs2 = plot_figs2(sol, solDM)
+figs2 = plot_figs2(sol, solDM);
+figs2 |> PNG

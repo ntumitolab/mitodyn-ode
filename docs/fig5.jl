@@ -8,12 +8,8 @@ using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
-using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
-
-# PNG output in Literate.jl
-PNG(fig) = display("image/png", fig)
 
 #---
 alg = TRBDF2()
@@ -81,6 +77,7 @@ end
 #---
 
 fig5 = plot_fig5(sol)
+FIG5 |> PNG
 
 # Export figure
 exportTIF(fig5, "Fig5.tif")

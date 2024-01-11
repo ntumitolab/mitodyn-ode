@@ -26,7 +26,7 @@ const R = 8.314            # Ideal gas constant (K/mol)
 const VT = R * T0 / F      # Default thermal voltage (Volts)
 const iVT = inv(VT)        # Reciprocal of thermal voltage
 
-"""Hill and MM functions"""
+"""Hill and Michaelis-Menten functions"""
 hil(x, k=one(x)) = x / (x + k)
 hil(x, k, n) = hil(nm.pow(x, n), nm.pow(k, n))
 
@@ -38,3 +38,6 @@ extract(sim::EnsembleSolution, k) = map(s->s[k][end], sim)
 
 """Export publication-ready TIFF file from a figure"""
 exportTIF(fig, name; dpi=300) = fig.savefig(name, dpi=dpi, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+
+"""Figure output in PNG format"""
+PNG(fig) = display("image/png", fig)

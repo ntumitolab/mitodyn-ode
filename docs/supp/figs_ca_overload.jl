@@ -3,14 +3,11 @@
 
 Steady-state solutions across a range of glucose levels.
 ===#
-
 using DifferentialEquations
 using ModelingToolkit
-using MitochondrialDynamics
-using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
-
+using MitochondrialDynamics
 import MitochondrialDynamics: μM
 
 # Default model
@@ -108,13 +105,16 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
 end
 
 # Default model
-fig_glc_default = plot_steady_state(glc, sim, sys, title="Calcium 1X")
+fig_glc_default = plot_steady_state(glc, sim, sys, title="Calcium 1X");
+fig_glc_default |> PNG
 
 # High calcium (5X)
-fig_ca5 = plot_steady_state(glc, sim_ca5, sys, title="Calcium 5X")
+fig_ca5 = plot_steady_state(glc, sim_ca5, sys, title="Calcium 5X");
+fig_ca5 |> PNG
 
 # High calcium (10X)
-fig_ca10 = plot_steady_state(glc, sim_ca10, sys, title="Calcium 10X")
+fig_ca10 = plot_steady_state(glc, sim_ca10, sys, title="Calcium 10X");
+fig_ca10 |> PNG
 
 # ## Comparing default and high calcium models
 function plot_comparision(glc, sim, sim_ca5, sim_ca10, sys;
@@ -176,13 +176,13 @@ function plot_comparision(glc, sim, sim_ca5, sim_ca10, sys;
     return fig
 end
 
-figcomp = plot_comparision(glc, sim, sim_ca5, sim_ca10, sys)
+figcomp = plot_comparision(glc, sim, sim_ca5, sim_ca10, sys);
+figcomp |> PNG
 
 # Export figure
 exportTIF(figcomp, "S1_HighCa.tif")
 
 # ## mitochondria membrane potential vs average node degree
-
 function plot_dpsi_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=["Ca 1X", "Ca 5X", "Ca 10X"])
     @unpack ΔΨm, degavg = sys
 
@@ -198,7 +198,8 @@ function plot_dpsi_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", label
     return fig
 end
 
-fig = plot_dpsi_k(sim, sim_ca5, sim_ca10, sys)
+fig = plot_dpsi_k(sim, sim_ca5, sim_ca10, sys);
+fig |> PNG
 
 #---
 exportTIF(fig, "S1_HighCa_dpsi_k.tif")
@@ -219,7 +220,8 @@ function plot_ca_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=
     return fig
 end
 
-fig = plot_ca_k(sim, sim_ca5, sim_ca10, sys)
+fig = plot_ca_k(sim, sim_ca5, sim_ca10, sys);
+fig |> PNG
 
 #---
 exportTIF(fig, "S1_HighCa_ca_k.tif")
@@ -242,7 +244,8 @@ function plot_atp_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels
     return fig
 end
 
-fig = plot_atp_k(sim, sim_ca5, sim_ca10, sys)
+fig = plot_atp_k(sim, sim_ca5, sim_ca10, sys);
+fig |> PNG
 
 #---
 exportTIF(fig, "S1_HighCa_atp_k.tif")
