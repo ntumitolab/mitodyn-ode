@@ -18,11 +18,10 @@ glc_step(t) = 5.0mM * (1 + (t >= 20minute) + (t >= 40minute))
 
 ts = range(0, 60minute; step=0.5minute)
 prob = ODEProblem(sys, [], ts[end])
-alg = Rodas5()
+alg = TRBDF2()
 sol = solve(prob, alg, tstops=[20minute, 40minute], saveat=ts);
 
 #---
-
 function plot_figs1( sol; figsize=(10, 10))
     @unpack G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ATP_c, ADP_c, AMP_c, ΔΨm, degavg, x = sol.prob.f.sys
     ts = sol.t
@@ -96,7 +95,7 @@ end
 fig = plot_figs1(sol)
 
 # Export figure
-## figs1.savefig("FigS_glc_step.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+fig.savefig("FigS_glc_step.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
 
 #===
 ## Step sesponse to glucose addition in healthy and DM cells.
