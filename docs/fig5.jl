@@ -77,7 +77,7 @@ end
 #---
 
 fig5 = plot_fig5(sol)
-FIG5 |> PNG
+fig5 |> PNG
 
 # Export figure
 exportTIF(fig5, "Fig5.tif")
