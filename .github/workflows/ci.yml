@@ -30,7 +30,7 @@ jobs:
       with:
         python-version: ${{ env.PY_VER }}
     - name: Cache pip
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       id: cache-pip
       with:
         path: ${{ env.pythonLocation }}
@@ -50,7 +50,7 @@ jobs:
         bash /tmp/jill.sh --version ${{ steps.read_toml.outputs.value }} -y
         echo "$HOME/.local/bin" >> $GITHUB_PATH
     - name: Cache Julia packages
-      uses: actions/cache/restore@v3
+      uses: actions/cache/restore@v4
       id: cache-julia
       with:
         path: |
@@ -65,7 +65,7 @@ jobs:
         julia --color=yes -e 'using Pkg; Pkg.add(["PrettyTables", "Literate"])'
         julia --project=@. --color=yes -e 'using Pkg, Dates; Pkg.instantiate(); Pkg.resolve(); Pkg.precompile(); Pkg.gc(collect_delay=Day(0))'
     - name: Save Julia packages
-      uses: actions/cache/save@v3
+      uses: actions/cache/save@v4
       if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       with:
         path: |
