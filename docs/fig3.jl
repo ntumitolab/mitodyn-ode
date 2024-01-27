@@ -7,21 +7,19 @@ Steady-state solutions for a range of glucose concentrations and OXPHOS capaciti
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
-## rcParams["font.sans-serif"] = "Arial"
-## rcParams["font.family"] = "sans-serif"
 
 #---
 
 @named sys = make_model()
 @unpack GlcConst, VmaxF1, VmaxETC, pHleak = sys
-iGlc = findfirst(isequal(GlcConst), parameters(sys))
-iVmaxF1 = findfirst(isequal(VmaxF1), parameters(sys))
-iVmaxETC = findfirst(isequal(VmaxETC), parameters(sys))
-ipHleak = findfirst(isequal(pHleak), parameters(sys))
-prob = SteadyStateProblem(sys, [])
+parmap = Dict((k,i) for (i, k) in enumerate(parameters(sys)))
+iGlc = parmap[sys.GlcConst]
+iVmaxF1 = parmap[sys.VmaxF1]
+iVmaxETC = parmap[sys.VmaxETC]
+ipHleak = parmap[sys.pHleak]
+prob = ODEProblem(sys, [], Inf)
 
 # Range for two parameters
 
@@ -32,12 +30,12 @@ rF1 = range(0.1, 2.0, 51)
 rETC = range(0.1, 2.0, 51)
 rHL = range(0.1, 5.0, 51)
 
-function solve_fig3(glc, r, protein, prob; alg=DynamicSS(Rodas5()))
-    idx = findfirst(isequal(protein), parameters(sys))
+function solve_fig3(glc, r, protein, prob; alg=Rodas5())
+    idx = parmap[protein]
     p = copy(prob.p)
     p[iGlc] = glc
     p[idx] = prob.p[idx] * r
-    return solve(remake(prob, p=p), alg)
+    return solve(remake(prob, p=p), alg, save_everystep=false, callback=TerminateSteadyState())
 end
 
 @unpack VmaxF1, VmaxETC, pHleak = sys
@@ -64,7 +62,7 @@ function plot_fig3(;
 )
     ## mapping functions
     @unpack degavg, ΔΨm, ATP_c, ADP_c = sys
-    fs = (s -> s[degavg], s -> s[ΔΨm * 1000] , s -> s[ATP_c / ADP_c])
+    fs = (s -> s[degavg][end], s -> s[ΔΨm * 1000][end] , s -> s[ATP_c / ADP_c][end])
 
     fig, axes = plt.subplots(3, 3; figsize)
 
@@ -113,7 +111,8 @@ end
 
 #---
 
-fig3 = plot_fig3(figsize=(13, 10))
+fig3 = plot_fig3(figsize=(13, 10));
+fig3 |> PNG
 
 # Export figure
-fig3.savefig("Fig3.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+exportTIF(fig3, "Fig3.tif")

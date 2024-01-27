@@ -10,11 +10,9 @@ using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
-## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
-## plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
+#---
 @named sys = make_model()
-
 @unpack GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC = sys
 
 idxGlc = findfirst(isequal(GlcConst), parameters(sys))
@@ -23,9 +21,9 @@ idxpHleak = findfirst(isequal(pHleak), parameters(sys))
 idxVmaxF1 =  findfirst(isequal(VmaxF1), parameters(sys))
 idxVmaxETC =  findfirst(isequal(VmaxETC), parameters(sys))
 
-tend = 80minute
+tend = 100minute
 ts = range(0, tend, 401)
-
+alg = TRBDF2()
 prob = ODEProblem(sys, [], ts[end])
 probs5 = ODEProblem(sys, [], ts[end])
 
@@ -71,10 +69,10 @@ end
 add_fccp_cb = PresetTimeCallback(60minute, add_fccp!)
 
 cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_fccp_cb)
-sols3 = solve(prob; callback=cbs, saveat=ts)
-solDMs3 = solve(prob_dm; callback=cbs, saveat=ts);
+sols3 = solve(prob, alg; callback=cbs, saveat=ts)
+solDMs3 = solve(prob_dm, alg; callback=cbs, saveat=ts);
 
-#---2]ax[0, 0]
+#---
 function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"])
     @unpack G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ATP_c, ADP_c, ΔΨm, degavg, J_O2 = sol.prob.f.sys
     ts = sol.t
@@ -152,6 +150,7 @@ function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"
     for i in 0:numrows-1, j in 0:numcols-1
         ax[i, j].legend()
         ax[i, j].grid()
+        ax[i, j].legend(loc="upper right")
     end
 
     fig.tight_layout()
@@ -160,6 +159,7 @@ end
 
 #---
 figs3 = plot_figs2(sols3, solDMs3)
+figs3 |> PNG
 
 # TIFF file
-## figs3.savefig("FigS3-Glucose-Oligomycin-FCCP.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+exportTIF(figs3, "FigS3-Glucose-Oligomycin-FCCP.tif")

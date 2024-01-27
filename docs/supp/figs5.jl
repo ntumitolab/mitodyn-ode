@@ -7,12 +7,8 @@ using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
-
-using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
-## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
-## plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
 @named sys = make_model()
 
@@ -24,7 +20,7 @@ idxpHleak = findfirst(isequal(pHleak), parameters(sys))
 idxVmaxF1 =  findfirst(isequal(VmaxF1), parameters(sys))
 idxVmaxETC =  findfirst(isequal(VmaxETC), parameters(sys))
 
-tend = 80minute
+tend = 100minute
 ts = range(0, tend, 401)
 
 probs5 = ODEProblem(sys, [], ts[end])
@@ -152,14 +148,14 @@ function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"
     fig.tight_layout()
     return fig
 end
-#---
 
 # Start simulations
-
 cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_rotenone_cb)
-sols5 = solve(probs5; callback=cbs, saveat=ts)
-sols5DM = solve(prob_dmS5; callback=cbs, saveat=ts)
-figs5 = plot_figs2(sols5, sols5DM)
+sols5 = solve(probs5, Rodas5(); callback=cbs, saveat=ts)
+sols5DM = solve(prob_dmS5, Rodas5(); callback=cbs, saveat=ts)
+
+figs5 = plot_figs2(sols5, sols5DM);
+figs5 |> PNG
 
 # TIFF file
-## figs5.savefig("FigS5-Glucose-Oligomycin-Rotenone.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+exportTIF(figs5, "FigS1-Glucose-Oligomycin-Rotenone.tif")

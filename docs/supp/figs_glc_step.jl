@@ -4,7 +4,6 @@ using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
-using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 ## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
@@ -18,10 +17,10 @@ glc_step(t) = 5.0mM * (1 + (t >= 20minute) + (t >= 40minute))
 
 ts = range(0, 60minute; step=0.5minute)
 prob = ODEProblem(sys, [], ts[end])
-sol = solve(prob, tstops=[20minute, 40minute], saveat=ts);
+alg = TRBDF2()
+sol = solve(prob, alg, tstops=[20minute, 40minute], saveat=ts);
 
 #---
-
 function plot_figs1( sol; figsize=(10, 10))
     @unpack G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ATP_c, ADP_c, AMP_c, ΔΨm, degavg, x = sol.prob.f.sys
     ts = sol.t
@@ -91,11 +90,11 @@ function plot_figs1( sol; figsize=(10, 10))
 end
 
 #---
-
-fig = plot_figs1(sol)
+fig = plot_figs1(sol);
+fig |> PNG
 
 # Export figure
-## figs1.savefig("FigS_glc_step.tif", dpi=300, format="tiff", pil_kwargs=Dict("compression" => "tiff_lzw"))
+exportTIF(fig, "FigS_glc_step.tif")
 
 #===
 ## Step sesponse to glucose addition in healthy and DM cells.
@@ -130,7 +129,7 @@ prob_dm = remake_dm(prob)
 
 #---
 ts = range(0, 60minute; step=0.5minute)
-solDM = solve(prob_dm, tstops=[20minute, 40minute], saveat=ts);
+solDM = solve(prob_dm, alg, tstops=[20minute, 40minute], saveat=ts);
 
 #---
 function plot_figs2(sol, solDM; figsize=(10, 10), labels=["Baseline", "Diabetic"])
@@ -215,4 +214,5 @@ function plot_figs2(sol, solDM; figsize=(10, 10), labels=["Baseline", "Diabetic"
     return fig
 end
 
-figs2 = plot_figs2(sol, solDM)
+figs2 = plot_figs2(sol, solDM);
+figs2 |> PNG

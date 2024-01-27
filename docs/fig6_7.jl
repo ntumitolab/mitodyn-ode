@@ -1,24 +1,17 @@
 #===
 # Figure 6 and 7
 ===#
-
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-## using MitochondrialDynamics: GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC, J_ANT, J_HL
-## using MitochondrialDynamics: G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ΔΨm, ATP_c, ADP_c, degavg
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
-using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
-## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
-## plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
 #---
-
 glc = 3.0:0.5:30.0
 @named sys = make_model()
-prob = SteadyStateProblem(sys, [])
+prob = ODEProblem(sys, [], Inf)
 
 # Parameters
 
@@ -67,18 +60,16 @@ end
 # DM cells
 
 prob_dm = remake_dm(prob)
-alg = DynamicSS(Rodas5())
+alg = TRBDF2()
 prob_func=prob_func_glc
 trajectories=length(glc)
+callback=TerminateSteadyState()
 
-sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
-solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories);
+sols = solve(EnsembleProblem(prob; prob_func), alg; save_everystep=false, trajectories, callback)
+solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; save_everystep=false, trajectories, callback);
 
 #---
-
 function plot_fig6(sols, solsDM, glc; figsize=(10, 10), labels=["Baseline", "Diabetic"])
-
-    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
     glc5 = glc ./ 5
     numrows = 3
     numcols = 3
@@ -87,14 +78,14 @@ function plot_fig6(sols, solsDM, glc; figsize=(10, 10), labels=["Baseline", "Dia
 
     sys = sols[begin].prob.f.sys
     @unpack G3P = sys
-    ax[0, 0].plot(glc5, extract(sols, G3P, 1000), label=labels[1])
-    ax[0, 0].plot(glc5, extract(solsDM, G3P, 1000), label=labels[2])
+    ax[0, 0].plot(glc5, extract(sols, G3P * 1000), label=labels[1])
+    ax[0, 0].plot(glc5, extract(solsDM, G3P * 1000), label=labels[2])
     ax[0, 0].set_title("(A) G3P", loc="left")
     ax[0, 0].set(ylabel="Conc. (μM)")
 
     @unpack Pyr = sys
-    ax[0, 1].plot(glc5, extract(sols, Pyr, 1000), label=labels[1])
-    ax[0, 1].plot(glc5, extract(solsDM, Pyr, 1000), label=labels[2])
+    ax[0, 1].plot(glc5, extract(sols, Pyr * 1000), label=labels[1])
+    ax[0, 1].plot(glc5, extract(solsDM, Pyr * 1000), label=labels[2])
     ax[0, 1].set_title("(B) Pyr", loc="left")
     ax[0, 1].set(ylabel="Conc. (μM)")
 
@@ -109,20 +100,20 @@ function plot_fig6(sols, solsDM, glc; figsize=(10, 10), labels=["Baseline", "Dia
     ax[1, 0].set_title("(D) NADH:NAD (mito)", loc="left")
 
     @unpack Ca_c = sys
-    ax[1, 1].plot(glc5, extract(sols, Ca_c, 1000), label=labels[1])
-    ax[1, 1].plot(glc5, extract(solsDM, Ca_c, 1000), label=labels[2])
+    ax[1, 1].plot(glc5, extract(sols, Ca_c * 1000), label=labels[1])
+    ax[1, 1].plot(glc5, extract(solsDM, Ca_c * 1000), label=labels[2])
     ax[1, 1].set_title("(E) Calcium (cyto)", loc="left")
     ax[1, 1].set(ylabel="Conc. (μM)")
 
     @unpack Ca_m = sys
-    ax[1, 2].plot(glc5, extract(sols, Ca_m, 1000), label=labels[1])
-    ax[1, 2].plot(glc5, extract(solsDM, Ca_m, 1000), label=labels[2])
+    ax[1, 2].plot(glc5, extract(sols, Ca_m * 1000), label=labels[1])
+    ax[1, 2].plot(glc5, extract(solsDM, Ca_m * 1000), label=labels[2])
     ax[1, 2].set_title("(F) Calcium (mito)", loc="left")
     ax[1, 2].set(ylabel="Conc. (μM)")
 
     @unpack ΔΨm = sys
-    ax[2, 0].plot(glc5, extract(sols, ΔΨm, 1000), label=labels[1])
-    ax[2, 0].plot(glc5, extract(solsDM, ΔΨm, 1000), label=labels[2])
+    ax[2, 0].plot(glc5, extract(sols, ΔΨm * 1000), label=labels[1])
+    ax[2, 0].plot(glc5, extract(solsDM, ΔΨm * 1000), label=labels[2])
     ax[2, 0].set_title("(G) ΔΨ", loc="left")
     ax[2, 0].set(xlabel="Glucose (X)", ylabel="mV")
 
@@ -148,32 +139,26 @@ function plot_fig6(sols, solsDM, glc; figsize=(10, 10), labels=["Baseline", "Dia
 end
 
 #---
-
-fig6 = plot_fig6(sols, solsDM, glc)
+fig6 = plot_fig6(sols, solsDM, glc);
+fig6 |> PNG
 
 # Export figure
-
-fig6.savefig("Fig6.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+exportTIF(fig6, "Fig6.tif")
 
 # ## Figure 7
-
 prob_fccp = remake_fccp(prob)
 prob_rotenone = remake_rotenone(prob)
 prob_oligomycin = remake_oligomycin(prob)
 
 #---
-
-sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
-solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories)
-solsFCCP = solve(EnsembleProblem(prob_fccp; prob_func), alg; trajectories)
-solsRot = solve(EnsembleProblem(prob_oligomycin; prob_func), alg; trajectories)
-solsOligo = solve(EnsembleProblem(prob_rotenone; prob_func), alg; trajectories)
+sols = solve(EnsembleProblem(prob; prob_func), alg; save_everystep=false, trajectories, callback)
+solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; save_everystep=false, trajectories, callback)
+solsFCCP = solve(EnsembleProblem(prob_fccp; prob_func), alg; save_everystep=false, trajectories, callback)
+solsRot = solve(EnsembleProblem(prob_oligomycin; prob_func), alg; save_everystep=false, trajectories, callback)
+solsOligo = solve(EnsembleProblem(prob_rotenone; prob_func), alg; save_everystep=false, trajectories, callback)
 
 #---
-
 function plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc; figsize=(12, 6))
-    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
-
     sys = sols[begin].prob.f.sys
     @unpack J_HL, J_ANT = sys
     ## Gather ATP synthesis rate (fusion) and proton leak rate (fission)
@@ -224,7 +209,7 @@ end
 #---
 
 fig7 = plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc)
+fig7 |> PNG
 
 # Export figure
-
-fig7.savefig("Fig7.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+exportTIF(fig7, "Fig7.tif")

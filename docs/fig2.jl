@@ -6,72 +6,63 @@ Steady-state solutions across a range of glucose levels.
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
-## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
-## plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
 # Default model
 @named sys = make_model()
-prob = SteadyStateProblem(sys, []) ## Use default u0
-alg = DynamicSS(Rodas5())
-sol = solve(prob, alg)
+prob = ODEProblem(sys, [], Inf)
+alg = Rodas5()
+sol = solve(prob, alg, save_everystep=false, callback=TerminateSteadyState())
 
 # Galactose model: glycolysis produces zero net ATP
 # By increasing the ATP consumed in the first part of glycolysis from 2 to 4
-@named sys_gal = make_model(gk_atp_stoich=4)
-prob_gal = SteadyStateProblem(sys_gal, [])
+prob_gal = ODEProblem(sys, [], Inf, [sys.ATPstiochGK => 4])
 
-# FFA model: Additional flux producing mitochondrial NADH
-@named sys_ffa = make_model()
-@unpack J_CAC, J_FFA = sys_ffa
-prob_ffa = SteadyStateProblem(sys_ffa, [], [J_FFA => sol[J_CAC] * 0.5])
+# FFA model: Additional flux reducing mitochondrial NAD/NADH couple
+# A 50% increase w.r.t baseline CAC flux
+prob_ffa = ODEProblem(sys, [], Inf, [sys.kFFA => sol[0.10 * sys.J_DH / sys.NAD_m][end]])
 
 # Simulating on a range of glucose
-@unpack GlcConst = sys
-idxGlc = findfirst(isequal(GlcConst), parameters(sys))
-
-# Test on a range of glucose
-
-glc = range(3.0, 30.0, length=101)  # Range of glucose
+# Test on a range of glucose (3 mM to 30 mM)
+glc = range(3.0, 30.0, step=0.3)
+idxGlc = indexof(sys.GlcConst, parameters(sys))
 
 prob_func = function (prob, i, repeat)
     prob.p[idxGlc] = glc[i]
-    prob
+    return prob
 end
 
-alg = DynamicSS(Rodas5())
-trajectories=length(glc)
+trajectories = length(glc)
+alg = Rodas5()
+callback=TerminateSteadyState()
 
-sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
-sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; trajectories)
-sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories);
+# Run the simulations
+sim = solve(EnsembleProblem(prob; prob_func), alg; save_everystep=false, trajectories, callback)
+sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; save_everystep=false, trajectories, callback)
+sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; save_everystep=false, trajectories, callback);
 
 # ## Steady states for a range of glucose
-
 function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
 
-    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
     @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x, degavg = sys
 
     glc5 = glc ./ 5
-    g3p = extract(sols, G3P, 1000)
-    pyr = extract(sols, Pyr, 1000)
-    ca_c = extract(sols, Ca_c, 1000)
-    ca_m = extract(sols, Ca_m, 1000)
-    nad_ratio_c = extract(sols, NADH_c/NAD_c)
-    nad_ratio_m = extract(sols, NADH_m/NAD_m)
-    atp_c = extract(sols, ATP_c, 1000)
-    adp_c = extract(sols, ADP_c, 1000)
-    amp_c = extract(sols, AMP_c, 1000)
+    g3p = extract(sols, G3P * 1000)
+    pyr = extract(sols, Pyr * 1000)
+    ca_c = extract(sols, Ca_c * 1000)
+    ca_m = extract(sols, Ca_m * 1000)
+    nad_ratio_c = extract(sols, NADH_c / NAD_c)
+    nad_ratio_m = extract(sols, NADH_m / NAD_m)
+    atp_c = extract(sols, ATP_c * 1000)
+    adp_c = extract(sols, ADP_c * 1000)
+    amp_c = extract(sols, AMP_c * 1000)
     td = extract(sols, ATP_c / ADP_c)
-    dpsi = extract(sols, ΔΨm, 1000)
+    dpsi = extract(sols, ΔΨm * 1000)
     x1 = extract(sols, x[1])
     x2 = extract(sols, x[2])
     x3 = extract(sols, x[3])
     deg = extract(sols, degavg)
-
 
     numrows = 3
     numcols = 3
@@ -101,6 +92,7 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     axs[2, 1].plot(glc5, x1, label="X1")
     axs[2, 1].plot(glc5, x2, label="X2")
     axs[2, 1].plot(glc5, x3, label="X3")
+    axs[2, 1].legend()
     axs[2, 1].set(title="(H) Mitochondrial nodes", xlabel="Glucose (X)")
     axs[2, 2].plot(glc5, deg)
     axs[2, 2].set(title="(I) Average Node Degree", xlabel="Glucose (X)")
@@ -115,22 +107,22 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
 end
 
 #---
-fig_glc_default = plot_steady_state(glc, sim, sys, title="")
+fig = fig_glc_default = plot_steady_state(glc, sim, sys, title="");
+fig |> PNG
 
 # Default parameters
-fig_glc_default.savefig("Fig2.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+exportTIF(fig_glc_default, "Fig2.tif")
 
 # Adding free fatty acids
-fig_glc_ffa = plot_steady_state(glc, sim_ffa, sys_ffa, title="FFA parameters")
+fig = plot_steady_state(glc, sim_ffa, sys, title="FFA parameters");
+fig |> PNG
 
 # Using galactose instead of glucose as the hydrocarbon source
-fig_glc_gal = plot_steady_state(glc, sim_gal, sys_gal, title="Galactose parameters")
+fig = plot_steady_state(glc, sim_gal, sys, title="Galactose parameters");
+fig |> PNG
 
 # ## Comparing default, FFA, and galactose models
-
 function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="", labels=["Default", "Gal", "FFA"])
-
-    extract(sols, k, scale=1) = map(s->s[k] * scale, sols)
 
     @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, degavg, J_O2 = sys
 
@@ -140,26 +132,26 @@ function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="
     fig, axs = plt.subplots(numrow, numcol; figsize)
 
     axs[0, 0].set(title="(A) Cytosolic NADH:NAD")
-    k = NADH_c/NAD_c
+    k = NADH_c / NAD_c
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = axs[0, 0].plot(glc5, yy)
     axs[0, 0].legend(lines, labels)
 
     axs[0, 1].set(title="(B) Mitochondrial NADH:NAD")
-    k = NADH_m/NAD_m
+    k = NADH_m / NAD_m
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = axs[0, 1].plot(glc5, yy)
     axs[0, 1].legend(lines, labels)
 
     axs[1, 0].set(title="(C) ATP:ADP")
-    k = ATP_c/ADP_c
+    k = ATP_c / ADP_c
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = axs[1, 0].plot(glc5, yy)
     axs[1, 0].legend(lines, labels)
 
     axs[1, 1].set(title="(D) ΔΨm (mV)")
-    k = ΔΨm
-    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)] .* 1000
+    k = ΔΨm * 1000
+    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = axs[1, 1].plot(glc5, yy)
     axs[1, 1].legend(lines, labels)
 
@@ -186,7 +178,8 @@ function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="
     return fig
 end
 
-figFFAGal = plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys)
+figFFAGal = plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys);
+figFFAGal |> PNG
 
 # Export figure
-figFFAGal.savefig("s1-fig1.tif", dpi=300, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
+exportTIF(figFFAGal, "s1-fig1.tif")
