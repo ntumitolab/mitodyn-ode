@@ -13,14 +13,15 @@ concurrency:
 
 env:
   NPROC: '2' # Number of Julia processes to run the notebooks
+  CACHE_NUM: '1'
   PY_VER: '3.12'
   JULIA_CONDAPKG_BACKEND: 'Null'
-  JULIA_NUM_THREADS: '6'
   JULIA_CI: 'true'
+  JULIA_NUM_THREADS: '2'
 
 jobs:
   CI:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -29,22 +30,41 @@ jobs:
       id: cp
       with:
         python-version: ${{ env.PY_VER }}
+        cache: 'pip'
     - name: Install python packages
       run: pip install -r requirements.txt
     - name: Read Julia version
-      uses: SebRollen/toml-action@v1.0.2
       id: read_toml
-      with:
-        file: 'Manifest.toml'
-        field: 'julia_version'
+      run: echo "value=$(python .github/read_toml.py)" >> "$GITHUB_OUTPUT"
     - name: Setup Julia
       uses: julia-actions/setup-julia@v1
       with:
         version: ${{ steps.read_toml.outputs.value }}
+    - name: Cache Julia packages
+      uses: actions/cache@v4
+      id: cache-julia
+      with:
+        save-always: 'true'
+        path: |
+          ~/.julia
+          !~/.julia/registries
+        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**','Project.toml', 'Manifest.toml')}}
+        restore-keys: |
+          ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
     - name: Install Julia packages
-      run: julia --project=@. --color=yes -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
+      if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
+      env:
+        PYTHON: ${{ env.pythonLocation }}/python
+      shell: julia --color=yes {0}
+      run: |
+        using Pkg, Dates
+        Pkg.add(["PrettyTables", "Literate"])
+        Pkg.activate(".")
+        Pkg.instantiate()
+        Pkg.precompile()
+        Pkg.gc(collect_delay=Day(0))
     - name: Run program
-      run: julia --project=@. --color=yes -p ${{ env.NPROC }} literate.jl
+      run: julia --color=yes -p ${{ env.NPROC }} literate.jl
     - name: Build website
       run: jupyter-book build docs/
     - name: Upload page artifact
