@@ -39,7 +39,7 @@ function make_model(;
     @variables t
 
     # Adenylate kinase (AdK)
-    @variables J_ADK(t) ATP_c(t) ADP_c(t) AMP_c(t)
+    @variables AEC(t) ATP_c(t) ADP_c(t) AMP_c(t)
     @parameters (kfAK=1000Hz/mM, kEqAK=0.931)
 
     # Glucokinase (GK)
@@ -117,7 +117,6 @@ function make_model(;
     eqs = [
         caceq,
         glceq,
-        J_ADK ~ kfAK * (ADP_c * ADP_c - ATP_c * AMP_c * kEqAK),
         J_GK ~ VmaxGK * hil(ATP_c, KatpGK) * hil(Glc, KglcGK, nGK),
         J_GPD ~ VmaxGPD * hil(ADP_c, KadpGPD) * hil(NAD_c, NADH_c * KnadGPD) * hil(G3P, Kg3pGPD),
         J_LDH ~ VmaxLDH * hil(Pyr, KpyrLDH) * hil(NADH_c, NAD_c * KnadhLDH),
@@ -134,13 +133,14 @@ function make_model(;
         J_NADHT ~ VmaxNADHT * hil(NADH_c, NAD_c * Ktn_c) * hil(NAD_m, NADH_m, Ktn_m),
         tiptip ~ kfuse1 * J_ANT / J_HL * x[1] * x[1] - kfiss1 * x[2],
         tipside ~ kfuse2 * J_ANT / J_HL * x[1] * x[2] - kfiss2 * x[3],
+        degavg ~ (x[1] + 2x[2] + 3x[3]) / (x[1] + x[2] + x[3]),
         # Conservation relationships
-        ΣAc ~ ATP_c + ADP_c + AMP_c,
+        ATP_c ~ ΣAc * aec2atp(AEC, kEqAK),
+        ADP_c ~ ΣAc * aec2adp(AEC, kEqAK),
+        AMP_c ~ ΣAc - ATP_c - ADP_c,
         Σn_c ~ NADH_c + NAD_c,
         Σn_m ~ NADH_m + NAD_m,
         1 ~ x[1] + 2x[2] + 3x[3],
-        # Observables
-        degavg ~ (x[1] + 2x[2] + 3x[3]) / (x[1] + x[2] + x[3]),
         # State variables
         D(NADH_m) ~ inv(V_MTX) * (J_DH + J_NADHT - J_O2) - kNADHm * NADH_m,
         # D(NAD_m) ~ # Conserved
@@ -150,21 +150,19 @@ function make_model(;
         D(ΔΨm) ~ inv(C_MIT) * (J_HR - J_HF - J_HL - J_ANT - 2 * J_MCU),
         D(G3P) ~ inv(V_I) * (2J_GK - J_GPD) - kG3P * G3P,
         D(Pyr) ~ inv(V_I + V_MTX) * (J_GPD - J_PDH - J_LDH) - kPyr * Pyr,
-        D(ATP_c) ~ inv(V_I) * (-ATPstiochGK * J_GK + 2 * J_GPD + J_ANT + J_ADK) - ATP_c * (kATP + kATPCa * Ca_c),
-        D(AMP_c) ~ inv(V_I) * J_ADK,
-        # D(ADP_c) ~ # Conserved
+        D(AEC) ~ (inv(V_I) * (-ATPstiochGK * J_GK + 2 * J_GPD + J_ANT) - ATP_c * (kATP + kATPCa * Ca_c))/ΣAc,
         # D(x[1]) ~ # Conserved
         D(x[2]) ~ tiptip - tipside,
         D(x[3]) ~ tipside,
     ]
+
     sys = ODESystem(eqs, t; name,
         defaults=[
             G3P => 2.9μM,
             Pyr => 8.7μM,
             NADH_c => 1μM,
             NADH_m => 57μM,
-            ATP_c => 3595μM,
-            AMP_c => 148μM,
+            AEC => 0.95,
             Ca_m => 0.200μM,
             ΔΨm => 92mV,
             x[2] => 0.24,
