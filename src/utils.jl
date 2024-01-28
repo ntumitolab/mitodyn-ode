@@ -1,5 +1,6 @@
 using PythonCall
 using DifferentialEquations
+import NaNMath as nm
 
 ## Units and physical constants
 const second = float(1)    # second
@@ -39,5 +40,20 @@ extract(sim::EnsembleSolution, k) = map(s->s[k][end], sim)
 """Export publication-ready TIFF file from a figure"""
 exportTIF(fig, name; dpi=300) = fig.savefig(name, dpi=dpi, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
 
-"""Figure output in PNG format"""
+"""Force output in PNG format"""
 PNG(fig) = display("image/png", fig)
+
+"""
+The deviation of adynylate pool steady state from energy charge
+"""
+aecdev(a, keq=1) = (-1 + nm.sqrt(1 + 4 * (4keq - 1) * a * (1 - a))) / (8 * keq - 2)
+
+"""
+ATP proportion from energy charge
+"""
+aec2atp(a, keq=1) = a - aecdev(a, keq)
+
+"""
+ADP proportion from energy charge
+"""
+aec2adp(a, keq=1) = 2 * aecdev(a, keq)
