@@ -1,6 +1,7 @@
 # # Step Response to elevated glucose concentrations
 
-using DifferentialEquations
+using OrdinaryDiffEq
+using DiffEqCallbacks
 using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute

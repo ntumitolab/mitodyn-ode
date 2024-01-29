@@ -3,8 +3,8 @@
 
 across a range of glucose levels, from 3mM to 30 mM.
 ===#
-
-using DifferentialEquations
+using OrdinaryDiffEq
+using DiffEqCallbacks
 using ModelingToolkit
 using MitochondrialDynamics
 using PythonCall
