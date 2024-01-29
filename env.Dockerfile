@@ -21,4 +21,5 @@ RUN pip install --no-cache-dir matplotlib
 
 # Julia environment
 COPY Project.toml Manifest.toml ./
+COPY src/ src
 RUN julia --color=yes -e 'using Pkg; Pkg.add(["Literate"]); Pkg.activate("."); Pkg.instantiate(); Pkg.precompile()'
