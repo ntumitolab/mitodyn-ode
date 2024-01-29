@@ -1,5 +1,5 @@
 using PythonCall
-using DifferentialEquations
+using OrdinaryDiffEq
 import NaNMath as nm
 
 ## Units and physical constants

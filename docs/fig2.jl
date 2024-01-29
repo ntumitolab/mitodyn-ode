@@ -3,7 +3,8 @@
 
 Steady-state solutions across a range of glucose levels.
 ===#
-using DifferentialEquations
+using OrdinaryDiffEq
+using DiffEqCallbacks
 using ModelingToolkit
 using MitochondrialDynamics
 import PythonPlot as plt

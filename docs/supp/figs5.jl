@@ -2,8 +2,8 @@
 # Glucose-Oligomycin-Rotenone
 ## Step responses to both glucose stimulation and chemical agents
 ===#
-
-using DifferentialEquations
+using OrdinaryDiffEq
+using DiffEqCallbacks
 using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
