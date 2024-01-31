@@ -162,7 +162,7 @@ function make_model(;
             Pyr => 8.7μM,
             NADH_c => 1μM,
             NADH_m => 57μM,
-            AEC => 0.95,
+            AEC => 0.9,
             Ca_m => 0.200μM,
             ΔΨm => 92mV,
             x[2] => 0.24,
