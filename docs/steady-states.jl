@@ -41,7 +41,7 @@ prob_hl = ODEProblem(sys, [], Inf, [sys.pHleak => 10 * sys.defaults[sys.pHleak]]
 
 # Simulating on a range of glucose
 # Test on a range of glucose (3 mM to 30 mM)
-glc = range(3.0, 30.0, step=0.3)
+glc = 3.0:0.3:30.0
 idxGlc = indexof(sys.GlcConst, parameters(sys))
 
 prob_func = (prob, i, repeat) -> remake(prob, p=replace(prob.p, idxGlc=>glc[i]))
