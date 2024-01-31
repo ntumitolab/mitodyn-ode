@@ -13,8 +13,14 @@ plt.matplotlib.rcParams["font.size"] = 14
 # Default model
 @named sys = make_model()
 prob = ODEProblem(sys, [], Inf)
-alg = Rodas5()
-sol = solve(prob, alg, save_everystep=false, callback=TerminateSteadyState())
+alg = TRBDF2()
+callback=TerminateSteadyState()
+opts = (
+    save_everystep = false,
+    callback=TerminateSteadyState(),
+    save_start = false
+)
+sol = solve(prob, alg; opts...)
 
 # Galactose model: glycolysis produces zero net ATP
 # By increasing the ATP consumed in the first part of glycolysis from 2 to 4
@@ -29,19 +35,17 @@ prob_ffa = ODEProblem(sys, [], Inf, [sys.kFFA => sol[0.10 * sys.J_DH / sys.NAD_m
 glc = range(3.0, 30.0, step=0.3)
 idxGlc = indexof(sys.GlcConst, parameters(sys))
 
-prob_func = function (prob, i, repeat)
-    prob.p[idxGlc] = glc[i]
-    return prob
-end
+prob_func = (prob, i, repeat) -> remake(prob, p=replace(prob.p, idxGlc=>glc[i]))
 
-trajectories = length(glc)
-alg = Rodas5()
-callback=TerminateSteadyState()
+eopts = (
+    opts...,
+    trajectories = length(glc)
+)
 
 # Run the simulations
-sim = solve(EnsembleProblem(prob; prob_func), alg; save_everystep=false, trajectories, callback)
-sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; save_everystep=false, trajectories, callback)
-sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; save_everystep=false, trajectories, callback);
+sim = solve(EnsembleProblem(prob; prob_func), alg; eopts...)
+sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; eopts...)
+sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; eopts...);
 
 # ## Steady states for a range of glucose
 function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")

@@ -1,7 +1,7 @@
 #===
 # Figure 3
 
-Steady-state solutions for a range of glucose concentrations and OXPHOS capacities.
+Steady-state solutions for a range of glucose concentrations and OXPHOS capacities by chemicals.
 ===#
 using OrdinaryDiffEq
 using DiffEqCallbacks
@@ -30,12 +30,18 @@ rF1 = range(0.1, 2.0, 51)
 rETC = range(0.1, 2.0, 51)
 rHL = range(0.1, 5.0, 51)
 
+opts = (
+    save_start = false,
+    save_everystep = false,
+    callback=TerminateSteadyState()
+)
+
 function solve_fig3(glc, r, protein, prob; alg=Rodas5())
     idx = parmap[protein]
     p = copy(prob.p)
     p[iGlc] = glc
     p[idx] = prob.p[idx] * r
-    return solve(remake(prob, p=p), alg, save_everystep=false, callback=TerminateSteadyState())
+    return solve(remake(prob, p=p), alg; opts...)
 end
 
 @unpack VmaxF1, VmaxETC, pHleak = sys

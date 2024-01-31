@@ -21,7 +21,6 @@ sssol = solve(prob, alg, save_everystep=false, callback=TerminateSteadyState())
 caavg = sssol[Ca_c][end]
 
 # Calcium wave independent to ATP:ADP ratio
-
 function cac_wave(t, amplitude=1.5)
     ca_r = 0.09μM
     period = 2minute
