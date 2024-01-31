@@ -17,10 +17,15 @@ tend = 2000.0
 @named sys = make_model()
 @unpack GlcConst, Ca_c = sys
 prob = ODEProblem(sys, [], Inf, [GlcConst => 10])
-sssol = solve(prob, alg, save_everystep=false, callback=TerminateSteadyState())
+opt = (
+    save_start = false,
+    save_everystep=false,
+    callback=TerminateSteadyState(),
+)
+sssol = solve(prob, alg; opt...)
 caavg = sssol[Ca_c][end]
 
-# Calcium wave independent to ATP:ADP ratio
+# Calcium wave independent from ATP:ADP ratio
 function cac_wave(t, amplitude=1.5)
     ca_r = 0.09μM
     period = 2minute
@@ -75,7 +80,7 @@ end
 
 #---
 
-fig5 = plot_fig5(sol)
+fig5 = plot_fig5(sol);
 fig5 |> PNG
 
 # Export figure

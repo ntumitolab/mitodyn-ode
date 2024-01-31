@@ -1,4 +1,5 @@
 # # Step Response to elevated glucose concentrations
+# Including baseline and T2DM results
 
 using OrdinaryDiffEq
 using DiffEqCallbacks
@@ -11,7 +12,6 @@ plt.matplotlib.rcParams["font.size"] = 14
 ## plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
 # ## Step Response to elevated glucose concentrations
-
 @variables t, Glc(t)
 glc_step(t) = 5.0mM * (1 + (t >= 20minute) + (t >= 40minute))
 @named sys = make_model(; glceq=Glc~glc_step(t))

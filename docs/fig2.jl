@@ -36,13 +36,14 @@ glc = range(3.0, 30.0, step=0.3)
 idxGlc = indexof(sys.GlcConst, parameters(sys))
 
 prob_func = (prob, i, repeat) -> remake(prob, p=replace(prob.p, idxGlc=>glc[i]))
-
+alg = TRBDF2()
 eopts = (
     opts...,
     trajectories = length(glc)
 )
 
 # Run the simulations
+sim = solve(EnsembleProblem(prob; prob_func), alg; eopts...)
 sim = solve(EnsembleProblem(prob; prob_func), alg; eopts...)
 sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; eopts...)
 sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; eopts...);

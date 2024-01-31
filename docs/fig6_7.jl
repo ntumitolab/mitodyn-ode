@@ -15,41 +15,39 @@ glc = 3.0:0.5:30.0
 prob = ODEProblem(sys, [], Inf)
 
 # Parameters
-
 @unpack GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC = sys
 
-idxGlc = findfirst(isequal(GlcConst), parameters(sys))
-idxVmaxPDH = findfirst(isequal(VmaxPDH), parameters(sys))
-idxpHleak = findfirst(isequal(pHleak), parameters(sys))
-idxVmaxF1 =  findfirst(isequal(VmaxF1), parameters(sys))
-idxVmaxETC =  findfirst(isequal(VmaxETC), parameters(sys))
+idxGlc = indexof(GlcConst, parameters(sys))
+idxVmaxPDH = indexof(VmaxPDH, parameters(sys))
+idxpHleak = indexof(pHleak, parameters(sys))
+idxVmaxF1 =  indexof(VmaxF1, parameters(sys))
+idxVmaxETC =  indexof(VmaxETC, parameters(sys))
 
 # ## Fig 6
-
 function remake_rotenone(prob; rETC=0.1)
     p = copy(prob.p)
-    p[idxVmaxETC] *= rETC
+    p[idxVmaxETC] = prob.p[idxVmaxETC] * rETC
     return remake(prob, p=p)
 end
 
 function remake_oligomycin(prob; rF1=0.1)
     p = copy(prob.p)
-    p[idxVmaxF1] *= rF1
+    p[idxVmaxF1] = prob.p[idxVmaxF1] * rF1
     return remake(prob, p=p)
 end
 
 function remake_fccp(prob; rHL=5)
     p = copy(prob.p)
-    p[idxpHleak] *= rHL
+    p[idxpHleak] = prob.p[idxpHleak] * rHL
     return remake(prob, p=p)
 end
 
 function remake_dm(prob; rPDH=0.5, rETC=0.75, rHL=1.4, rF1=0.5)
     p = copy(prob.p)
-    p[idxVmaxETC] *= rETC
-    p[idxVmaxF1] *= rF1
-    p[idxpHleak] *= rHL
-    p[idxVmaxPDH] *= rPDH
+    p[idxVmaxETC] = rETC * prob.p[idxVmaxETC]
+    p[idxVmaxF1] = rF1 * prob.p[idxVmaxF1]
+    p[idxpHleak] = rHL * prob.p[idxpHleak]
+    p[idxVmaxPDH] = rPDH * prob.p[idxVmaxPDH]
     return remake(prob, p=p)
 end
 
@@ -63,11 +61,15 @@ end
 prob_dm = remake_dm(prob)
 alg = TRBDF2()
 prob_func=prob_func_glc
-trajectories=length(glc)
-callback=TerminateSteadyState()
+opt = (
+    trajectories=length(glc),
+    callback=TerminateSteadyState(),
+    save_everystep=false,
+    save_start = false,
+)
 
-sols = solve(EnsembleProblem(prob; prob_func), alg; save_everystep=false, trajectories, callback)
-solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; save_everystep=false, trajectories, callback);
+sols = solve(EnsembleProblem(prob; prob_func), alg; opt...)
+solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; opt...);
 
 #---
 function plot_fig6(sols, solsDM, glc; figsize=(10, 10), labels=["Baseline", "Diabetic"])
@@ -77,7 +79,6 @@ function plot_fig6(sols, solsDM, glc; figsize=(10, 10), labels=["Baseline", "Dia
 
     fig, ax = plt.subplots(numrows, numcols; figsize)
 
-    sys = sols[begin].prob.f.sys
     @unpack G3P = sys
     ax[0, 0].plot(glc5, extract(sols, G3P * 1000), label=labels[1])
     ax[0, 0].plot(glc5, extract(solsDM, G3P * 1000), label=labels[2])
@@ -152,11 +153,11 @@ prob_rotenone = remake_rotenone(prob)
 prob_oligomycin = remake_oligomycin(prob)
 
 #---
-sols = solve(EnsembleProblem(prob; prob_func), alg; save_everystep=false, trajectories, callback)
-solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; save_everystep=false, trajectories, callback)
-solsFCCP = solve(EnsembleProblem(prob_fccp; prob_func), alg; save_everystep=false, trajectories, callback)
-solsRot = solve(EnsembleProblem(prob_oligomycin; prob_func), alg; save_everystep=false, trajectories, callback)
-solsOligo = solve(EnsembleProblem(prob_rotenone; prob_func), alg; save_everystep=false, trajectories, callback)
+sols = solve(EnsembleProblem(prob; prob_func), alg; opt...)
+solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; opt...)
+solsFCCP = solve(EnsembleProblem(prob_fccp; prob_func), alg; opt...)
+solsRot = solve(EnsembleProblem(prob_oligomycin; prob_func), alg; opt...)
+solsOligo = solve(EnsembleProblem(prob_rotenone; prob_func), alg; opt...);
 
 #---
 function plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc; figsize=(12, 6))
@@ -209,7 +210,7 @@ end
 
 #---
 
-fig7 = plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc)
+fig7 = plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc);
 fig7 |> PNG
 
 # Export figure
