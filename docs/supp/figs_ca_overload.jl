@@ -30,7 +30,7 @@ prob_ca10 = ODEProblem(sys, [], Inf, [RestingCa=>0.9μM, ActivatedCa=>2.5μM])
 
 # Simulating on a range of glucose
 @unpack GlcConst = sys
-idxGlc = findfirst(isequal(GlcConst), parameters(sys))
+idxGlc = indexof(GlcConst, parameters(sys))
 
 # Test on a range of glucose
 glc = 3.5:0.5:30.0
@@ -39,11 +39,14 @@ prob_func = function (prob, i, repeat)
     prob
 end
 
-trajectories=length(glc)
+eopt = (
+    opt...,
+    trajectories=length(glc)
+)
 
-sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories,save_everystep=false, callback)
-sim_ca5 = solve(EnsembleProblem(prob_ca5; prob_func), alg; trajectories,save_everystep=false, callback)
-sim_ca10 = solve(EnsembleProblem(prob_ca10; prob_func), alg; trajectories,save_everystep=false, callback)
+sim = solve(EnsembleProblem(prob; prob_func), alg; eopt...)
+sim_ca5 = solve(EnsembleProblem(prob_ca5; prob_func), alg; eopt...)
+sim_ca10 = solve(EnsembleProblem(prob_ca10; prob_func), alg; eopt...);
 
 # ## Steady states for a range of glucose
 
