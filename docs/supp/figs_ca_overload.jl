@@ -6,17 +6,22 @@ Steady-state solutions across a range of glucose levels.
 using OrdinaryDiffEq
 using DiffEqCallbacks
 using ModelingToolkit
-import PythonPlot as plt
-plt.matplotlib.rcParams["font.size"] = 14
 using MitochondrialDynamics
 import MitochondrialDynamics: μM
+import PythonPlot as plt
+plt.matplotlib.rcParams["font.size"] = 14
 
 # Default model
 @named sys = make_model()
 prob = ODEProblem(sys, [], Inf)
 alg = Rodas5()
-callback=TerminateSteadyState()
-sol = solve(prob, alg; save_everystep=false, callback)
+opt = (
+    callback=TerminateSteadyState(),
+    save_everystep=false,
+    save_start = false,
+)
+
+sol = solve(prob, alg; opt...)
 
 # High calcium model
 @unpack RestingCa, ActivatedCa = sys
