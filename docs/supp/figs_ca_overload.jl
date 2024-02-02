@@ -66,9 +66,9 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     amp_c = extract(sols, AMP_c * 1000)
     td = extract(sols, ATP_c / ADP_c)
     dpsi = extract(sols, ΔΨm * 1000)
-    x1 = extract(sols, x[1])
-    x2 = extract(sols, x[2])
-    x3 = extract(sols, x[3])
+    x1 = extract(sols, x1)
+    x2 = extract(sols, x2)
+    x3 = extract(sols, x3)
     deg = extract(sols, degavg)
 
     numrows = 3

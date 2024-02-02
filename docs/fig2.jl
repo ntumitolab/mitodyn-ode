@@ -13,7 +13,7 @@ plt.matplotlib.rcParams["font.size"] = 14
 # Default model
 @named sys = make_model()
 prob = ODEProblem(sys, [], Inf)
-alg = TRBDF2()
+alg = Rodas5()
 callback=TerminateSteadyState()
 opts = (
     save_everystep = false,
@@ -21,13 +21,33 @@ opts = (
     save_start = false
 )
 sol = solve(prob, alg; opts...)
+#---
+sol[sys.G3P][end]
+#---
+sol[sys.Pyr][end]
+#---
+sol[sys.ATP_c/sys.ADP_c][end]
+#---
+sol[sys.NADH_c][end]
+#---
+sol[sys.NADH_m][end]
+#---
+sol[sys.Ca_m][end]
+#---
+sol[sys.ΔΨm][end]
+#---
+sol[sys.x1][end]
+#---
+sol[sys.x2][end]
+#---
+sol[sys.x3][end]
 
 # Galactose model: glycolysis produces zero net ATP
 # By increasing the ATP consumed in the first part of glycolysis from 2 to 4
 prob_gal = ODEProblem(sys, [], Inf, [sys.ATPstiochGK => 4])
 
 # FFA model: Additional flux reducing mitochondrial NAD/NADH couple
-# A 50% increase w.r.t baseline CAC flux
+# A 10% increase w.r.t baseline CAC flux
 prob_ffa = ODEProblem(sys, [], Inf, [sys.kFFA => sol[0.10 * sys.J_DH / sys.NAD_m][end]])
 
 # Simulating on a range of glucose
@@ -35,8 +55,11 @@ prob_ffa = ODEProblem(sys, [], Inf, [sys.kFFA => sol[0.10 * sys.J_DH / sys.NAD_m
 glc = range(3.0, 30.0, step=0.3)
 idxGlc = indexof(sys.GlcConst, parameters(sys))
 
-prob_func = (prob, i, repeat) -> remake(prob, p=replace(prob.p, idxGlc=>glc[i]))
-alg = TRBDF2()
+prob_func = (prob, i, repeat) -> begin
+    prob.p[idxGlc] = glc[i]
+    prob
+end
+alg = Rodas5()
 eopts = (
     opts...,
     trajectories = length(glc)
@@ -44,14 +67,13 @@ eopts = (
 
 # Run the simulations
 sim = solve(EnsembleProblem(prob; prob_func), alg; eopts...)
-sim = solve(EnsembleProblem(prob; prob_func), alg; eopts...)
 sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; eopts...)
 sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; eopts...);
 
 # ## Steady states for a range of glucose
 function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
 
-    @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x, degavg = sys
+    @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x1, x2, x3, degavg = sys
 
     glc5 = glc ./ 5
     g3p = extract(sols, G3P * 1000)
@@ -65,9 +87,9 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     amp_c = extract(sols, AMP_c * 1000)
     td = extract(sols, ATP_c / ADP_c)
     dpsi = extract(sols, ΔΨm * 1000)
-    x1 = extract(sols, x[1])
-    x2 = extract(sols, x[2])
-    x3 = extract(sols, x[3])
+    x1 = extract(sols, x1)
+    x2 = extract(sols, x2)
+    x3 = extract(sols, x3)
     deg = extract(sols, degavg)
 
     numrows = 3

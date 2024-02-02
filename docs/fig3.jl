@@ -121,4 +121,4 @@ fig3 = plot_fig3(figsize=(13, 10));
 fig3 |> PNG
 
 # Export figure
-exportTIF(fig3, "Fig3.tif")
+exportTIF(fig3, "Fig3-2Dsteadystate.tif")

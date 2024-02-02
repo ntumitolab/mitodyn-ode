@@ -20,8 +20,8 @@ prob = ODEProblem(sys, [], Inf)
 idxGlc = indexof(GlcConst, parameters(sys))
 idxVmaxPDH = indexof(VmaxPDH, parameters(sys))
 idxpHleak = indexof(pHleak, parameters(sys))
-idxVmaxF1 =  indexof(VmaxF1, parameters(sys))
-idxVmaxETC =  indexof(VmaxETC, parameters(sys))
+idxVmaxF1 = indexof(VmaxF1, parameters(sys))
+idxVmaxETC = indexof(VmaxETC, parameters(sys))
 
 # ## Fig 6
 function remake_rotenone(prob; rETC=0.1)

@@ -83,7 +83,7 @@ function make_model(;
     mcueq = let
         zvfrt = 2 * iVT * ΔΨm
         em1 = expm1(zvfrt)
-        J_MCU ~ PcaMCU * (zvfrt / em1) * (0.341 * Ca_c * (em1 + 1) - 0.200 * Ca_m)
+        J_MCU ~ PcaMCU * (zvfrt / em1) * (0.341 * Ca_c * (em1 + 1) - 0.2 * Ca_m)
     end
 
     # Mitochondrial sodium calcium exchanger (NCLX)
@@ -106,10 +106,10 @@ function make_model(;
     # Baseline consumption rates
     @parameters (kNADHc=0.1Hz, kNADHm=0.1Hz, kATP=0.04Hz, kATPCa=90Hz/mM, kG3P=0.01Hz, kPyr=0.01Hz)
     # Conservation relationships
-    @parameters (ΣAc=4.5mM, Σn_c=2mM, Σn_m=2.2mM)
+    @parameters (ΣAc=4.56mM, Σn_c=2mM, Σn_m=2.2mM)
 
     # Fission-fusion rates
-    @variables (x(t))[1:3] degavg(t) tiptip(t) tipside(t)
+    @variables x1(t) x2(t) x3(t) degavg(t) tiptip(t) tipside(t)
     @parameters (kfiss1=inv(10minute), kfuse1=kfiss1, kfiss2=1.5*kfiss1, kfuse2=0.5*kfuse1)
 
     D = Differential(t)
@@ -131,16 +131,16 @@ function make_model(;
         mcueq,
         nclxeq,
         J_NADHT ~ VmaxNADHT * hil(NADH_c, NAD_c * Ktn_c) * hil(NAD_m, NADH_m, Ktn_m),
-        tiptip ~ kfuse1 * J_ANT / J_HL * x[1] * x[1] - kfiss1 * x[2],
-        tipside ~ kfuse2 * J_ANT / J_HL * x[1] * x[2] - kfiss2 * x[3],
-        degavg ~ (x[1] + 2x[2] + 3x[3]) / (x[1] + x[2] + x[3]),
+        tiptip ~ kfuse1 * J_ANT / J_HL * x1 * x1 - kfiss1 * x2,
+        tipside ~ kfuse2 * J_ANT / J_HL * x1 * x2 - kfiss2 * x3,
+        degavg ~ (x1 + 2x2 + 3x3) / (x1 + x2 + x3),
         # Conservation relationships
         ATP_c ~ ΣAc * aec2atp(AEC, kEqAK),
         ADP_c ~ ΣAc * aec2adp(AEC, kEqAK),
         AMP_c ~ ΣAc - ATP_c - ADP_c,
         Σn_c ~ NADH_c + NAD_c,
         Σn_m ~ NADH_m + NAD_m,
-        1 ~ x[1] + 2x[2] + 3x[3],
+        1 ~ x1 + 2x2 + 3x3,
         # State variables
         D(NADH_m) ~ inv(V_MTX) * (J_DH + J_NADHT - J_O2) - kNADHm * NADH_m,
         # D(NAD_m) ~ # Conserved
@@ -152,8 +152,8 @@ function make_model(;
         D(Pyr) ~ inv(V_I + V_MTX) * (J_GPD - J_PDH - J_LDH) - kPyr * Pyr,
         D(AEC) ~ (inv(V_I) * (-ATPstiochGK * J_GK + 2 * J_GPD + J_ANT) - ATP_c * (kATP + kATPCa * Ca_c))/ΣAc,
         # D(x[1]) ~ # Conserved
-        D(x[2]) ~ tiptip - tipside,
-        D(x[3]) ~ tipside,
+        D(x2) ~ tiptip - tipside,
+        D(x3) ~ tipside,
     ]
 
     sys = ODESystem(eqs, t; name,
@@ -165,8 +165,8 @@ function make_model(;
             AEC => 0.9,
             Ca_m => 0.200μM,
             ΔΨm => 92mV,
-            x[2] => 0.24,
-            x[3] => 0.06
+            x2 => 0.24,
+            x3 => 0.06
         ]
     )
 

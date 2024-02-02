@@ -84,4 +84,4 @@ fig5 = plot_fig5(sol);
 fig5 |> PNG
 
 # Export figure
-exportTIF(fig5, "Fig5.tif")
+exportTIF(fig5, "Fig5-ca-oscillation.tif")

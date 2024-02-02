@@ -23,7 +23,7 @@ sol = solve(prob, alg, tstops=[20minute, 40minute], saveat=ts);
 
 #---
 function plot_figs1( sol; figsize=(10, 10))
-    @unpack G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ATP_c, ADP_c, AMP_c, ΔΨm, degavg, x = sol.prob.f.sys
+    @unpack G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ATP_c, ADP_c, AMP_c, ΔΨm, degavg, x1, x2, x3 = sol.prob.f.sys
     ts = sol.t
     tsm = ts ./ 60
     g3p = sol[G3P * 1000]
@@ -37,9 +37,9 @@ function plot_figs1( sol; figsize=(10, 10))
     amp_c = sol[AMP_c * 1000]
     dpsi = sol[ΔΨm * 1000]
     k = sol[degavg]
-    x1 = sol[x[1]]
-    x2 = sol[x[2]]
-    x3 = sol[x[3]]
+    x1 = sol[x1]
+    x2 = sol[x2]
+    x3 = sol[x3]
 
     numrows = 3
     numcols = 3

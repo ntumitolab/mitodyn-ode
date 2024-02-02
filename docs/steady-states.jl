@@ -79,7 +79,7 @@ function plot_comparisions(k; figsize=(6, 6), title="", ylabel="", legend_loc="b
     return fig
 end
 
-@unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x, degavg, J_O2 = sys
+@unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x1, x3, degavg, J_O2 = sys
 
 # Mitochondrial membrane potential
 fig = plot_comparisions(ΔΨm * 1000, title="(A) Mitochondrial membrane potential", ylabel="ΔΨm (mV)");
@@ -110,5 +110,5 @@ fig = plot_comparisions(degavg, title="(G) Average node degree");
 fig |> PNG
 
 # Node ratio
-fig = plot_comparisions(x[3] / x[1], title="(H) Degree-3 to degree-1 ratio");
+fig = plot_comparisions(x3 / x1, title="(H) Degree-3 to degree-1 ratio");
 fig |> PNG
