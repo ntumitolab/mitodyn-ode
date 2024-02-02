@@ -34,7 +34,7 @@ idxGlc = indexof(GlcConst, parameters(sys))
 
 # Test on a range of glucose
 glc = 3.5:0.5:30.0
-prob_func = function (prob, i, repeat)
+prob_func = (prob, i, repeat) -> begin
     prob.p[idxGlc] = glc[i]
     prob
 end
@@ -52,7 +52,7 @@ sim_ca10 = solve(EnsembleProblem(prob_ca10; prob_func), alg; eopt...);
 
 function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
 
-    @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x, degavg = sys
+    @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x1, x2, x3, degavg = sys
 
     glc5 = glc ./ 5
     g3p = extract(sols, G3P * 1000)
