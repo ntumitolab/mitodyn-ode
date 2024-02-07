@@ -6,6 +6,7 @@ Steady-state solutions for a range of glucose concentrations and OXPHOS capaciti
 using OrdinaryDiffEq
 using DiffEqCallbacks
 using ModelingToolkit
+using DisplayAs: PNG
 using MitochondrialDynamics
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14

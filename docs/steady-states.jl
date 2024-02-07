@@ -6,6 +6,7 @@ across a range of glucose levels, from 3mM to 30 mM.
 using OrdinaryDiffEq
 using DiffEqCallbacks
 using ModelingToolkit
+using DisplayAs: PNG
 using MitochondrialDynamics
 using PythonCall
 import PythonPlot as plt

@@ -5,6 +5,7 @@
 using OrdinaryDiffEq
 using DiffEqCallbacks
 using ModelingToolkit
+using DisplayAs: PNG
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 import PythonPlot as plt

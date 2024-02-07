@@ -40,9 +40,6 @@ extract(sim::EnsembleSolution, k) = map(s->s[k][end], sim)
 """Export publication-ready TIFF file from a figure"""
 exportTIF(fig, name; dpi=300) = fig.savefig(name, dpi=dpi, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))
 
-"""Force output in PNG format"""
-PNG(fig) = display("image/png", fig)
-
 """
 The deviation of adynylate pool steady state from energy charge
 """

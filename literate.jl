@@ -1,7 +1,12 @@
-using PrettyTables, Literate, Pkg
-ENV["GKSwstype"] = "100"
-ENV["JULIA_DEBUG"] = "Literate"
-Pkg.activate(Base.current_project())
+using Distributed
+using PrettyTables
+
+@everywhere begin
+    ENV["GKSwstype"] = "100"
+    using Literate, Pkg
+    Pkg.activate(Base.current_project())
+end
+
 basedir = "docs"
 nbs = String[]
 
@@ -15,14 +20,24 @@ for (root, dirs, files) in walkdir(basedir)
 end
 
 # Execute the notebooks in worker process(es)
-ts = map(nbs) do nb
-    try
-        @elapsed Literate.notebook(nb, dirname(nb); mdstrings=true)
-    catch e
-        println(e)
-        NaN
-    end
+ts = pmap(nbs; on_error=ex->NaN) do nb
+    @elapsed Literate.notebook(nb, dirname(nb); mdstrings=true)
 end
 
 pretty_table([nbs ts], header=["Notebook", "Elapsed (s)"])
+
+# Debug notebooks one by one if there are errors
+for (nb, t) in zip(nbs, ts)
+    if isnan(t)
+        println("Debugging notebook: ", nb)
+        try
+            withenv("JULIA_DEBUG" => "Literate") do
+                Literate.notebook(nb, dirname(nb); config)
+            end
+        catch e
+            println(e)
+        end
+    end
+end
+
 any(isnan, ts) && error("Please check errors.")
