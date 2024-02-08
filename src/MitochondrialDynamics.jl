@@ -86,7 +86,7 @@ function make_model(;
         J_MCU ~ PcaMCU * (zvfrt / em1) * (0.341 * Ca_c * (em1 + 1) - 0.2 * Ca_m)
     end
 
-    # Mitochondrial sodium calcium exchanger (NCLX)
+    # Mitochondrial sodium-calcium exchanger (NCLX)
     @variables J_NCLX(t)
     @parameters (Na_c=10mM, Na_m=5mM, VmaxNCLX=75μM*Hz, KnaNCLX=8.2mM, KcaNCLX=8μM)
     nclxeq = let
@@ -130,7 +130,7 @@ function make_model(;
         J_ANT ~ J_HF / 3,
         mcueq,
         nclxeq,
-        J_NADHT ~ VmaxNADHT * hil(NADH_c, NAD_c * Ktn_c) * hil(NAD_m, NADH_m, Ktn_m),
+        J_NADHT ~ VmaxNADHT * hil(NADH_c, NAD_c * Ktn_c) * hil(NAD_m, NADH_m * Ktn_m),
         tiptip ~ kfuse1 * J_ANT / J_HL * x1 * x1 - kfiss1 * x2,
         tipside ~ kfuse2 * J_ANT / J_HL * x1 * x2 - kfiss2 * x3,
         degavg ~ (x1 + 2x2 + 3x3) / (x1 + x2 + x3),
