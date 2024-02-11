@@ -1,5 +1,4 @@
-using OrdinaryDiffEq
-using SteadyStateDiffEq
+using DifferentialEquations
 using ModelingToolkit
 
 @variables t x(t) RHS(t)
