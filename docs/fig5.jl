@@ -3,8 +3,7 @@
 
 Calcium oscillation
 ===#
-using OrdinaryDiffEq
-using DiffEqCallbacks
+using DifferentialEquations
 using ModelingToolkit
 using DisplayAs: PNG
 using MitochondrialDynamics
@@ -13,18 +12,11 @@ import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
 #---
-alg = TRBDF2()
-tend = 2000.0
 @named sys = make_model()
 @unpack GlcConst, Ca_c = sys
-prob = ODEProblem(sys, [], Inf, [GlcConst => 10])
-opt = (
-    save_start = false,
-    save_everystep=false,
-    callback=TerminateSteadyState(),
-)
-sssol = solve(prob, alg; opt...)
-caavg = sssol[Ca_c][end]
+ssprob = SteadyStateProblem(sys, [], [GlcConst => 10])
+sssol = solve(ssprob, DynamicSS(Rodas5()))
+caavg = sssol[Ca_c]
 
 # Calcium wave independent from ATP:ADP ratio
 function cac_wave(t, amplitude=1.5)
@@ -40,6 +32,8 @@ end
 @named sysosci = make_model(; caceq=Ca_c~cac_wave(t))
 
 #---
+alg = Rodas5()
+tend = 2000.0
 ts = range(1520.0, tend; step=2.0)
 prob = ODEProblem(sysosci, [], tend, [GlcConst => 10])
 sol = solve(prob, TRBDF2(), saveat=ts)
