@@ -3,9 +3,7 @@
 
 Steady-state solutions across a range of glucose levels.
 ===#
-using OrdinaryDiffEq
-using DiffEqCallbacks
-using ModelingToolkit
+using DifferentialEquations
 using DisplayAs: PNG
 using MitochondrialDynamics
 import PythonPlot as plt
@@ -13,43 +11,38 @@ plt.matplotlib.rcParams["font.size"] = 14
 
 # Default model
 @named sys = make_model()
-prob = ODEProblem(sys, [], Inf)
-alg = Rodas5()
-callback=TerminateSteadyState()
-opts = (
-    save_everystep = false,
-    callback=TerminateSteadyState(),
-    save_start = false
-)
-sol = solve(prob, alg; opts...)
+
+prob = SteadyStateProblem(sys, [])
+alg = DynamicSS(Rodas5())
+sol = solve(prob, alg)
 #---
-sol[sys.G3P][end]
+sol[sys.G3P]
 #---
-sol[sys.Pyr][end]
+sol[sys.Pyr]
 #---
-sol[sys.ATP_c/sys.ADP_c][end]
+sol[sys.ATP_c/sys.ADP_c]
 #---
-sol[sys.NADH_c][end]
+sol[sys.NADH_c]
 #---
-sol[sys.NADH_m][end]
+sol[sys.NADH_m]
 #---
-sol[sys.Ca_m][end]
+sol[sys.Ca_m]
 #---
-sol[sys.ΔΨm][end]
+sol[sys.ΔΨm]
 #---
-sol[sys.x1][end]
+sol[sys.x1]
 #---
-sol[sys.x2][end]
+sol[sys.x2]
 #---
-sol[sys.x3][end]
+sol[sys.x3]
 
 # Galactose model: glycolysis produces zero net ATP
 # By increasing the ATP consumed in the first part of glycolysis from 2 to 4
-prob_gal = ODEProblem(sys, [], Inf, [sys.ATPstiochGK => 4])
+prob_gal = SteadyStateProblem(sys, [], [sys.ATPstiochGK => 4])
 
 # FFA model: Additional flux reducing mitochondrial NAD/NADH couple
 # A 10% increase w.r.t baseline CAC flux
-prob_ffa = ODEProblem(sys, [], Inf, [sys.kFFA => sol[0.10 * sys.J_DH / sys.NAD_m][end]])
+prob_ffa = SteadyStateProblem(sys, [], [sys.kFFA => sol[0.10 * sys.J_DH / sys.NAD_m]])
 
 # Simulating on a range of glucose
 # Test on a range of glucose (3 mM to 30 mM)
@@ -60,16 +53,11 @@ prob_func = (prob, i, repeat) -> begin
     prob.p[idxGlc] = glc[i]
     prob
 end
-alg = Rodas5()
-eopts = (
-    opts...,
-    trajectories = length(glc)
-)
 
 # Run the simulations
-sim = solve(EnsembleProblem(prob; prob_func), alg; eopts...)
-sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; eopts...)
-sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; eopts...);
+sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories = length(glc))
+sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; trajectories = length(glc))
+sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories = length(glc));
 
 # ## Steady states for a range of glucose
 function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
