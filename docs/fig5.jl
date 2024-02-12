@@ -13,9 +13,10 @@ plt.matplotlib.rcParams["font.size"] = 14
 
 #---
 @named sys = make_model()
-ssprob = SteadyStateProblem(sys, [], [sys.GlcConst => 10mM])
-sssol = solve(ssprob, DynamicSS(Rodas5()))
-caavg = sssol[sys.Ca_c]
+@unpack Ca_c, GlcConst = sys
+ssprob = SteadyStateProblem(sys, [], [GlcConst => 10mM])
+sssol = solve(ssprob, DynamicSS(TRBDF2()))
+caavg = sssol[Ca_c]
 
 # Calcium wave independent from ATP:ADP ratio
 function cac_wave(t, amplitude=1.5)
@@ -31,10 +32,10 @@ end
 @named sysosci = make_model(; caceq=Ca_c~cac_wave(t))
 
 #---
-alg = Rodas5()
+alg = TRBDF2()
 tend = 2000.0
 ts = range(1520.0, tend; step=2.0)
-prob = ODEProblem(sysosci, [], tend, [GlcConst => 10])
+prob = ODEProblem(sysosci, [], tend, [GlcConst => 10mM])
 sol = solve(prob, alg, saveat=ts)
 
 #---
@@ -54,10 +55,10 @@ function plot_fig5(sol, figsize=(10, 10))
     ax[2].plot(tsm, sol[ΔΨm * 1000], label="ΔΨm (mV)")
     ax[2].set_title("C", loc="left")
 
-    ax[3].plot(tsm, sol[degavg], label="<k>")
+    ax[3].plot(tsm, sol[degavg], label="Average node degree")
     ax[3].set_title("D", loc="left")
 
-    ax[4].plot(tsm, sol[J_ANT], label="ANT (mM/s)")
+    ax[4].plot(tsm, sol[J_ANT], label="ATP export (mM/s)")
     ax[4].plot(tsm, sol[J_HL], label="H leak (mM/s)")
     ax[4].set_title("E", loc="left")
     ax[4].set(xlabel="Time (minute)")
