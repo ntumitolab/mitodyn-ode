@@ -13,10 +13,9 @@ plt.matplotlib.rcParams["font.size"] = 14
 
 #---
 @named sys = make_model()
-@unpack GlcConst, Ca_c = sys
-ssprob = SteadyStateProblem(sys, [], [GlcConst => 10])
+ssprob = SteadyStateProblem(sys, [], [sys.GlcConst => 10mM])
 sssol = solve(ssprob, DynamicSS(Rodas5()))
-caavg = sssol[Ca_c]
+caavg = sssol[sys.Ca_c]
 
 # Calcium wave independent from ATP:ADP ratio
 function cac_wave(t, amplitude=1.5)
@@ -36,7 +35,7 @@ alg = Rodas5()
 tend = 2000.0
 ts = range(1520.0, tend; step=2.0)
 prob = ODEProblem(sysosci, [], tend, [GlcConst => 10])
-sol = solve(prob, TRBDF2(), saveat=ts)
+sol = solve(prob, alg, saveat=ts)
 
 #---
 function plot_fig5(sol, figsize=(10, 10))
