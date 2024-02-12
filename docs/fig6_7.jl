@@ -10,7 +10,7 @@ import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
 #---
-glc = 3.0:0.5:30.0
+glc = 4.0:0.5:30.0
 @named sys = make_model()
 prob = SteadyStateProblem(sys, [])
 
@@ -61,9 +61,10 @@ end
 prob_dm = remake_dm(prob)
 alg = DynamicSS(TRBDF2())
 prob_func=prob_func_glc
+trajectories = length(glc)
 
-sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories=length(glc))
-solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories=length(glc));
+sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
+solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories);
 
 #---
 function plot_fig6(sols, solsDM, glc; figsize=(10, 10), labels=["Baseline", "Diabetic"])
@@ -145,7 +146,6 @@ exportTIF(fig6, "Fig6.tif")
 prob_fccp = remake_fccp(prob)
 prob_rotenone = remake_rotenone(prob)
 prob_oligomycin = remake_oligomycin(prob)
-trajectories=length(glc)
 
 #---
 sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)

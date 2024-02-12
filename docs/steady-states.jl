@@ -3,8 +3,7 @@
 
 across a range of glucose levels, from 3mM to 30 mM.
 ===#
-using OrdinaryDiffEq
-using DiffEqCallbacks
+using DifferentialEquations
 using ModelingToolkit
 using DisplayAs: PNG
 using MitochondrialDynamics
@@ -14,31 +13,26 @@ plt.matplotlib.rcParams["font.size"] = 14
 
 # Default model
 @named sys = make_model()
-prob = ODEProblem(sys, [], Inf)
-alg = Rodas5()
-opt = (
-    callback = TerminateSteadyState(),
-    save_everystep = false,
-    save_start = false
-)
-sol = solve(prob, alg; opt...)
+prob = SteadyStateProblem(sys, [])
+alg = DynamicSS(Rodas5())
+sol = solve(prob, alg)
 
 # Galactose model: glycolysis produces zero net ATP
 # By increasing the ATP consumed in the first part of glycolysis from 2 to 4
-prob_gal = ODEProblem(sys, [], Inf, [sys.ATPstiochGK => 4])
+prob_gal = SteadyStateProblem(sys, [], [sys.ATPstiochGK => 4])
 
 # NAD reducing model: an additional reaction to reduce mitochondrial NAD
-prob_ffa = ODEProblem(sys, [], Inf, [sys.kFFA => sol[0.10 * sys.J_DH / sys.NAD_m][end]])
+prob_ffa = SteadyStateProblem(sys, [], [sys.kFFA => sol[0.10 * sys.J_DH / sys.NAD_m][end]])
 
 # ATP synthase-limiting model (Oligomycin)
-prob_f1 = ODEProblem(sys, [], Inf, [sys.VmaxF1 => 0.1 * sys.defaults[sys.VmaxF1]])
+prob_f1 = SteadyStateProblem(sys, [], [sys.VmaxF1 => 0.1 * sys.defaults[sys.VmaxF1]])
 
 # ETC-limiting model (Rotenone / AA?)
-prob_etc = ODEProblem(sys, [], Inf, [sys.VmaxETC => 0.1 * sys.defaults[sys.VmaxETC]])
+prob_etc = SteadyStateProblem(sys, [], [sys.VmaxETC => 0.1 * sys.defaults[sys.VmaxETC]])
 
 # Proton leak-increasing (FCCP) model
 # increase proton leak by 10X
-prob_hl = ODEProblem(sys, [], Inf, [sys.pHleak => 10 * sys.defaults[sys.pHleak]])
+prob_hl = SteadyStateProblem(sys, [], [sys.pHleak => 10 * sys.defaults[sys.pHleak]])
 
 # Simulating on a range of glucose
 # Test on a range of glucose (3 mM to 30 mM)
@@ -46,21 +40,16 @@ glc = 3.0:0.3:30.0
 idxGlc = indexof(sys.GlcConst, parameters(sys))
 
 prob_func = (prob, i, repeat) -> remake(prob, p=replace(prob.p, idxGlc=>glc[i]))
-alg = Rodas5()
-eopt = (
-    trajectories = length(glc),
-    callback=TerminateSteadyState(),
-    save_everystep = false,
-    save_start = false
-)
+
+trajectories = length(glc)
 
 # Run the simulations
-sim = solve(EnsembleProblem(prob; prob_func), alg; eopt...)
-sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; eopt...)
-sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; eopt...)
-sim_f1 = solve(EnsembleProblem(prob_f1; prob_func), alg; eopt...)
-sim_etc = solve(EnsembleProblem(prob_etc; prob_func), alg; eopt...)
-sim_hl = solve(EnsembleProblem(prob_hl; prob_func), alg; eopt...);
+sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
+sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; trajectories)
+sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories)
+sim_f1 = solve(EnsembleProblem(prob_f1; prob_func), alg; trajectories)
+sim_etc = solve(EnsembleProblem(prob_etc; prob_func), alg; trajectories)
+sim_hl = solve(EnsembleProblem(prob_hl; prob_func), alg; trajectories);
 
 # Plot results
 function plot_comparisions(k; figsize=(6, 6), title="", ylabel="", legend_loc="best")
