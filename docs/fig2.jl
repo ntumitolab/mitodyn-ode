@@ -4,6 +4,7 @@
 Steady-state solutions across a range of glucose levels.
 ===#
 using DifferentialEquations
+using ModelingToolkit
 using DisplayAs: PNG
 using MitochondrialDynamics
 import PythonPlot as plt
