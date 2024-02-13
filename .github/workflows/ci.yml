@@ -13,7 +13,7 @@ concurrency:
 
 env:
   CACHE_NUM: '2'
-  PY_VER: '3.12'
+  PY_VER: '3.12.1'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
   JULIA_NUM_THREADS: 'auto'
