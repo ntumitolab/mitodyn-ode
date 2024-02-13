@@ -4,7 +4,7 @@ using PrettyTables
 using SHA
 
 ENV["GKSwstype"] = "100"
-E# NV["JULIA_DEBUG"] = "Literate"
+# ENV["JULIA_DEBUG"] = "Literate"
 Pkg.activate(Base.current_project())
 
 basedir = "docs"
