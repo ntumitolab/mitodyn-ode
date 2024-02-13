@@ -4,7 +4,7 @@ using PrettyTables
 using SHA
 
 ENV["GKSwstype"] = "100"
-ENV["JULIA_DEBUG"] = "Literate"
+E# NV["JULIA_DEBUG"] = "Literate"
 Pkg.activate(Base.current_project())
 
 basedir = "docs"
@@ -42,6 +42,7 @@ ts = map(nbs) do nb
     try
         @elapsed Literate.notebook(nb, dirname(nb); mdstrings=true)
     catch err
+        println("Error occured in notebook:", nb)
         println(err)
         NaN
     end
