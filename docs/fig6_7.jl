@@ -1,8 +1,7 @@
 #===
 # Figure 6 and 7
 ===#
-using OrdinaryDiffEq
-using DiffEqCallbacks
+using DifferentialEquations
 using ModelingToolkit
 using DisplayAs: PNG
 using MitochondrialDynamics
@@ -11,9 +10,9 @@ import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
 #---
-glc = 3.0:0.5:30.0
+glc = 4.0:0.5:30.0
 @named sys = make_model()
-prob = ODEProblem(sys, [], Inf)
+prob = SteadyStateProblem(sys, [])
 
 # Parameters
 @unpack GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC = sys
@@ -27,28 +26,28 @@ idxVmaxETC = indexof(VmaxETC, parameters(sys))
 # ## Fig 6
 function remake_rotenone(prob; rETC=0.1)
     p = copy(prob.p)
-    p[idxVmaxETC] = prob.p[idxVmaxETC] * rETC
+    p[idxVmaxETC] *= rETC
     return remake(prob, p=p)
 end
 
 function remake_oligomycin(prob; rF1=0.1)
     p = copy(prob.p)
-    p[idxVmaxF1] = prob.p[idxVmaxF1] * rF1
+    p[idxVmaxF1] *= rF1
     return remake(prob, p=p)
 end
 
 function remake_fccp(prob; rHL=5)
     p = copy(prob.p)
-    p[idxpHleak] = prob.p[idxpHleak] * rHL
+    p[idxpHleak] *= rHL
     return remake(prob, p=p)
 end
 
 function remake_dm(prob; rPDH=0.5, rETC=0.75, rHL=1.4, rF1=0.5)
     p = copy(prob.p)
-    p[idxVmaxETC] = rETC * prob.p[idxVmaxETC]
-    p[idxVmaxF1] = rF1 * prob.p[idxVmaxF1]
-    p[idxpHleak] = rHL * prob.p[idxpHleak]
-    p[idxVmaxPDH] = rPDH * prob.p[idxVmaxPDH]
+    p[idxVmaxETC] *= rETC
+    p[idxVmaxF1] *= rF1
+    p[idxpHleak] *= rHL
+    p[idxVmaxPDH] *= rPDH
     return remake(prob, p=p)
 end
 
@@ -60,17 +59,12 @@ end
 # DM cells
 
 prob_dm = remake_dm(prob)
-alg = TRBDF2()
+alg = DynamicSS(TRBDF2())
 prob_func=prob_func_glc
-opt = (
-    trajectories=length(glc),
-    callback=TerminateSteadyState(),
-    save_everystep=false,
-    save_start = false,
-)
+trajectories = length(glc)
 
-sols = solve(EnsembleProblem(prob; prob_func), alg; opt...)
-solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; opt...);
+sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
+solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories);
 
 #---
 function plot_fig6(sols, solsDM, glc; figsize=(10, 10), labels=["Baseline", "Diabetic"])
@@ -154,11 +148,11 @@ prob_rotenone = remake_rotenone(prob)
 prob_oligomycin = remake_oligomycin(prob)
 
 #---
-sols = solve(EnsembleProblem(prob; prob_func), alg; opt...)
-solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; opt...)
-solsFCCP = solve(EnsembleProblem(prob_fccp; prob_func), alg; opt...)
-solsRot = solve(EnsembleProblem(prob_oligomycin; prob_func), alg; opt...)
-solsOligo = solve(EnsembleProblem(prob_rotenone; prob_func), alg; opt...);
+sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
+solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories)
+solsFCCP = solve(EnsembleProblem(prob_fccp; prob_func), alg; trajectories)
+solsRot = solve(EnsembleProblem(prob_oligomycin; prob_func), alg; trajectories)
+solsOligo = solve(EnsembleProblem(prob_rotenone; prob_func), alg; trajectories);
 
 #---
 function plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc; figsize=(12, 6))

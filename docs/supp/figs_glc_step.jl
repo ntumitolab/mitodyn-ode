@@ -1,16 +1,13 @@
 # # Step Response to elevated glucose concentrations
 # Including baseline and T2DM results
 
-using OrdinaryDiffEq
-using DiffEqCallbacks
+using DifferentialEquations
 using ModelingToolkit
 using DisplayAs: PNG
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
-## plt.matplotlib.rcParams["font.sans-serif"] = "Arial"
-## plt.matplotlib.rcParams["font.family"] = "sans-serif"
 
 # ## Step Response to elevated glucose concentrations
 @variables t, Glc(t)

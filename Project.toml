@@ -4,15 +4,12 @@ authors = ["Wen-Wei Tseng <sosiristseng@gmail.com>"]
 version = "0.3.0"
 
 [deps]
-DiffEqCallbacks = "459566f4-90b8-5000-8ac3-15dfb0a30def"
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
 DisplayAs = "0b91fe84-8a4c-11e9-3e1d-67c38462b6d6"
 Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
 Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
 NaNMath = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
-OrdinaryDiffEq = "1dea7af3-3e70-54e6-95c3-0bf5283fa5ed"
 PrettyTables = "08abe8d2-0d0c-5749-adfa-8a2ac140af0d"
 PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
 PythonPlot = "274fc56d-3b97-40fa-a1cd-1b4a50311bf9"
-SteadyStateDiffEq = "9672c7b4-1e72-59bd-8a11-6ac3964bc41f"

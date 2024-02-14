@@ -3,8 +3,7 @@
 
 Steady-state solutions for a range of glucose concentrations and OXPHOS capacities by chemicals.
 ===#
-using OrdinaryDiffEq
-using DiffEqCallbacks
+using DifferentialEquations
 using ModelingToolkit
 using DisplayAs: PNG
 using MitochondrialDynamics
@@ -15,12 +14,11 @@ plt.matplotlib.rcParams["font.size"] = 14
 
 @named sys = make_model()
 @unpack GlcConst, VmaxF1, VmaxETC, pHleak = sys
-parmap = Dict((k,i) for (i, k) in enumerate(parameters(sys)))
-iGlc = parmap[sys.GlcConst]
-iVmaxF1 = parmap[sys.VmaxF1]
-iVmaxETC = parmap[sys.VmaxETC]
-ipHleak = parmap[sys.pHleak]
-prob = ODEProblem(sys, [], Inf)
+iGlc = indexof(sys.GlcConst, parameters(sys))
+iVmaxF1 = indexof(sys.VmaxF1, parameters(sys))
+iVmaxETC = indexof(sys.VmaxETC, parameters(sys))
+ipHleak = indexof(sys.pHleak, parameters(sys))
+prob = SteadyStateProblem(sys, [])
 
 # Range for two parameters
 
@@ -31,24 +29,16 @@ rF1 = range(0.1, 2.0, 51)
 rETC = range(0.1, 2.0, 51)
 rHL = range(0.1, 5.0, 51)
 
-opts = (
-    save_start = false,
-    save_everystep = false,
-    callback=TerminateSteadyState()
-)
-
-function solve_fig3(glc, r, protein, prob; alg=Rodas5())
-    idx = parmap[protein]
+function solve_fig3(glc, r, pidx, prob; alg=DynamicSS(Rodas5()))
     p = copy(prob.p)
     p[iGlc] = glc
-    p[idx] = prob.p[idx] * r
-    return solve(remake(prob, p=p), alg; opts...)
+    p[pidx] = prob.p[pidx] * r
+    return solve(remake(prob, p=p), alg)
 end
 
-@unpack VmaxF1, VmaxETC, pHleak = sys
-solsf1 = [solve_fig3(glc, r, VmaxF1, prob) for r in rF1, glc in rGlcF1];
-solsetc = [solve_fig3(glc, r, VmaxETC, prob) for r in rETC, glc in rGlcETC];
-solshl = [solve_fig3(glc, r, pHleak, prob) for r in rHL, glc in rGlcHL];
+solsf1 = [solve_fig3(glc, r, iVmaxF1, prob) for r in rF1, glc in rGlcF1];
+solsetc = [solve_fig3(glc, r, iVmaxETC, prob) for r in rETC, glc in rGlcETC];
+solshl = [solve_fig3(glc, r, ipHleak, prob) for r in rHL, glc in rGlcHL];
 
 #---
 
@@ -69,7 +59,7 @@ function plot_fig3(;
 )
     ## mapping functions
     @unpack degavg, ΔΨm, ATP_c, ADP_c = sys
-    fs = (s -> s[degavg][end], s -> s[ΔΨm * 1000][end] , s -> s[ATP_c / ADP_c][end])
+    fs = (s -> s[degavg], s -> s[ΔΨm * 1000] , s -> s[ATP_c / ADP_c])
 
     fig, axes = plt.subplots(3, 3; figsize)
 

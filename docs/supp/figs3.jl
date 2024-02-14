@@ -2,13 +2,11 @@
 # Glucose-Oligomycin-FCCP protocol
 ## Step responses to both glucose stimulation and chemical agents (I)
 ===#
-using OrdinaryDiffEq
-using DiffEqCallbacks
+using DifferentialEquations
 using ModelingToolkit
 using DisplayAs: PNG
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
-using PythonCall
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 

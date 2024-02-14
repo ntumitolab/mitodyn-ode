@@ -3,8 +3,7 @@
 
 Steady-state solutions across a range of glucose levels.
 ===#
-using OrdinaryDiffEq
-using DiffEqCallbacks
+using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
 using DisplayAs: PNG
@@ -14,20 +13,14 @@ plt.matplotlib.rcParams["font.size"] = 14
 
 # Default model
 @named sys = make_model()
-prob = ODEProblem(sys, [], Inf)
-alg = Rodas5()
-opt = (
-    callback=TerminateSteadyState(),
-    save_everystep=false,
-    save_start = false,
-)
-
-sol = solve(prob, alg; opt...)
+prob = SteadyStateProblem(sys, [])
+alg = DynamicSS(Rodas5())
+sol = solve(prob, alg)
 
 # High calcium model
 @unpack RestingCa, ActivatedCa = sys
-prob_ca5 = ODEProblem(sys, [], Inf, [RestingCa=>0.45μM, ActivatedCa=>1.25μM])
-prob_ca10 = ODEProblem(sys, [], Inf, [RestingCa=>0.9μM, ActivatedCa=>2.5μM])
+prob_ca5 = SteadyStateProblem(sys, [], [RestingCa=>0.45μM, ActivatedCa=>1.25μM])
+prob_ca10 = SteadyStateProblem(sys, [], [RestingCa=>0.9μM, ActivatedCa=>2.5μM])
 
 # Simulating on a range of glucose
 @unpack GlcConst = sys
@@ -40,14 +33,11 @@ prob_func = (prob, i, repeat) -> begin
     prob
 end
 
-eopt = (
-    opt...,
-    trajectories=length(glc)
-)
+trajectories=length(glc)
 
-sim = solve(EnsembleProblem(prob; prob_func), alg; eopt...)
-sim_ca5 = solve(EnsembleProblem(prob_ca5; prob_func), alg; eopt...)
-sim_ca10 = solve(EnsembleProblem(prob_ca10; prob_func), alg; eopt...);
+sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
+sim_ca5 = solve(EnsembleProblem(prob_ca5; prob_func), alg; trajectories)
+sim_ca10 = solve(EnsembleProblem(prob_ca10; prob_func), alg; trajectories);
 
 # ## Steady states for a range of glucose
 

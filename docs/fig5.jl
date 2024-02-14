@@ -3,8 +3,7 @@
 
 Calcium oscillation
 ===#
-using OrdinaryDiffEq
-using DiffEqCallbacks
+using DifferentialEquations
 using ModelingToolkit
 using DisplayAs: PNG
 using MitochondrialDynamics
@@ -13,18 +12,11 @@ import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
 #---
-alg = TRBDF2()
-tend = 2000.0
 @named sys = make_model()
-@unpack GlcConst, Ca_c = sys
-prob = ODEProblem(sys, [], Inf, [GlcConst => 10])
-opt = (
-    save_start = false,
-    save_everystep=false,
-    callback=TerminateSteadyState(),
-)
-sssol = solve(prob, alg; opt...)
-caavg = sssol[Ca_c][end]
+@unpack Ca_c, GlcConst = sys
+ssprob = SteadyStateProblem(sys, [], [GlcConst => 10mM])
+sssol = solve(ssprob, DynamicSS(TRBDF2()))
+caavg = sssol[Ca_c]
 
 # Calcium wave independent from ATP:ADP ratio
 function cac_wave(t, amplitude=1.5)
@@ -40,9 +32,11 @@ end
 @named sysosci = make_model(; caceq=Ca_c~cac_wave(t))
 
 #---
+alg = TRBDF2()
+tend = 2000.0
 ts = range(1520.0, tend; step=2.0)
-prob = ODEProblem(sysosci, [], tend, [GlcConst => 10])
-sol = solve(prob, TRBDF2(), saveat=ts)
+prob = ODEProblem(sysosci, [], tend, [GlcConst => 10mM])
+sol = solve(prob, alg, saveat=ts)
 
 #---
 function plot_fig5(sol, figsize=(10, 10))
@@ -61,10 +55,10 @@ function plot_fig5(sol, figsize=(10, 10))
     ax[2].plot(tsm, sol[ΔΨm * 1000], label="ΔΨm (mV)")
     ax[2].set_title("C", loc="left")
 
-    ax[3].plot(tsm, sol[degavg], label="<k>")
+    ax[3].plot(tsm, sol[degavg], label="Average node degree")
     ax[3].set_title("D", loc="left")
 
-    ax[4].plot(tsm, sol[J_ANT], label="ANT (mM/s)")
+    ax[4].plot(tsm, sol[J_ANT], label="ATP export (mM/s)")
     ax[4].plot(tsm, sol[J_HL], label="H leak (mM/s)")
     ax[4].set_title("E", loc="left")
     ax[4].set(xlabel="Time (minute)")

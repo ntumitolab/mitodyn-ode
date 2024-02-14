@@ -26,6 +26,7 @@ function make_model(;
     name,
     caceq=cac_atp(),
     glceq=const_glc(5mM),
+    kwargs...
 )
     @constants begin
         C_MIT=1.812μM/mV # Mitochondrial membrane capacitance
@@ -167,7 +168,8 @@ function make_model(;
             ΔΨm => 92mV,
             x2 => 0.24,
             x3 => 0.06
-        ]
+        ],
+        kwargs...
     )
 
     return structural_simplify(sys)
