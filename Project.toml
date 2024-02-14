@@ -1,7 +1,7 @@
 name = "MitochondrialDynamics"
 uuid = "1a231dcf-63c2-466e-8f46-4027ba595b90"
 authors = ["Wen-Wei Tseng <sosiristseng@gmail.com>"]
-version = "0.3.0"
+version = "0.4.0"
 
 [deps]
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
