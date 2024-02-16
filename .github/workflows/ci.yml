@@ -12,7 +12,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NPROC: '2' # Number of Julia processes to run the notebooks
   CACHE_NUM: '3'
   PY_VER: '3.12'
   JULIA_CONDAPKG_BACKEND: 'Null'
@@ -84,7 +83,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-nb-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}-
     - name: Run literate notebooks
-      run: julia --color=yes -p ${{ env.NPROC }} literate.jl
+      run: julia --color=yes literate.jl
     - name: Build website
       run: jupyter-book build docs/
     - name: Upload page artifact
