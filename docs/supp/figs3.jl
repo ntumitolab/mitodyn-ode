@@ -75,12 +75,12 @@ sols3 = solve(prob, alg; callback=cbs, saveat=ts)
 solDMs3 = solve(prob_dm, alg; callback=cbs, saveat=ts);
 
 #---
-function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"])
+function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"], jo2_mul=t->1)
     @unpack G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ATP_c, ADP_c, ΔΨm, degavg, J_O2 = sol.prob.f.sys
     ts = sol.t
     tsm = ts ./ 60
 
-    jo2 = sol[J_O2 * 1000]
+    jo2 = sol[J_O2 * 1000] .* jo2_mul.(ts)
     pyr = sol[Pyr * 1000]
     nadh_c = sol[NADH_c * 1000]
     nadh_m = sol[NADH_m * 1000]
@@ -91,7 +91,7 @@ function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"
     k = sol[degavg]
 
     pyrDM = solDM[Pyr * 1000]
-    jo2DM = solDM[J_O2 * 1000]
+    jo2DM = solDM[J_O2 * 1000] .* jo2_mul.(ts)
     nadh_cDM = solDM[NADH_c * 1000]
     nadh_mDM = solDM[NADH_m * 1000]
     ca_cDM = solDM[Ca_c * 1000]
@@ -172,8 +172,8 @@ prob_dm5 = remake(remake_dm(prob5), u0=sssol_dm.u)
 cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_rotenone_cb)
 sols5 = solve(prob5, alg; callback=cbs, saveat=ts)
 sols5DM = solve(prob_dm5, alg; callback=cbs, saveat=ts)
-
-figs5 = plot_figs2(sols5, sols5DM);
+jo2_mul = t -> 1 - 0.9 * (t>=60minute)
+figs5 = plot_figs2(sols5, sols5DM; jo2_mul);
 figs5 |> PNG
 
 #---
