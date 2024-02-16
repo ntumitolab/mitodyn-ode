@@ -1,6 +1,8 @@
 #===
-# Glucose-Oligomycin-FCCP protocol
-## Step responses to both glucose stimulation and chemical agents (I)
+# Diabetic step response
+## Glucose-Oligomycin-FCCP protocol
+
+Step responses to both glucose stimulation and chemical agents (I)
 ===#
 using DifferentialEquations
 using ModelingToolkit
@@ -20,11 +22,10 @@ idxpHleak = findfirst(isequal(pHleak), parameters(sys))
 idxVmaxF1 =  findfirst(isequal(VmaxF1), parameters(sys))
 idxVmaxETC =  findfirst(isequal(VmaxETC), parameters(sys))
 
-tend = 100minute
+tend = 80minute
 ts = range(0, tend, 401)
 alg = TRBDF2()
 prob = ODEProblem(sys, [], ts[end])
-probs5 = ODEProblem(sys, [], ts[end])
 
 function remake_dm(prob; rPDH=0.5, rETC=0.75, rHL=1.4, rF1=0.5)
     p = copy(prob.p)
@@ -35,38 +36,37 @@ function remake_dm(prob; rPDH=0.5, rETC=0.75, rHL=1.4, rF1=0.5)
     return remake(prob, p=p)
 end
 
-prob_dm = remake_dm(prob)
-prob_dmS5 = remake_dm(probs5)
-
 # Define events
 function add_glucose!(i)
-    i.p[idxGlc] += 15mM
+    i.p[idxGlc] = 20mM
     set_proposed_dt!(i, 0.1)
 end
 
 add_glucose_cb = PresetTimeCallback(20minute, add_glucose!)
 
 function add_oligomycin!(i)
-    i.p[idxVmaxF1] *= 0.05
+    i.p[idxVmaxF1] *= 0.1
     set_proposed_dt!(i, 0.1)
 end
 
 add_oligomycin_cb = PresetTimeCallback(40minute, add_oligomycin!)
 
 function add_rotenone!(i)
-    i.p[idxVmaxETC] *= 0.05
+    i.p[idxVmaxETC] *= 0.1
     set_proposed_dt!(i, 0.1)
 end
 
 add_rotenone_cb = PresetTimeCallback(60minute, add_rotenone!)
 
 function add_fccp!(i)
-    i.p[idxpHleak] *= 10
+    i.p[idxpHleak] *= 5
     set_proposed_dt!(i, 0.1)
 end
 
 add_fccp_cb = PresetTimeCallback(60minute, add_fccp!)
 
+prob = ODEProblem(sys, [], ts[end])
+prob_dm = remake_dm(prob)
 cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_fccp_cb)
 sols3 = solve(prob, alg; callback=cbs, saveat=ts)
 solDMs3 = solve(prob_dm, alg; callback=cbs, saveat=ts);
@@ -77,8 +77,8 @@ function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"
     ts = sol.t
     tsm = ts ./ 60
 
-    g3p = sol[G3P * 1000]
-    jo2 = sol[J_O2]
+    jo2 = sol[J_O2 * 1000]
+    pyr = sol[Pyr * 1000]
     nadh_c = sol[NADH_c * 1000]
     nadh_m = sol[NADH_m * 1000]
     ca_c = sol[Ca_c * 1000]
@@ -87,8 +87,8 @@ function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"
     dpsi = sol[ΔΨm * 1000]
     k = sol[degavg]
 
-    g3pDM = solDM[G3P * 1000]
-    jo2DM = solDM[J_O2]
+    pyrDM = solDM[Pyr * 1000]
+    jo2DM = solDM[J_O2 * 1000]
     nadh_cDM = solDM[NADH_c * 1000]
     nadh_mDM = solDM[NADH_m * 1000]
     ca_cDM = solDM[Ca_c * 1000]
@@ -101,15 +101,16 @@ function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"
     numcols = 3
     fig, ax = plt.subplots(numrows, numcols; figsize)
 
-    ax[0, 0].plot(tsm, g3p, label=labels[1])
-    ax[0, 0].plot(tsm, g3pDM, label=labels[2])
-    ax[0, 0].set(ylabel="G3P (μM)")
+    ax[0, 0].plot(tsm, jo2, label=labels[1])
+    ax[0, 0].plot(tsm, jo2DM, label=labels[2])
+    ax[0, 0].set(ylabel="OCR (μM/s)")
     ax[0, 0].set_title("(A)", loc="left")
+    ax[0, 0].legend(loc="lower right")
 
-    ax[0, 1 ].plot(tsm, jo2, label=labels[1])
-    ax[0, 1 ].plot(tsm, jo2DM, label=labels[2])
-    ax[0, 1 ].set(ylabel="OCR (mM/s)")
-    ax[0, 1 ].set_title("(B)", loc="left")
+    ax[0, 1].plot(tsm, pyr, label=labels[1])
+    ax[0, 1].plot(tsm, pyrDM, label=labels[2])
+    ax[0, 1].set(ylabel="Pyruvate (μM)")
+    ax[0, 1].set_title("(B)", loc="left")
 
     ax[0, 2].plot(tsm, nadh_c, label=labels[1])
     ax[0, 2].plot(tsm, nadh_cDM, label=labels[2])
@@ -149,7 +150,6 @@ function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"
     for i in 0:numrows-1, j in 0:numcols-1
         ax[i, j].legend()
         ax[i, j].grid()
-        ax[i, j].legend(loc="upper right")
     end
 
     fig.tight_layout()
@@ -157,8 +157,21 @@ function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"
 end
 
 #---
-figs3 = plot_figs2(sols3, solDMs3)
+figs3 = plot_figs2(sols3, solDMs3);
 figs3 |> PNG
 
 # TIFF file
-exportTIF(figs3, "FigS3-Glucose-Oligomycin-FCCP.tif")
+exportTIF(figs3, "FigDM-Glucose-Oligomycin-FCCP.tif")
+
+## Glucose-Oligomycin-Rotenone
+@named sys = make_model()
+prob5 = ODEProblem(sys, [], ts[end])
+prob_dm5 = remake_dm(prob5)
+cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_rotenone_cb)
+sols5 = solve(prob5, alg; callback=cbs, saveat=ts)
+sols5DM = solve(prob_dm5, alg; callback=cbs, saveat=ts)
+
+figs5 = plot_figs2(sols5, sols5DM);
+figs5 |> PNG
+
+exportTIF(figs5, "FigDM-Glucose-Oligomycin-RotAA.tif")
