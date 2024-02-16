@@ -83,7 +83,7 @@ function plot_fig6(sols, solsDM, glc; figsize=(10, 10), labels=["Baseline", "Dia
     @unpack Pyr = sys
     ax[0, 1].plot(glc5, extract(sols, Pyr * 1000), label=labels[1])
     ax[0, 1].plot(glc5, extract(solsDM, Pyr * 1000), label=labels[2])
-    ax[0, 1].set_title("(B) Pyr", loc="left")
+    ax[0, 1].set_title("(B) Pyruvate", loc="left")
     ax[0, 1].set(ylabel="Conc. (μM)")
 
     @unpack NADH_c, NAD_c = sys
@@ -123,7 +123,7 @@ function plot_fig6(sols, solsDM, glc; figsize=(10, 10), labels=["Baseline", "Dia
     @unpack degavg = sys
     ax[2, 2].plot(glc5, extract(sols, degavg), label=labels[1])
     ax[2, 2].plot(glc5, extract(solsDM, degavg), label=labels[2])
-    ax[2, 2].set_title("(I) Avg, Node degree", loc="left")
+    ax[2, 2].set_title("(I) Avg. Node degree", loc="left")
     ax[2, 2].set(xlabel="Glucose (X)")
 
     for i in 0:numrows-1, j in 0:numcols-1
