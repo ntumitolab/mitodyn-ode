@@ -36,6 +36,9 @@ function remake_dm(prob; rPDH=0.5, rETC=0.75, rHL=1.4, rF1=0.5)
     return remake(prob, p=p)
 end
 
+ssprob_dm = remake_dm(SteadyStateProblem(sys, []))
+sssol_dm = solve(ssprob_dm, DynamicSS(Rodas5()))
+
 # Define events
 function add_glucose!(i)
     i.p[idxGlc] = 20mM
@@ -66,7 +69,7 @@ end
 add_fccp_cb = PresetTimeCallback(60minute, add_fccp!)
 
 prob = ODEProblem(sys, [], ts[end])
-prob_dm = remake_dm(prob)
+prob_dm = remake(remake_dm(prob), u0=sssol_dm.u)
 cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_fccp_cb)
 sols3 = solve(prob, alg; callback=cbs, saveat=ts)
 solDMs3 = solve(prob_dm, alg; callback=cbs, saveat=ts);
@@ -164,9 +167,8 @@ figs3 |> PNG
 exportTIF(figs3, "FigDM-Glucose-Oligomycin-FCCP.tif")
 
 ## Glucose-Oligomycin-Rotenone
-@named sys = make_model()
 prob5 = ODEProblem(sys, [], ts[end])
-prob_dm5 = remake_dm(prob5)
+prob_dm5 = remake(remake_dm(prob5), u0=sssol_dm.u)
 cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_rotenone_cb)
 sols5 = solve(prob5, alg; callback=cbs, saveat=ts)
 sols5DM = solve(prob_dm5, alg; callback=cbs, saveat=ts)
