@@ -176,4 +176,5 @@ sols5DM = solve(prob_dm5, alg; callback=cbs, saveat=ts)
 figs5 = plot_figs2(sols5, sols5DM);
 figs5 |> PNG
 
+#---
 exportTIF(figs5, "FigDM-Glucose-Oligomycin-RotAA.tif")
