@@ -1,7 +1,7 @@
 #===
 # Figure 2
 
-Steady-state solutions across a range of glucose levels.
+Steady-state solutions for a range of glucose concentrations and OXPHOS capacities by chemicals.
 ===#
 using DifferentialEquations
 using ModelingToolkit
@@ -10,195 +10,106 @@ using MitochondrialDynamics
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
-# baseline model
+#---
+
 @named sys = make_model()
-@unpack G3P, Pyr, ATP_c, ADP_c, NADH_c, NADH_m, Ca_m, ΔΨm, x1, x2, x3 = sys
+@unpack GlcConst, VmaxF1, VmaxETC, pHleak = sys
+iGlc = indexof(sys.GlcConst, parameters(sys))
+iVmaxF1 = indexof(sys.VmaxF1, parameters(sys))
+iVmaxETC = indexof(sys.VmaxETC, parameters(sys))
+ipHleak = indexof(sys.pHleak, parameters(sys))
 prob = SteadyStateProblem(sys, [])
-alg = DynamicSS(Rodas5())
-sol = solve(prob, alg)
-#---
-sol[G3P]
-#---
-sol[Pyr]
-#---
-sol[ATP_c/ADP_c]
-#---
-sol[NADH_c]
-#---
-sol[NADH_m]
-#---
-sol[Ca_m]
-#---
-sol[ΔΨm]
-#---
-sol[x1]
-#---
-sol[x2]
-#---
-sol[x3]
 
-# Galactose model: glycolysis produces zero net ATP
-# By increasing the ATP consumed in the first part of glycolysis from 2 to 4
-prob_gal = SteadyStateProblem(sys, [], [sys.ATPstiochGK => 4])
+# Range for two parameters
 
-# FFA model: Additional flux reducing mitochondrial NAD/NADH couple
-# A 10% increase w.r.t baseline CAC flux
-prob_ffa = SteadyStateProblem(sys, [], [sys.kFFA => sol[0.10 * sys.J_DH / sys.NAD_m]])
+rGlcF1 = range(3.0, 30.0, 51)
+rGlcETC = range(3.0, 30.0, 51)
+rGlcHL = range(4.0, 30.0, 51)
+rF1 = range(0.1, 2.0, 51)
+rETC = range(0.1, 2.0, 51)
+rHL = range(0.1, 5.0, 51)
 
-# Simulating on a range of glucose
-# Test on a range of glucose (3 mM to 30 mM)
-glc = range(3.0, 30.0, step=0.3)
-
-prob_func = (prob, i, repeat) -> begin
-    prob.ps[sys.GlcConst] = glc[i]
-    prob
+function solve_fig3(glc, r, pidx, prob; alg=DynamicSS(Rodas5()))
+    p = copy(prob.p)
+    p[iGlc] = glc
+    p[pidx] = prob.p[pidx] * r
+    return solve(remake(prob, p=p), alg)
 end
 
-trajectories = length(glc)
+solsf1 = [solve_fig3(glc, r, iVmaxF1, prob) for r in rF1, glc in rGlcF1];
+solsetc = [solve_fig3(glc, r, iVmaxETC, prob) for r in rETC, glc in rGlcETC];
+solshl = [solve_fig3(glc, r, ipHleak, prob) for r in rHL, glc in rGlcHL];
 
-# Run the simulations
-sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
-sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; trajectories)
-sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories);
+#---
 
-# ## Steady states for a range of glucose
-function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
+function plot_fig3(;
+    figsize=(10, 10),
+    cmaps=["bwr", "magma", "viridis"],
+    ylabels=[
+        "ATP synthase capacity (X)",
+        "ETC capacity (X)",
+        "Proton leak rate (X)"
+    ],
+    cbarlabels=["<k>", "ΔΨ", "ATP/ADP"],
+    xxs=(rGlcF1, rGlcETC, rGlcHL),
+    xscale=5.0,
+    yys=(rF1, rETC, rHL),
+    zs=(solsf1, solsetc, solshl),
+    extremes=((1.0, 1.8), (80.0, 180.0), (0.0, 60.0))
+)
+    ## mapping functions
+    @unpack degavg, ΔΨm, ATP_c, ADP_c = sys
+    fs = (s -> s[degavg], s -> s[ΔΨm * 1000] , s -> s[ATP_c / ADP_c])
 
-    @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x1, x2, x3, degavg = sys
+    fig, axes = plt.subplots(3, 3; figsize)
 
-    glc5 = glc ./ 5
-    g3p = extract(sols, G3P * 1000)
-    pyr = extract(sols, Pyr * 1000)
-    ca_c = extract(sols, Ca_c * 1000)
-    ca_m = extract(sols, Ca_m * 1000)
-    nad_ratio_c = extract(sols, NADH_c / NAD_c)
-    nad_ratio_m = extract(sols, NADH_m / NAD_m)
-    atp_c = extract(sols, ATP_c * 1000)
-    adp_c = extract(sols, ADP_c * 1000)
-    amp_c = extract(sols, AMP_c * 1000)
-    td = extract(sols, ATP_c / ADP_c)
-    dpsi = extract(sols, ΔΨm * 1000)
-    x1 = extract(sols, x1)
-    x2 = extract(sols, x2)
-    x3 = extract(sols, x3)
-    deg = extract(sols, degavg)
+    for col in 1:3
+        f = fs[col]
+        cm = cmaps[col]
+        cbl = cbarlabels[col]
+        vmin, vmax = extremes[col]
 
-    numrows = 3
-    numcols = 3
-    fig, axs = plt.subplots(numrows, numcols; figsize)
+        ## lvls = LinRange(vmin, vmax, levels)
+        for row in 1:3
+            xx = xxs[row] ./ xscale
+            yy = yys[row]
+            z = zs[row]
+            ax = axes[row-1, col-1]
 
-    axs[0, 0].plot(glc5, g3p)
-    axs[0, 0].set(title="(A) G3P (μM)", ylim=(0.0, 10.0))
-    axs[0, 1].plot(glc5, pyr)
-    axs[0, 1].set(title="(B) Pyruvate (μM)")
-    axs[0, 2].plot(glc5, ca_c, label="cyto")
-    axs[0, 2].plot(glc5, ca_m, label="mito")
-    axs[0, 2].legend()
-    axs[0, 2].set(title="(C) Calcium (μM)", ylim=(0.0, 1.5))
-    axs[1, 0].plot(glc5, nad_ratio_c, label="cyto")
-    axs[1, 0].plot(glc5, nad_ratio_m, label="mito")
-    axs[1, 0].legend()
-    axs[1, 0].set(title="(D) NADH:NAD")
-    axs[1, 1].plot(glc5, atp_c, label="ATP")
-    axs[1, 1].plot(glc5, adp_c, label="ADP")
-    axs[1, 1].plot(glc5, amp_c, label="AMP")
-    axs[1, 1].legend()
-    axs[1, 1].set(title="(E) Adenylates (μM)")
-    axs[1, 2].plot(glc5, td)
-    axs[1, 2].set(title="(F) ATP:ADP")
-    axs[2, 0].plot(glc5, dpsi, label="cyto")
-    axs[2, 0].set(title="(G) ΔΨ (mV)", xlabel="Glucose (X)")
-    axs[2, 1].plot(glc5, x1, label="X1")
-    axs[2, 1].plot(glc5, x2, label="X2")
-    axs[2, 1].plot(glc5, x3, label="X3")
-    axs[2, 1].legend()
-    axs[2, 1].set(title="(H) Mitochondrial nodes", xlabel="Glucose (X)")
-    axs[2, 2].plot(glc5, deg)
-    axs[2, 2].set(title="(I) Average Node Degree", xlabel="Glucose (X)")
+            ylabel = ylabels[row]
 
-    for i in 0:numrows-1, j in 0:numcols-1
-        axs[i, j].set_xticks(1:6)
-        axs[i, j].grid()
+            mesh = ax.pcolormesh(
+                xx, yy, map(f, z);
+                shading="gouraud",
+                rasterized=true,
+                cmap=cm,
+                vmin=vmin,
+                vmax=vmax
+            )
+
+            ax.set(ylabel=ylabel, xlabel="Glucose (X)")
+
+            ## Arrow annotation: https://matplotlib.org/stable/tutorials/text/annotations.html#plotting-guide-annotation
+            if row == 1
+                ax.text(5.5, 1, "Oligomycin", ha="center", va="center", rotation=-90, size=16, bbox=Dict("boxstyle" => "rarrow", "fc" => "w", "ec" => "k", "lw" => 2, "alpha" => 0.5))
+            elseif row == 2
+                ax.text(5.5, 1, "Rotenone", ha="center", va="center", rotation=-90, size=16, bbox=Dict("boxstyle" => "rarrow", "fc" => "w", "ec" => "k", "lw" => 2, "alpha" => 0.5))
+            elseif row == 3
+                ax.text(5.5, 2.5, "FCCP", ha="center", va="center", rotation=90, size=16, bbox=Dict("boxstyle" => "rarrow", "fc" => "w", "ec" => "k", "lw" => 2, "alpha" => 0.5))
+            end
+            cbar = fig.colorbar(mesh, ax=ax)
+            cbar.ax.set_title(cbl)
+        end
     end
-    fig.suptitle(title)
+
     fig.tight_layout()
     return fig
 end
 
 #---
-fig = plot_steady_state(glc, sim, sys, title="");
+
+fig = plot_fig3(figsize=(13, 10));
 fig |> PNG
-
-# Default parameters
-## exportTIF(fig, "Fig2.tif")
-
-# Adding free fatty acids
-fig = plot_steady_state(glc, sim_ffa, sys, title="FFA model");
-fig |> PNG
-
-# Using galactose instead of glucose as the hydrocarbon source
-fig = plot_steady_state(glc, sim_gal, sys, title="Galactose model");
-fig |> PNG
-
-# ## Comparing default, FFA, and galactose models
-function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="", labels=["Baseline", "Gal", "FFA"])
-
-    @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, degavg, J_O2 = sys
-
-    glc5 = glc ./ 5
-    numcol = 2
-    numrow = 3
-    fig, axs = plt.subplots(numrow, numcol; figsize)
-
-    axs[0, 0].set(title="(A) Cytosolic NADH:NAD")
-    k = NADH_c / NAD_c
-    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
-    lines = axs[0, 0].plot(glc5, yy)
-    axs[0, 0].legend(lines, labels)
-
-    axs[0, 1].set(title="(B) Mitochondrial NADH:NAD")
-    k = NADH_m / NAD_m
-    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
-    lines = axs[0, 1].plot(glc5, yy)
-    axs[0, 1].legend(lines, labels)
-
-    axs[1, 0].set(title="(C) ATP:ADP")
-    k = ATP_c / ADP_c
-    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
-    lines = axs[1, 0].plot(glc5, yy)
-    axs[1, 0].legend(lines, labels)
-
-    axs[1, 1].set(title="(D) ΔΨm (mV)")
-    k = ΔΨm * 1000
-    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
-    lines = axs[1, 1].plot(glc5, yy)
-    axs[1, 1].legend(lines, labels)
-
-    axs[2, 0].set(title="(E) Average node degree")
-    k = degavg
-    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
-    lines = axs[2, 0].plot(glc5, yy)
-    axs[2, 0].legend(lines, labels)
-    axs[2, 0].set(xlabel="Glucose (X)")
-
-    axs[2, 1].set(title="(F) Oxygen consumption")
-    k = J_O2 * 1000
-    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
-    lines = axs[2, 1].plot(glc5, yy)
-    axs[2, 1].legend(lines, labels)
-    axs[2, 1].set(xlabel="Glucose (X)", ylabel="μM/s")
-
-    for i in 0:numrow-1, j in 0:numcol-1
-        axs[i, j].set_xticks(1:6)
-        axs[i, j].grid()
-    end
-    fig.suptitle(title)
-    fig.tight_layout()
-    return fig
-end
-
-figFFAGal = plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys);
-figFFAGal |> PNG
 
 # Export figure
-exportTIF(figFFAGal, "Fig-Base-Gal-FFA.tif")
+## exportTIF(fig, "Fig2-2Dsteadystate.tif")
