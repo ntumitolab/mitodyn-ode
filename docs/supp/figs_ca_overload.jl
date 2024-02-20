@@ -19,17 +19,17 @@ sol = solve(prob, alg)
 
 # High calcium model
 @unpack RestingCa, ActivatedCa = sys
+
 prob_ca5 = SteadyStateProblem(sys, [], [RestingCa=>0.45μM, ActivatedCa=>1.25μM])
 prob_ca10 = SteadyStateProblem(sys, [], [RestingCa=>0.9μM, ActivatedCa=>2.5μM])
 
 # Simulating on a range of glucose
 @unpack GlcConst = sys
-idxGlc = indexof(GlcConst, parameters(sys))
 
 # Test on a range of glucose
 glc = 3.5:0.5:30.0
 prob_func = (prob, i, repeat) -> begin
-    prob.p[idxGlc] = glc[i]
+    prob.ps[GlcConst] = glc[i]
     prob
 end
 
