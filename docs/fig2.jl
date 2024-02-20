@@ -182,11 +182,11 @@ function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="
     axs[2, 0].set(xlabel="Glucose (X)")
 
     axs[2, 1].set(title="(F) Oxygen consumption")
-    k = J_O2
+    k = J_O2 * 1000
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = axs[2, 1].plot(glc5, yy)
     axs[2, 1].legend(lines, labels)
-    axs[2, 1].set(xlabel="Glucose (X)", ylabel="mM/s")
+    axs[2, 1].set(xlabel="Glucose (X)", ylabel="μM/s")
 
     for i in 0:numrow-1, j in 0:numcol-1
         axs[i, j].set_xticks(1:6)
