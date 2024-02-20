@@ -12,11 +12,11 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CACHE_NUM: '3'
+  CACHE_NUM: '1'
   PY_VER: '3.12'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
-  JULIA_NUM_THREADS: '2'
+  JULIA_NUM_THREADS: 'auto'
 
 jobs:
   CI:
