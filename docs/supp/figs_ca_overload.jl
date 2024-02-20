@@ -180,9 +180,9 @@ figcomp = plot_comparision(glc, sim, sim_ca5, sim_ca10, sys);
 figcomp |> PNG
 
 # Export figure
-exportTIF(figcomp, "S1_HighCa.tif")
+## exportTIF(figcomp, "S1_HighCa.tif")
 
-# ## mitochondria membrane potential vs average node degree
+# ## MMP vs <k>
 function plot_dpsi_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=["Ca 1X", "Ca 5X", "Ca 10X"])
     @unpack ΔΨm, degavg = sys
 
@@ -202,7 +202,7 @@ fig = plot_dpsi_k(sim, sim_ca5, sim_ca10, sys);
 fig |> PNG
 
 #---
-exportTIF(fig, "S1_HighCa_dpsi_k.tif")
+## exportTIF(fig, "S1_HighCa_dpsi_k.tif")
 
 # ## x-axis as Ca2+ and y-axis as average node degree
 
