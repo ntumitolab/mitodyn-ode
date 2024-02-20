@@ -10,32 +10,32 @@ using MitochondrialDynamics
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
-# Default model
+# baseline model
 @named sys = make_model()
-
+@unpack G3P, Pyr, ATP_c, ADP_c, NADH_c, NADH_m, Ca_m, ΔΨm, x1, x2, x3 = sys
 prob = SteadyStateProblem(sys, [])
 alg = DynamicSS(Rodas5())
 sol = solve(prob, alg)
 #---
-sol[sys.G3P]
+sol[G3P]
 #---
-sol[sys.Pyr]
+sol[Pyr]
 #---
-sol[sys.ATP_c/sys.ADP_c]
+sol[ATP_c/ADP_c]
 #---
-sol[sys.NADH_c]
+sol[NADH_c]
 #---
-sol[sys.NADH_m]
+sol[NADH_m]
 #---
-sol[sys.Ca_m]
+sol[Ca_m]
 #---
-sol[sys.ΔΨm]
+sol[ΔΨm]
 #---
-sol[sys.x1]
+sol[x1]
 #---
-sol[sys.x2]
+sol[x2]
 #---
-sol[sys.x3]
+sol[x3]
 
 # Galactose model: glycolysis produces zero net ATP
 # By increasing the ATP consumed in the first part of glycolysis from 2 to 4
@@ -48,17 +48,18 @@ prob_ffa = SteadyStateProblem(sys, [], [sys.kFFA => sol[0.10 * sys.J_DH / sys.NA
 # Simulating on a range of glucose
 # Test on a range of glucose (3 mM to 30 mM)
 glc = range(3.0, 30.0, step=0.3)
-idxGlc = indexof(sys.GlcConst, parameters(sys))
 
 prob_func = (prob, i, repeat) -> begin
-    prob.p[idxGlc] = glc[i]
+    prob.ps[sys.GlcConst] = glc[i]
     prob
 end
 
+trajectories = length(glc)
+
 # Run the simulations
-sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories = length(glc))
-sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; trajectories = length(glc))
-sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories = length(glc));
+sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
+sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; trajectories)
+sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories);
 
 # ## Steady states for a range of glucose
 function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
@@ -125,22 +126,22 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
 end
 
 #---
-fig = fig_glc_default = plot_steady_state(glc, sim, sys, title="");
+fig = plot_steady_state(glc, sim, sys, title="");
 fig |> PNG
 
 # Default parameters
-exportTIF(fig_glc_default, "Fig2.tif")
+## exportTIF(fig, "Fig2.tif")
 
 # Adding free fatty acids
-fig = plot_steady_state(glc, sim_ffa, sys, title="FFA parameters");
+fig = plot_steady_state(glc, sim_ffa, sys, title="FFA model");
 fig |> PNG
 
 # Using galactose instead of glucose as the hydrocarbon source
-fig = plot_steady_state(glc, sim_gal, sys, title="Galactose parameters");
+fig = plot_steady_state(glc, sim_gal, sys, title="Galactose model");
 fig |> PNG
 
 # ## Comparing default, FFA, and galactose models
-function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="", labels=["Default", "Gal", "FFA"])
+function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="", labels=["Baseline", "Gal", "FFA"])
 
     @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, degavg, J_O2 = sys
 
@@ -200,4 +201,4 @@ figFFAGal = plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys);
 figFFAGal |> PNG
 
 # Export figure
-exportTIF(figFFAGal, "s1-fig1.tif")
+exportTIF(figFFAGal, "Fig-Base-Gal-FFA.tif")
