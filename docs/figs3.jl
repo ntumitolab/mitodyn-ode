@@ -107,48 +107,48 @@ function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"
     ax[0, 0].plot(tsm, jo2, label=labels[1])
     ax[0, 0].plot(tsm, jo2DM, label=labels[2])
     ax[0, 0].set(ylabel="OCR (μM/s)")
-    ax[0, 0].set_title("(A)", loc="left")
+    ax[0, 0].set_title("(A) Oxygen consumption", loc="left")
     ax[0, 0].legend(loc="lower right")
 
     ax[0, 1].plot(tsm, pyr, label=labels[1])
     ax[0, 1].plot(tsm, pyrDM, label=labels[2])
     ax[0, 1].set(ylabel="Pyruvate (μM)")
-    ax[0, 1].set_title("(B)", loc="left")
+    ax[0, 1].set_title("(B) Pyruvate", loc="left")
 
     ax[0, 2].plot(tsm, nadh_c, label=labels[1])
     ax[0, 2].plot(tsm, nadh_cDM, label=labels[2])
     ax[0, 2].set(ylabel="Cytosolic NADH (μM)")
-    ax[0, 2].set_title("(C)", loc="left")
+    ax[0, 2].set_title("(C) Cyto. NADH", loc="left")
 
     ax[1, 0].plot(tsm, nadh_m, label=labels[1])
     ax[1, 0].plot(tsm, nadh_mDM, label=labels[2])
     ax[1, 0].set(ylabel="Mitochondrial NADH (μM)")
-    ax[1, 0].set_title("(D)", loc="left")
+    ax[1, 0].set_title("(D) Mito. NADH", loc="left")
 
     ax[1, 1].plot(tsm, ca_c, label=labels[1])
     ax[1, 1].plot(tsm, ca_cDM, label=labels[2])
     ax[1, 1].set(ylabel="Cytosolic Calcium (μM)")
-    ax[1, 1].set_title("(E)", loc="left")
+    ax[1, 1].set_title("(E) Cyto. calcium", loc="left")
 
     ax[1, 2].plot(tsm, ca_m, label=labels[1])
     ax[1, 2].plot(tsm, ca_mDM, label=labels[2])
     ax[1, 2].set(ylabel="Mitochondrial Calcium (μM)")
-    ax[1, 2].set_title("(F)", loc="left")
+    ax[1, 2].set_title("(F) Mito. calcium", loc="left")
 
     ax[2, 0].plot(tsm, td, label=labels[1])
     ax[2, 0].plot(tsm, tdDM, label=labels[2])
     ax[2, 0].set(ylabel="ATP:ADP")
-    ax[2, 0].set_title("(G)", loc="left")
+    ax[2, 0].set_title("(G) ATP:ADP ratio", loc="left")
 
     ax[2, 1].plot(tsm, dpsi, label=labels[1])
     ax[2, 1].plot(tsm, dpsiDM, label=labels[2])
     ax[2, 1].set(ylabel="ΔΨm (mV)")
-    ax[2, 1].set_title("(H)", loc="left")
+    ax[2, 1].set_title("(H) ΔΨm", loc="left")
 
     ax[2, 2].plot(tsm, k, label=labels[1])
     ax[2, 2].plot(tsm, kDM, label=labels[2])
     ax[2, 2].set(ylabel="Average Node Degree")
-    ax[2, 2].set_title("(I)", loc="left")
+    ax[2, 2].set_title("(I) Average Node Degree", loc="left")
 
     for i in 0:numrows-1, j in 0:numcols-1
         ax[i, j].legend()
