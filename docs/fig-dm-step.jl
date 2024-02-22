@@ -16,24 +16,18 @@ plt.matplotlib.rcParams["font.size"] = 14
 @named sys = make_model()
 @unpack GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC = sys
 
-idxGlc = findfirst(isequal(GlcConst), parameters(sys))
-idxVmaxPDH = findfirst(isequal(VmaxPDH), parameters(sys))
-idxpHleak = findfirst(isequal(pHleak), parameters(sys))
-idxVmaxF1 =  findfirst(isequal(VmaxF1), parameters(sys))
-idxVmaxETC =  findfirst(isequal(VmaxETC), parameters(sys))
-
 tend = 80minute
 ts = range(0, tend, 401)
 alg = TRBDF2()
 prob = ODEProblem(sys, [], ts[end])
 
 function remake_dm(prob; rPDH=0.5, rETC=0.75, rHL=1.4, rF1=0.5)
-    p = copy(prob.p)
-    p[idxVmaxETC] *= rETC
-    p[idxVmaxF1] *= rF1
-    p[idxpHleak] *= rHL
-    p[idxVmaxPDH] *= rPDH
-    return remake(prob, p=p)
+    p = remake(prob)
+    p.ps[VmaxETC] *= rETC
+    p.ps[VmaxF1] *= rF1
+    p.ps[pHleak] *= rHL
+    p.ps[VmaxPDH] *= rPDH
+    return p
 end
 
 ssprob_dm = remake_dm(SteadyStateProblem(sys, []))
@@ -41,28 +35,28 @@ sssol_dm = solve(ssprob_dm, DynamicSS(Rodas5()))
 
 # Define events
 function add_glucose!(i)
-    i.p[idxGlc] = 20mM
+    i.ps[GlcConst] = 20mM
     set_proposed_dt!(i, 0.1)
 end
 
 add_glucose_cb = PresetTimeCallback(20minute, add_glucose!)
 
 function add_oligomycin!(i)
-    i.p[idxVmaxF1] *= 0.1
+    i.ps[VmaxF1] *= 0.1
     set_proposed_dt!(i, 0.1)
 end
 
 add_oligomycin_cb = PresetTimeCallback(40minute, add_oligomycin!)
 
 function add_rotenone!(i)
-    i.p[idxVmaxETC] *= 0.1
+    i.ps[VmaxETC] *= 0.1
     set_proposed_dt!(i, 0.1)
 end
 
 add_rotenone_cb = PresetTimeCallback(60minute, add_rotenone!)
 
 function add_fccp!(i)
-    i.p[idxpHleak] *= 5
+    i.ps[pHleak] *= 5
     set_proposed_dt!(i, 0.1)
 end
 
@@ -75,7 +69,7 @@ sols3 = solve(prob, alg; callback=cbs, saveat=ts)
 solDMs3 = solve(prob_dm, alg; callback=cbs, saveat=ts);
 
 #---
-function plot_figs2(sol, solDM; figsize=(12, 8), labels=["Baseline", "Diabetic"], jo2_mul=t->1)
+function plot_figs2(sol, solDM; figsize=(14, 10), labels=["Baseline", "Diabetic"], jo2_mul=t->1)
     @unpack G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ATP_c, ADP_c, ΔΨm, degavg, J_O2 = sol.prob.f.sys
     ts = sol.t
     tsm = ts ./ 60
