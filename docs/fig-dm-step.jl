@@ -75,7 +75,7 @@ sols3 = solve(prob, alg; callback=cbs, saveat=ts)
 solDMs3 = solve(prob_dm, alg; callback=cbs, saveat=ts);
 
 #---
-function plot_figs2(sol, solDM; figsize=(12, 12), labels=["Baseline", "Diabetic"], jo2_mul=t->1)
+function plot_figs2(sol, solDM; figsize=(12, 8), labels=["Baseline", "Diabetic"], jo2_mul=t->1)
     @unpack G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ATP_c, ADP_c, ΔΨm, degavg, J_O2 = sol.prob.f.sys
     ts = sol.t
     tsm = ts ./ 60
