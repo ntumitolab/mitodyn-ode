@@ -13,10 +13,12 @@ plt.matplotlib.rcParams["font.size"] = 14
 #---
 @named sys = make_model()
 @unpack GlcConst, VmaxF1, VmaxETC, pHleak = sys
+
 iGlc = indexof(sys.GlcConst, parameters(sys))
 iVmaxF1 = indexof(sys.VmaxF1, parameters(sys))
 iVmaxETC = indexof(sys.VmaxETC, parameters(sys))
 ipHleak = indexof(sys.pHleak, parameters(sys))
+
 prob = SteadyStateProblem(sys, [])
 
 # Range for two parameters
@@ -29,13 +31,15 @@ rETC = range(0.1, 2.0, 51)
 rHL = range(0.1, 5.0, 51)
 
 # Testing
-
-ModelingToolkit.default_p(sys)
-
 prob.p
+p = copy(prob.p)
+newp = ModelingToolkit.MTKParameters(sys, [GlcConst => 10.0])
+p
+
 newprob = remake(prob, ps=Dict(GlcConst => 10.0))
 newprob.ps[GlcConst] = 10.0
 prob.ps[GlcConst]
+
 
 function solve_fig3(glc, r, k, prob)
     newprob = remake(prob)
