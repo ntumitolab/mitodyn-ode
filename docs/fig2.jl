@@ -29,16 +29,16 @@ rF1 = range(0.1, 2.0, 51)
 rETC = range(0.1, 2.0, 51)
 rHL = range(0.1, 5.0, 51)
 
-function solve_fig3(glc, r, pidx, prob; alg=DynamicSS(Rodas5()))
-    p = copy(prob.p)
-    p[iGlc] = glc
-    p[pidx] = prob.p[pidx] * r
-    return solve(remake(prob, p=p), alg)
+function solve_fig3(glc, r, k, prob)
+    newprob = deepcopy(prob)
+    newprob.ps[GlcConst] = glc
+    newprob.ps[k] = r * prob.ps[k]
+    return solve(newprob, DynamicSS(Rodas5()))
 end
 
-solsf1 = [solve_fig3(glc, r, iVmaxF1, prob) for r in rF1, glc in rGlcF1];
-solsetc = [solve_fig3(glc, r, iVmaxETC, prob) for r in rETC, glc in rGlcETC];
-solshl = [solve_fig3(glc, r, ipHleak, prob) for r in rHL, glc in rGlcHL];
+solsf1 = [solve_fig3(glc, r, VmaxF1, prob) for r in rF1, glc in rGlcF1];
+solsetc = [solve_fig3(glc, r, VmaxETC, prob) for r in rETC, glc in rGlcETC];
+solshl = [solve_fig3(glc, r, pHleak, prob) for r in rHL, glc in rGlcHL];
 
 #---
 
