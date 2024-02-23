@@ -11,7 +11,6 @@ import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
 #---
-
 @named sys = make_model()
 @unpack GlcConst, VmaxF1, VmaxETC, pHleak = sys
 iGlc = indexof(sys.GlcConst, parameters(sys))
@@ -29,8 +28,17 @@ rF1 = range(0.1, 2.0, 51)
 rETC = range(0.1, 2.0, 51)
 rHL = range(0.1, 5.0, 51)
 
+# Testing
+
+ModelingToolkit.default_p(sys)
+
+prob.p
+newprob = remake(prob, ps=Dict(GlcConst => 10.0))
+newprob.ps[GlcConst] = 10.0
+prob.ps[GlcConst]
+
 function solve_fig3(glc, r, k, prob)
-    newprob = deepcopy(prob)
+    newprob = remake(prob)
     newprob.ps[GlcConst] = glc
     newprob.ps[k] = r * prob.ps[k]
     return solve(newprob, DynamicSS(Rodas5()))
