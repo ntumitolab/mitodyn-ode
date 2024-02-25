@@ -35,7 +35,7 @@ jobs:
       with:
         save-always: 'true'
         path: ${{ env.pythonLocation }}
-        key:  ${{ runner.os }}-pip-${{ env.CACHE_NUM }}-${{ steps.cp.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+        key:  ${{ runner.os }}-pip-${{ steps.cp.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
     - name: Install pip dependencies if cache miss
       if: ${{ steps.cache-py.outputs.cache-hit != 'true' }}
       run: pip install -r requirements.txt
@@ -77,20 +77,20 @@ jobs:
       id: cache-nb
       with:
         path: |
-          docs/**/*.ipynb
-          docs/**/*.sha
-        key: ${{ runner.os }}-nb-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}-${{ hashFiles('docs/**/*.jl') }}
+          notebooks/**/*.ipynb
+          notebooks/**/*.sha
+        key: ${{ runner.os }}-nb-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}-${{ hashFiles('notebooks/**/*.jl') }}
         restore-keys: |
           ${{ runner.os }}-nb-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}-
     - name: Run literate notebooks
       run: julia --color=yes literate.jl
     - name: Build website
-      run: jupyter-book build docs/
+      run: jupyter-book build notebooks/
     - name: Upload page artifact
       if: ${{ github.ref == 'refs/heads/main' }}
       uses: actions/upload-pages-artifact@v3
       with:
-        path: docs/_build/html
+        path: notebooks/_build/html
 
   # Deploy pages
   deploy:
