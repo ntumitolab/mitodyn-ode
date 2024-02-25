@@ -12,7 +12,7 @@ plt.matplotlib.rcParams["font.size"] = 14
 
 #---
 @named sys = make_model()
-@unpack GlcConst, VmaxF1, VmaxETC, pHleak = sys
+@unpack GlcConst, rETC, rHL, rF1, rPDH = sys
 prob = SteadyStateProblem(sys, [])
 
 # Range for two parameters
@@ -20,31 +20,22 @@ prob = SteadyStateProblem(sys, [])
 rGlcF1 = range(3.0, 30.0, 51)
 rGlcETC = range(3.0, 30.0, 51)
 rGlcHL = range(4.0, 30.0, 51)
-rF1 = range(0.1, 2.0, 51)
-rETC = range(0.1, 2.0, 51)
-rHL = range(0.1, 5.0, 51)
+rf1 = range(0.1, 2.0, 51)
+retc = range(0.1, 2.0, 51)
+rhl = range(0.1, 5.0, 51)
 
-# Testing
-prob.p
-p = copy(prob.p)
-newp = ModelingToolkit.MTKParameters(sys, [GlcConst => 10.0])
-p
-
-newprob = remake(prob, ps=Dict(GlcConst => 10.0))
-newprob.ps[GlcConst] = 10.0
-prob.ps[GlcConst]
-
+# 2D steady states
 
 function solve_fig3(glc, r, k, prob)
-    newprob = remake(prob)
+    newprob = remake(prob, p=copy(prob.p))
     newprob.ps[GlcConst] = glc
-    newprob.ps[k] = r * prob.ps[k]
+    newprob.ps[k] = r
     return solve(newprob, DynamicSS(Rodas5()))
 end
 
-solsf1 = [solve_fig3(glc, r, VmaxF1, prob) for r in rF1, glc in rGlcF1];
-solsetc = [solve_fig3(glc, r, VmaxETC, prob) for r in rETC, glc in rGlcETC];
-solshl = [solve_fig3(glc, r, pHleak, prob) for r in rHL, glc in rGlcHL];
+solsf1 = [solve_fig3(glc, r, rF1, prob) for r in rf1, glc in rGlcF1];
+solsetc = [solve_fig3(glc, r, rETC, prob) for r in retc, glc in rGlcETC];
+solshl = [solve_fig3(glc, r, rHL, prob) for r in rhl, glc in rGlcHL];
 
 #---
 
@@ -59,7 +50,7 @@ function plot_fig3(;
     cbarlabels=["<k>", "ΔΨ", "ATP/ADP"],
     xxs=(rGlcF1, rGlcETC, rGlcHL),
     xscale=5.0,
-    yys=(rF1, rETC, rHL),
+    yys=(rf1, retc, rhl),
     zs=(solsf1, solsetc, solshl),
     extremes=((1.0, 1.8), (80.0, 180.0), (0.0, 60.0))
 )

@@ -14,51 +14,21 @@ glc = 4.0:0.5:30.0
 @named sys = make_model()
 prob = SteadyStateProblem(sys, [])
 
-# Parameters
-@unpack GlcConst, VmaxPDH, pHleak, VmaxF1, VmaxETC = sys
-
-idxGlc = indexof(GlcConst, parameters(sys))
-idxVmaxPDH = indexof(VmaxPDH, parameters(sys))
-idxpHleak = indexof(pHleak, parameters(sys))
-idxVmaxF1 = indexof(VmaxF1, parameters(sys))
-idxVmaxETC = indexof(VmaxETC, parameters(sys))
+# Change parameters
+@unpack GlcConst, rETC, rHL, rF1, rPDH = sys
 
 # ## Fig 6
-function remake_rotenone(prob; rETC=0.1)
-    p = copy(prob.p)
-    p[idxVmaxETC] *= rETC
-    return remake(prob, p=p)
-end
-
-function remake_oligomycin(prob; rF1=0.1)
-    p = copy(prob.p)
-    p[idxVmaxF1] *= rF1
-    return remake(prob, p=p)
-end
-
-function remake_fccp(prob; rHL=5)
-    p = copy(prob.p)
-    p[idxpHleak] *= rHL
-    return remake(prob, p=p)
-end
-
-function remake_dm(prob; rPDH=0.5, rETC=0.75, rHL=1.4, rF1=0.5)
-    p = copy(prob.p)
-    p[idxVmaxETC] *= rETC
-    p[idxVmaxF1] *= rF1
-    p[idxpHleak] *= rHL
-    p[idxVmaxPDH] *= rPDH
-    return remake(prob, p=p)
-end
+prob_dm = SteadyStateProblem(sys, [], [rPDH=>0.5, rETC=>0.75, rHL=>1.4, rF1=>0.5])
+prob_fccp = SteadyStateProblem(sys, [], [rHL=>5.0])
+prob_rotenone = SteadyStateProblem(sys, [], [rETC=>0.1])
+prob_oligomycin = SteadyStateProblem(sys, [], [rF1=>0.1])
 
 function prob_func_glc(prob, i, repeat)
-    prob.p[idxGlc] = glc[i]
+    prob.ps[GlcConst] = glc[i]
     prob
 end
 
 # DM cells
-
-prob_dm = remake_dm(prob)
 alg = DynamicSS(TRBDF2())
 prob_func=prob_func_glc
 trajectories = length(glc)
@@ -67,7 +37,7 @@ sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
 solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories);
 
 #---
-function plot_fig6(sols, solsDM, glc; figsize=(10, 10), labels=["Baseline", "Diabetic"])
+function plot_fig6(sols, solsDM, glc; figsize=(10, 8), labels=["Baseline", "Diabetic"])
     glc5 = glc ./ 5
     numrows = 3
     numcols = 3
@@ -143,11 +113,6 @@ fig6 |> PNG
 exportTIF(fig6, "Fig6.tif")
 
 # ## Figure 7
-prob_fccp = remake_fccp(prob)
-prob_rotenone = remake_rotenone(prob)
-prob_oligomycin = remake_oligomycin(prob)
-
-#---
 sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
 solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories)
 solsFCCP = solve(EnsembleProblem(prob_fccp; prob_func), alg; trajectories)

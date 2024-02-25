@@ -12,7 +12,7 @@ plt.matplotlib.rcParams["font.size"] = 14
 
 # baseline model
 @named sys = make_model()
-@unpack G3P, Pyr, ATP_c, ADP_c, NADH_c, NADH_m, Ca_m, ΔΨm, x1, x2, x3 = sys
+@unpack GlcConst, G3P, Pyr, ATP_c, ADP_c, NADH_c, NADH_m, Ca_m, ΔΨm, x1, x2, x3 = sys
 prob = SteadyStateProblem(sys, [])
 alg = DynamicSS(Rodas5())
 sol = solve(prob, alg)
@@ -50,7 +50,7 @@ prob_ffa = SteadyStateProblem(sys, [], [sys.kFFA => sol[0.10 * sys.J_DH / sys.NA
 glc = range(3.0, 30.0, step=0.3)
 
 prob_func = (prob, i, repeat) -> begin
-    prob.ps[sys.GlcConst] = glc[i]
+    prob.ps[GlcConst] = glc[i]
     prob
 end
 
