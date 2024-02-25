@@ -13,12 +13,6 @@ plt.matplotlib.rcParams["font.size"] = 14
 #---
 @named sys = make_model()
 @unpack GlcConst, VmaxF1, VmaxETC, pHleak = sys
-
-iGlc = indexof(sys.GlcConst, parameters(sys))
-iVmaxF1 = indexof(sys.VmaxF1, parameters(sys))
-iVmaxETC = indexof(sys.VmaxETC, parameters(sys))
-ipHleak = indexof(sys.pHleak, parameters(sys))
-
 prob = SteadyStateProblem(sys, [])
 
 # Range for two parameters
