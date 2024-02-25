@@ -22,7 +22,7 @@ jobs:
         uses: julia-actions/setup-julia@v1
       - name: Convert literate notebooks to markdown files
         shell: julia --color=yes {0}
-        working-directory: docs
+        working-directory: notebooks
         run: |
           import Pkg
           Pkg.add("Literate")
@@ -47,6 +47,6 @@ jobs:
         id: lychee
         with:
           fail: true
-          args: '--accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d docs/'
+          args: '--accept 200,204,429 --verbose --no-progress --cache --max-cache-age 1d notebooks/'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

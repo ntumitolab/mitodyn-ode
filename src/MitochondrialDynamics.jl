@@ -38,6 +38,10 @@ function make_model(;
     end
 
     @variables t
+    D = Differential(t)
+
+    # Adjustable parameters
+    @parameters (rETC = 1, rHL = 1, rF1 = 1, rPDH = 1)
 
     # Adenylate kinase (AdK)
     @variables AEC(t) ATP_c(t) ADP_c(t) AMP_c(t)
@@ -63,7 +67,7 @@ function make_model(;
         fpCa = hil(1, U2PDH * (1 + U1PDH * c))
         fNAD = hil(NAD_m, NADH_m * KnadPDH)
         fPyr = hil(Pyr, KpyrPDH)
-        J_PDH ~ VmaxPDH * fpCa * fNAD * fPyr
+        J_PDH ~ VmaxPDH * rPDH * fpCa * fNAD * fPyr
     end
 
     # Electron transport chain (ETC)
@@ -113,8 +117,6 @@ function make_model(;
     @variables x1(t) x2(t) x3(t) degavg(t) tiptip(t) tipside(t)
     @parameters (kfiss1=inv(10minute), kfuse1=kfiss1, kfiss2=1.5*kfiss1, kfuse2=0.5*kfuse1)
 
-    D = Differential(t)
-    # Reaction equations
     eqs = [
         caceq,
         glceq,
@@ -124,10 +126,10 @@ function make_model(;
         pdheq,
         J_FFA ~ kFFA * NAD_m,
         J_DH ~ 4.6 * J_PDH + J_FFA,
-        J_HR ~ VmaxETC * hil(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm),
+        J_HR ~ VmaxETC * rETC * hil(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm),
         J_O2 ~ J_HR / 10,
-        J_HL ~ pHleak * exp(kvHleak * ΔΨm),
-        J_HF ~ VmaxF1 * hil(FmgadpF1 * ADP_c, KadpF1, nadpF1) * hil(ΔΨm, KvF1, nvF1) * (1 - exp(-Ca_m / KcaF1)),
+        J_HL ~ pHleak * rHL * exp(kvHleak * ΔΨm),
+        J_HF ~ VmaxF1 * rF1 * hil(FmgadpF1 * ADP_c, KadpF1, nadpF1) * hil(ΔΨm, KvF1, nvF1) * (1 - exp(-Ca_m / KcaF1)),
         J_ANT ~ J_HF / 3,
         mcueq,
         nclxeq,

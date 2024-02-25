@@ -19,7 +19,7 @@ noiseeqs = [
 ]
 
 @named ode = ODESystem(eqs, t, [x, y, z], [σ, ρ, β])
-@named sde = SDESystem(eqs, noiseeqs, t, [x, y, z], [σ, ρ, β])
+@named sde = SDESystem(ode, noiseeqs)
 
 u0map = [
     x => 1.0,
@@ -35,8 +35,8 @@ parammap = [
 
 tspan = (0.0, 100.0)
 
-odeprob = ODEProblem(ode, u0map, tspan, parammap)
-sdeprob = SDEProblem(sde, u0map, tspan, parammap)
+odeprob = ODEProblem(ode |> complete, u0map, tspan, parammap)
+sdeprob = SDEProblem(sde |> complete, u0map, tspan, parammap)
 
 odesol = solve(odeprob, Tsit5())
 sdesol = solve(sdeprob, SOSRI())

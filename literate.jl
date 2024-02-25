@@ -7,7 +7,7 @@ ENV["GKSwstype"] = "100"
 # ENV["JULIA_DEBUG"] = "Literate"
 Pkg.activate(Base.current_project())
 
-basedir = "docs"
+basedir = "notebooks"
 nbs = String[]
 
 # Collect the list of Literate notebooks (ends with .jl)
