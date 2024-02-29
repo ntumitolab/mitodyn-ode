@@ -12,8 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CACHE_NUM: '4'
-  PY_VER: '3.12'
+  CACHE_NUM: '1'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
   JULIA_NUM_THREADS: 'auto'
@@ -28,7 +27,7 @@ jobs:
       uses: actions/setup-python@v5
       id: cp
       with:
-        python-version: ${{ env.PY_VER }}
+        python-version: '3.x'
     - name: Cache pip dependencies
       uses: actions/cache@v4
       id: cache-py
@@ -79,9 +78,9 @@ jobs:
         path: |
           notebooks/**/*.ipynb
           notebooks/**/*.sha
-        key: ${{ runner.os }}-nb-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}-${{ hashFiles('notebooks/**/*.jl') }}
+        key: ${{ runner.os }}-nb-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml')}}-${{ hashFiles('notebooks/**/*.jl') }}
         restore-keys: |
-          ${{ runner.os }}-nb-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}-
+          ${{ runner.os }}-nb-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml')}}-
     - name: Run literate notebooks
       run: julia --color=yes literate.jl
     - name: Build website
