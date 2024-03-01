@@ -110,7 +110,7 @@ fig6 = plot_fig6(sols, solsDM, glc);
 fig6 |> PNG
 
 # Export figure
-exportTIF(fig6, "Fig6.tif")
+exportTIF(fig6, "Fig7-DM-steadystates.tif")
 
 # ## Figure 7
 sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
@@ -174,4 +174,4 @@ fig7 = plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc);
 fig7 |> PNG
 
 # Export figure
-exportTIF(fig7, "Fig7.tif")
+exportTIF(fig7, "Fig8.tif")

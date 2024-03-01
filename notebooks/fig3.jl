@@ -130,7 +130,7 @@ fig = plot_steady_state(glc, sim, sys, title="");
 fig |> PNG
 
 # Default parameters
-## exportTIF(fig, "Fig2.tif")
+exportTIF(fig, "Fig3-steady-state.tif")
 
 # Adding free fatty acids
 fig = plot_steady_state(glc, sim_ffa, sys, title="FFA model");
@@ -201,4 +201,4 @@ figFFAGal = plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys);
 figFFAGal |> PNG
 
 # Export figure
-## exportTIF(figFFAGal, "Fig-Base-Gal-FFA.tif")
+exportTIF(figFFAGal, "Fig-Base-Gal-FFA.tif")
