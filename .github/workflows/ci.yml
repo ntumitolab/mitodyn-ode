@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CACHE_NUM: '1'
+  CACHE_NUM: '2'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
   JULIA_NUM_THREADS: 'auto'
@@ -52,7 +52,6 @@ jobs:
       uses: actions/cache@v4
       id: cache-julia
       with:
-        save-always: 'true'
         path: |
           ~/.julia
           !~/.julia/registries
@@ -70,6 +69,7 @@ jobs:
         Pkg.activate(".")
         Pkg.instantiate()
         Pkg.precompile()
+        Pkg.gc(collect_delay=Day(0))
     - name: Cache literate notebooks
       uses: actions/cache@v4
       id: cache-nb
@@ -77,9 +77,9 @@ jobs:
         path: |
           notebooks/**/*.ipynb
           notebooks/**/*.sha
-        key: ${{ runner.os }}-nb-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml')}}-${{ hashFiles('notebooks/**/*.jl') }}
+        key: ${{ runner.os }}-nb-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml')}}-${{ hashFiles('notebooks/**/*.jl') }}
         restore-keys: |
-          ${{ runner.os }}-nb-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml')}}-
+          ${{ runner.os }}-nb-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml')}}-
     - name: Run literate notebooks
       run: julia --color=yes literate.jl
     - name: Build website
@@ -89,11 +89,6 @@ jobs:
       uses: actions/upload-pages-artifact@v3
       with:
         path: notebooks/_build/html
-    - name: Upload figures
-      uses: actions/upload-artifact@v4
-      with:
-        name: figs
-        path: notebooks/**/*.tif
 
   # Deploy pages
   deploy:
