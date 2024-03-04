@@ -8,7 +8,7 @@ using SHA
     Pkg.activate(Base.current_project())
 end
 
-basedir = "docs"
+basedir = "notebooks"
 nbs = String[]
 
 # Collect the list of Literate notebooks (ends with .jl)
