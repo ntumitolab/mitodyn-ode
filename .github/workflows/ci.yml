@@ -61,7 +61,7 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-nb-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml')}}-
     - name: Run literate notebooks
-      run: julia --color=yes -p 2 literate.jl
+      run: julia --color=yes -p 6 literate.jl
     - name: Build website
       run: jupyter-book build notebooks/
     - name: Upload page artifact
