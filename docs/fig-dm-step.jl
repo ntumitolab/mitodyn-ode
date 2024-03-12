@@ -29,28 +29,24 @@ sssol_dm = solve(ssprob_dm, DynamicSS(Rodas5()))
 # Define events
 function add_glucose!(i)
     i.ps[GlcConst] = 20mM
-    set_proposed_dt!(i, 0.1)
 end
 
 add_glucose_cb = PresetTimeCallback(20minute, add_glucose!)
 
 function add_oligomycin!(i)
     i.ps[rF1] *= 0.1
-    set_proposed_dt!(i, 0.1)
 end
 
 add_oligomycin_cb = PresetTimeCallback(40minute, add_oligomycin!)
 
 function add_rotenone!(i)
     i.ps[rETC] *= 0.1
-    set_proposed_dt!(i, 0.1)
 end
 
 add_rotenone_cb = PresetTimeCallback(60minute, add_rotenone!)
 
 function add_fccp!(i)
     i.ps[rHL] *= 5
-    set_proposed_dt!(i, 0.1)
 end
 
 add_fccp_cb = PresetTimeCallback(60minute, add_fccp!)
@@ -61,7 +57,7 @@ sols3 = solve(prob, alg; callback=cbs, saveat=ts)
 solDMs3 = solve(prob_dm, alg; callback=cbs, saveat=ts);
 
 #---
-function plot_figs2(sol, solDM; figsize=(14, 10), labels=["Baseline", "Diabetic"], jo2_mul=t->1)
+function plot_figs2(sol, solDM; figsize=(14, 10), labels=["Baseline", "Diabetic"], jo2_mul=t->1, laststep="FCCP")
     @unpack G3P, Pyr, NADH_c, NADH_m, Ca_c, Ca_m, ATP_c, ADP_c, ΔΨm, degavg, J_O2 = sol.prob.f.sys
     ts = sol.t
     tsm = ts ./ 60
@@ -93,48 +89,54 @@ function plot_figs2(sol, solDM; figsize=(14, 10), labels=["Baseline", "Diabetic"
     ax[0, 0].plot(tsm, jo2, label=labels[1])
     ax[0, 0].plot(tsm, jo2DM, label=labels[2])
     ax[0, 0].set(ylabel="OCR (μM/s)")
-    ax[0, 0].set_title("(A) Oxygen consumption", loc="left")
+    ax[0, 0].set_title("(a) Oxygen consumption", loc="left")
     ax[0, 0].legend(loc="lower right")
+    ax[0, 0].annotate("Glc", xy=(20, 65), xytext=(20, 72),
+        arrowprops=Dict("shrink"=>3, "facecolor"=>"black"))
+    ax[0, 0].annotate("Omy", xy=(40, 65), xytext=(40, 72),
+        arrowprops=Dict("shrink"=>3, "facecolor"=>"black"))
+    ax[0, 0].annotate(laststep, xy=(60, 65), xytext=(60, 72),
+        arrowprops=Dict("shrink"=>3, "facecolor"=>"black"))
 
     ax[0, 1].plot(tsm, pyr, label=labels[1])
     ax[0, 1].plot(tsm, pyrDM, label=labels[2])
     ax[0, 1].set(ylabel="Pyruvate (μM)")
-    ax[0, 1].set_title("(B) Pyruvate", loc="left")
+    ax[0, 1].set_title("(b) Pyruvate", loc="left")
 
     ax[0, 2].plot(tsm, nadh_c, label=labels[1])
     ax[0, 2].plot(tsm, nadh_cDM, label=labels[2])
     ax[0, 2].set(ylabel="Cytosolic NADH (μM)")
-    ax[0, 2].set_title("(C) Cyto. NADH", loc="left")
+    ax[0, 2].set_title("(c) Cyto. NADH", loc="left")
 
     ax[1, 0].plot(tsm, nadh_m, label=labels[1])
     ax[1, 0].plot(tsm, nadh_mDM, label=labels[2])
     ax[1, 0].set(ylabel="Mitochondrial NADH (μM)")
-    ax[1, 0].set_title("(D) Mito. NADH", loc="left")
+    ax[1, 0].set_title("(d) Mito. NADH", loc="left")
 
     ax[1, 1].plot(tsm, ca_c, label=labels[1])
     ax[1, 1].plot(tsm, ca_cDM, label=labels[2])
     ax[1, 1].set(ylabel="Cytosolic Calcium (μM)")
-    ax[1, 1].set_title("(E) Cyto. calcium", loc="left")
+    ax[1, 1].set_title("(e) Cyto. calcium", loc="left")
 
     ax[1, 2].plot(tsm, ca_m, label=labels[1])
     ax[1, 2].plot(tsm, ca_mDM, label=labels[2])
     ax[1, 2].set(ylabel="Mitochondrial Calcium (μM)")
-    ax[1, 2].set_title("(F) Mito. calcium", loc="left")
+    ax[1, 2].set_title("(f) Mito. calcium", loc="left")
 
     ax[2, 0].plot(tsm, td, label=labels[1])
     ax[2, 0].plot(tsm, tdDM, label=labels[2])
-    ax[2, 0].set(ylabel="ATP:ADP")
-    ax[2, 0].set_title("(G) ATP:ADP ratio", loc="left")
+    ax[2, 0].set(ylabel="ATP:ADP", xlabel="Time (min)")
+    ax[2, 0].set_title("(g) ATP:ADP ratio", loc="left")
 
     ax[2, 1].plot(tsm, dpsi, label=labels[1])
     ax[2, 1].plot(tsm, dpsiDM, label=labels[2])
-    ax[2, 1].set(ylabel="ΔΨm (mV)")
-    ax[2, 1].set_title("(H) ΔΨm", loc="left")
+    ax[2, 1].set(ylabel="ΔΨm (mV)", xlabel="Time (min)")
+    ax[2, 1].set_title("(h) ΔΨm", loc="left")
 
     ax[2, 2].plot(tsm, k, label=labels[1])
     ax[2, 2].plot(tsm, kDM, label=labels[2])
-    ax[2, 2].set(ylabel="Average Node Degree")
-    ax[2, 2].set_title("(I) Average Node Degree", loc="left")
+    ax[2, 2].set(ylabel="Average Node Degree", xlabel="Time (min)")
+    ax[2, 2].set_title("(i) Average Node Degree", loc="left")
 
     for i in 0:numrows-1, j in 0:numcols-1
         ax[i, j].legend()
@@ -154,12 +156,13 @@ exportTIF(figs3, "FigDM-Glucose-Oligomycin-FCCP.tif")
 
 ## Glucose-Oligomycin-Rotenone
 prob5 = ODEProblem(sys, [], tspan)
-prob_dm5 = ODEProblem(sys, [], tspan, [rPDH=>0.5, rETC=>0.75, rHL=>1.4, rF1=>0.5])
+prob_dm5 = ODEProblem(sys, sssol_dm.u, tspan, [rPDH=>0.5, rETC=>0.75, rHL=>1.4, rF1=>0.5])
 cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_rotenone_cb)
 sols5 = solve(prob5, alg; callback=cbs, saveat=ts)
 sols5DM = solve(prob_dm5, alg; callback=cbs, saveat=ts)
-jo2_mul = t -> 1 - 0.9 * (t>=60minute)
-figs5 = plot_figs2(sols5, sols5DM; jo2_mul);
+
+jo2_mul = t -> 10 - 9 * (t>=60minute)
+figs5 = plot_figs2(sols5, sols5DM; jo2_mul, laststep="Rot");
 figs5 |> PNG
 
 #---
