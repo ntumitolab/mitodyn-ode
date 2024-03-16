@@ -57,14 +57,16 @@ jobs:
         path: |
           ~/.julia
           !~/.julia/registries
-        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml' )}}
+        key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('Project.toml', 'Manifest.toml')}}-${{ hashFiles('src/**')}}
         restore-keys: |
-          ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
+          ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('Project.toml', 'Manifest.toml')}}
     - name: Install Julia packages
       if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
       env:
         PYTHON: ${{ env.pythonLocation }}/python
-      run: julia --color=yes instantiate.jl
+      run: |
+        julia --color=yes -e 'using Pkg; Pkg.add(["PrettyTables", "Literate"])'
+        julia --color=yes --project=@. -e 'using Pkg; Pkg.instantiate(); Pkg.precompile()'
     - name: Save Julia packages
       uses: actions/cache/save@v4
       if: ${{ steps.cache-julia.outputs.cache-hit != 'true' }}
@@ -80,9 +82,9 @@ jobs:
         path: |
           docs/**/*.ipynb
           docs/**/*.sha
-        key: ${{ steps.cache-julia.outputs.cache-primary-key }}-nb-${{ hashFiles('docs/**/*.jl') }}
+        key: nb-${{ steps.cache-julia.outputs.cache-primary-key }}-${{ hashFiles('docs/**/*.jl') }}
         restore-keys: |
-          ${{ steps.cache-julia.outputs.cache-primary-key }}-nb-
+          nb-${{ steps.cache-julia.outputs.cache-primary-key }}-
     - name: Run literate notebooks
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
       run: julia --color=yes -p ${{ env.NPROC }} literate.jl
