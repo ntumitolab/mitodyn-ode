@@ -1,4 +1,4 @@
-name: Cleanup PR caches
+name: Cleanup caches
 on:
   pull_request:
     types:
