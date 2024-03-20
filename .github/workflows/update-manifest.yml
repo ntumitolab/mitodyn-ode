@@ -2,8 +2,8 @@ name: Auto update Julia dependencies
 
 on:
   workflow_dispatch:
-  # schedule:
-  #   - cron: '0 0 * * 1' # Every week
+  schedule:
+    - cron: '0 0 * * 1' # Every week
   push:
     branches:
       - main
@@ -16,7 +16,6 @@ concurrency:
 
 env:
   APP_ID: '189113' # https://github.com/apps/wen-wei-s-pr-bot
-  JL_VER: '1'
 
 jobs:
   update-manifest:
@@ -30,7 +29,7 @@ jobs:
       - name: Setup Julia
         uses: julia-actions/setup-julia@v1
         with:
-          version: ${{ env.JL_VER }}
+          version: '1'
       - name: Update Julia dependencies
         env:
           JULIA_PKG_PRECOMPILE_AUTO: '0'
