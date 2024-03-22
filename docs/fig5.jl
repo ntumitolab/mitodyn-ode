@@ -7,35 +7,34 @@ using DifferentialEquations
 using ModelingToolkit
 using DisplayAs: PNG
 using MitochondrialDynamics
-using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
+using MitochondrialDynamics: second, μM, mV, mM, Hz, minute, hil
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
 #---
 @named sys = make_model()
-@unpack Ca_c, GlcConst = sys
+@unpack Ca_c, GlcConst, kATPCa, kATP = sys
 alg = TRBDF2()
 ssprob = SteadyStateProblem(sys, [], [GlcConst => 10mM])
 sssol = solve(ssprob, DynamicSS(alg))
 caavg = sssol[Ca_c]
 
-# Calcium wave independent from ATP:ADP ratio
-function cac_wave(t, amplitude=1.5)
-    ca_r = 0.09μM
-    period = 2minute
-    ka_ca = (caavg - ca_r) * amplitude
-    x = 5 * ((t / period) % 1.0)
-    return ca_r + ka_ca * (x * exp(1 - x))^4
+# Calcium oscillation function
+function cac_wave(; ca_base = 0.09μM, ca_act = 0.25μM, n=4, katp=25, amplitude=0.5, period=2minute)
+    @variables t Ca_c(t) ATP_c(t) ADP_c(t)
+    @parameters (RestingCa=ca_base, ActivatedCa=ca_act, NCac=n, KatpCac=katp)
+    x = 5 * ((t / period) % 1.0) ## An oscillating function
+    w = (x * exp(1 - x))^4  ## Scale from 0 to 1
+    caceq = Ca_c ~ RestingCa + ActivatedCa * hil(ATP_c, KatpCac * ADP_c, NCac) * (1 + amplitude * (2w-1))
+    return caceq
 end
 
-@variables t
-@register_symbolic cac_wave(t)
-@named sysosci = make_model(; caceq=Ca_c~cac_wave(t))
+@named sysosci = make_model(; caceq=cac_wave(amplitude=0.8))
 
 #---
-tend = 2000.0
-ts = range(1520.0, tend; step=2.0)
-prob = ODEProblem(sysosci, [], tend, [GlcConst => 10mM])
+tend = 4000.0
+ts = range(tend-480, tend; step=2.0)
+prob = ODEProblem(sysosci, [], tend, [GlcConst => 10mM, kATPCa=>5Hz/mM, kATP=>0.05Hz])
 sol = solve(prob, alg, saveat=ts)
 
 #---
