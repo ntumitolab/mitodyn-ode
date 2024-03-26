@@ -15,9 +15,6 @@ plt.matplotlib.rcParams["font.size"] = 14
 @named sys = make_model()
 @unpack Ca_c, GlcConst, kATPCa, kATP = sys
 alg = TRBDF2()
-ssprob = SteadyStateProblem(sys, [], [GlcConst => 10mM])
-sssol = solve(ssprob, DynamicSS(alg))
-caavg = sssol[Ca_c]
 
 # Calcium oscillation function
 function cac_wave(; ca_base = 0.09μM, ca_act = 0.25μM, n=4, katp=25, amplitude=0.5, period=2minute)
@@ -33,8 +30,9 @@ end
 
 #---
 tend = 4000.0
-ts = range(tend-480, tend; step=2.0)
-prob = ODEProblem(sysosci, [], tend, [GlcConst => 10mM, kATPCa=>5Hz/mM, kATP=>0.05Hz])
+ts = range(tend-480, tend; length=201)
+# prob = ODEProblem(sysosci, [], tend, [GlcConst => 10mM])
+prob = ODEProblem(sysosci, [], tend, [GlcConst => 10mM, kATPCa=>1Hz/mM, kATP=>0.06Hz])
 sol = solve(prob, alg, saveat=ts)
 
 #---
@@ -78,4 +76,4 @@ fig5 = plot_fig5(sol);
 fig5 |> PNG
 
 # Export figure
-exportTIF(fig5, "Fig6-ca-oscillation.tif")
+exportTIF(fig5, "Fig6-ca-oscillation-adjusted.tif")
