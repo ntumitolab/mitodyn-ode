@@ -55,8 +55,6 @@ jobs:
           ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
     - name: Install Julia packages
       if: ${{ !contains(runner.name, 'GitHub Actions') || steps.cache-julia.outputs.cache-hit != 'true' }}
-      env:
-        PYTHON: ${{ steps.setup-python.outputs.python-path }}
       run: julia --color=yes instantiate.jl
     - name: Save Julia packages
       uses: actions/cache/save@v4
