@@ -3,14 +3,12 @@ using Distributed
 using PrettyTables
 using SHA
 using IJulia
+using Literate
+using Pkg
 
-@everywhere begin
-    ENV["GKSwstype"] = "100"
-    using Literate, Pkg
-    Pkg.activate(Base.current_project())
-end
+ENV["GKSwstype"] = "100"
+Pkg.activate(Base.current_project())
 
-outfile = "ipynbs.txt"
 basedir = get(ENV, "DOCDIR", "docs") # Defaults to docs/
 cachedir = get(ENV, "NBCACHE", ".cache") # Defaults to .cache/
 ipynbs = String[]
@@ -58,33 +56,11 @@ for (root, dirs, files) in walkdir(cachedir)
     end
 end
 
-# Execute literate notebooks in worker process(es)
-ts = pmap(litnbs; on_error=ex->NaN) do nb
-    outdir = joinpath(cachedir, dirname(nb))
-    @elapsed Literate.notebook(nb, outdir; mdstrings=true)
+# Execute literate notebooks
+littimes = similar(litnbs, Float64)
+Threads.@threads for (i, nb) in enumerate(litnbs)
+    littimes[i] = @elapsed Literate.notebook(nb, outdir; mdstrings=true)
 end
-
-# Show literate notebook execution results
-pretty_table([litnbs ts], header=["Notebook", "Elapsed (s)"])
-
-# Remove worker processes in Distributed.jl
-rmprocs(workers())
-
-# Debug notebooks one by one if there are errors
-for (nb, t) in zip(litnbs, ts)
-    if isnan(t)
-        println("Debugging notebook: ", nb)
-        try
-            withenv("JULIA_DEBUG" => "Literate") do
-                Literate.notebook(nb, dirname(nb); mdstrings=true)
-            end
-        catch e
-            println(e)
-        end
-    end
-end
-
-any(isnan, ts) && error("Please check literate notebook error(s).")
 
 # Install IJulia kernel
 IJulia.installkernel("Julia", "--project=@.", "--heap-size-hint=3G")
@@ -97,9 +73,9 @@ timeout = "--ExecutePreprocessor.timeout=" * get(ENV, "TIMEOUT", "-1")
 cmds = [`jupyter nbconvert --to notebook $(execute) $(timeout) $(kernelname) --output $(joinpath(abspath(pwd()), cachedir, nb)) $(nb)` for nb in ipynbs]
 
 # Run the nbconvert commands in parallel
-ts = asyncmap(cmds; ntasks) do cmd
+ipynbtimes = asyncmap(cmds; ntasks) do cmd
     @elapsed run(cmd)
 end
 
 # Print execution result
-pretty_table([ipynbs ts], header=["Notebook", "Elapsed (s)"])
+pretty_table([litnbs littimes; ipynbs ipynbtimes], header=["Notebook", "Elapsed (s)"])
