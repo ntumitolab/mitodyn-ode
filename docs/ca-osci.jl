@@ -31,8 +31,7 @@ end
 #---
 tend = 4000.0
 ts = range(tend-480, tend; length=201)
-# prob = ODEProblem(sysosci, [], tend, [GlcConst => 10mM])
-prob = ODEProblem(sysosci, [], tend, [GlcConst => 10mM, kATPCa=>1Hz/mM, kATP=>0.06Hz])
+prob = ODEProblem(sysosci, [], tend, [GlcConst => 10mM])
 sol = solve(prob, alg, saveat=ts)
 
 #---
@@ -76,4 +75,15 @@ fig5 = plot_fig5(sol);
 fig5 |> PNG
 
 # Export figure
-exportTIF(fig5, "Fig6-ca-oscillation-adjusted.tif")
+exportTIF(fig5, "Fig6-ca-oscillation.tif")
+
+# Tuning ca-dependent ATP consumption rate (kATPCa)
+# kATPCa : 90 -> 10
+prob2 = ODEProblem(sysosci, [], tend, [GlcConst => 10mM, kATPCa=>10Hz/mM, kATP=>0.055Hz])
+sol2 = solve(prob2, alg, saveat=ts)
+plot_fig5(sol2) |> PNG
+
+# kATPCa : 90 -> 1
+prob3 = ODEProblem(sysosci, [], tend, [GlcConst => 10mM, kATPCa=>1Hz/mM, kATP=>0.06Hz])
+sol3 = solve(prob3, alg, saveat=ts)
+plot_fig5(sol3) |> PNG
