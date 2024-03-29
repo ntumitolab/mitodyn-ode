@@ -70,7 +70,6 @@ jobs:
       id: cache-julia
       with:
         path: |
-          .CondaPkg
           ~/.julia
           !~/.julia/registries
         key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml') }}
@@ -86,10 +85,11 @@ jobs:
       if: ${{ contains(runner.name, 'GitHub Actions') && steps.cache-julia.outputs.cache-hit != 'true' }}
       with:
         path: |
+          ~/.julia
           !~/.julia/registries
         key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Run notebooks
-      run: julia --color=yes run.jl
+      run: julia --color=yes --project=@. run.jl
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
     - name: Build website

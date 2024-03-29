@@ -7,7 +7,6 @@ using Literate
 using Pkg
 
 ENV["GKSwstype"] = "100"
-Pkg.activate(Base.current_project())
 
 basedir = get(ENV, "DOCDIR", "docs") # Defaults to docs/
 cachedir = get(ENV, "NBCACHE", ".cache") # Defaults to .cache/
