@@ -26,6 +26,11 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      id: setup-python
+      with:
+        python-version: '3.x'
     - name: Cache executed notebooks
       uses: actions/cache@v4
       id: cache-nb
@@ -66,11 +71,6 @@ jobs:
         key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Run notebooks
       run: julia --color=yes -p ${{ env.LITERATE_PROC }} --heap-size-hint=4G run.jl
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      id: setup-python
-      with:
-        python-version: '3.x'
     - name: Cache virtualenv
       uses: actions/cache@v4
       id: cache-venv
