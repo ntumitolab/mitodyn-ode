@@ -67,7 +67,7 @@ end
 rmprocs(workers())
 
 # Debug notebooks one by one if there are errors
-for (nb, t) in zip(litnbs, ts)
+for (nb, t) in zip(litnbs, litts)
     if isnan(t)
         println("Debugging notebook: ", nb)
         try
@@ -80,7 +80,7 @@ for (nb, t) in zip(litnbs, ts)
     end
 end
 
-any(isnan, ts) && error("Please check literate notebook error(s).")
+any(isnan, litts) && error("Please check literate notebook error(s).")
 
 # Install IJulia kernel
 IJulia.installkernel("Julia", "--project=@.", "--heap-size-hint=3G")
