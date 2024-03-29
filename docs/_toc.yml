@@ -6,7 +6,7 @@ root: index
 chapters:
   - file: fig2
   - file: fig3
-  - file: fig5
+  - file: ca-osci
   - file: fig6_7
   - file: figs-ca-overload
   - file: fig-dm-step
