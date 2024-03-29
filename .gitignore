@@ -53,7 +53,7 @@ docs/site/
 # environment.
 # Manifest.toml
 
-LocalPreferences.toml
+# LocalPreferences.toml
 
 # PythonCall
 .CondaPkg

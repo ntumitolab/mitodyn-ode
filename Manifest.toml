@@ -2,7 +2,7 @@
 
 julia_version = "1.10.2"
 manifest_format = "2.0"
-project_hash = "a477af35ccb31f75e8f492f8a26c187f9f2f9161"
+project_hash = "09f1c2f735d81bf5609717d21e98c154d2012dc6"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "016833eb52ba2d6bea9fcb50ca295980e728ee24"
@@ -1134,6 +1134,12 @@ deps = ["Preferences"]
 git-tree-sha1 = "5aa36f7049a63a1528fe8f7c3f2113413ffd4e1f"
 uuid = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
 version = "1.2.1"
+
+[[deps.PreferenceTools]]
+deps = ["Markdown", "Pkg", "Preferences"]
+git-tree-sha1 = "44ffbe8eb0b8bdff44bd1e9898de5157fcae7893"
+uuid = "ba661fbb-e901-4445-b070-854aec6bfbc5"
+version = "0.1.2"
 
 [[deps.Preferences]]
 deps = ["TOML"]
