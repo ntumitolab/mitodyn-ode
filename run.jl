@@ -58,7 +58,8 @@ end
 
 # Execute literate notebooks
 littimes = similar(litnbs, Float64)
-Threads.@threads for (i, nb) in enumerate(litnbs)
+Threads.@threads for i in eachindex(littimes, litnbs)
+    nb = litnbs[i]
     outdir = joinpath(cachedir, dirname(nb))
     littimes[i] = @elapsed Literate.notebook(nb, outdir; mdstrings=true)
 end
