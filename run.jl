@@ -10,7 +10,6 @@ using IJulia
     Pkg.activate(Base.current_project())
 end
 
-outfile = "ipynbs.txt"
 basedir = get(ENV, "DOCDIR", "docs") # Defaults to docs/
 cachedir = get(ENV, "NBCACHE", ".cache") # Defaults to .cache/
 ipynbs = String[]
@@ -59,13 +58,10 @@ for (root, dirs, files) in walkdir(cachedir)
 end
 
 # Execute literate notebooks in worker process(es)
-ts = pmap(litnbs; on_error=ex->NaN) do nb
+litts = pmap(litnbs; on_error=ex->NaN) do nb
     outdir = joinpath(cachedir, dirname(nb))
     @elapsed Literate.notebook(nb, outdir; mdstrings=true)
 end
-
-# Show literate notebook execution results
-pretty_table([litnbs ts], header=["Notebook", "Elapsed (s)"])
 
 # Remove worker processes in Distributed.jl
 rmprocs(workers())
@@ -97,9 +93,9 @@ timeout = "--ExecutePreprocessor.timeout=" * get(ENV, "TIMEOUT", "-1")
 cmds = [`jupyter nbconvert --to notebook $(execute) $(timeout) $(kernelname) --output $(joinpath(abspath(pwd()), cachedir, nb)) $(nb)` for nb in ipynbs]
 
 # Run the nbconvert commands in parallel
-ts = asyncmap(cmds; ntasks) do cmd
+ipynbts = asyncmap(cmds; ntasks) do cmd
     @elapsed run(cmd)
 end
 
 # Print execution result
-pretty_table([ipynbs ts], header=["Notebook", "Elapsed (s)"])
+pretty_table([litnbs litts;ipynbs ipynbts], header=["Notebook", "Elapsed (s)"])

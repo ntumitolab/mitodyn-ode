@@ -15,10 +15,10 @@ env:
   NBCONVERT_JOBS: '4'
   LITERATE_PROC: '2'
   ALLOWERRORS: 'false'
-  CACHE_NUM: '3'
+  CACHE_NUM: '1'
   JULIA_CI: 'true'
+  JULIA_CONDAPKG_BACKEND: 'Null'
   NBCACHE: '.cache'
-  VENV: '.venv'
 
 jobs:
   CI:
@@ -31,6 +31,15 @@ jobs:
       id: setup-python
       with:
         python-version: '3.x'
+    - name: Cache python
+      uses: actions/cache@v4
+      id: cache-py
+      with:
+        key: ${{ runner.os }}-py-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
+        path: ${{ env.pythonLocation }}
+    - name: Install Python dependencies
+      if: ${{ steps.cache-py.outputs.cache-hit != 'true' }}
+      run: pip install -r requirements.txt
     - name: Cache executed notebooks
       uses: actions/cache@v4
       id: cache-nb
@@ -52,7 +61,6 @@ jobs:
       id: cache-julia
       with:
         path: |
-          .CondaPkg
           ~/.julia
           !~/.julia/registries
         key: ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-${{ hashFiles('src/**', 'Project.toml', 'Manifest.toml') }}
@@ -60,6 +68,8 @@ jobs:
           ${{ runner.os }}-julia-${{ env.CACHE_NUM }}-
     - name: Install Julia packages
       if: ${{ !contains(runner.name, 'GitHub Actions') || steps.cache-julia.outputs.cache-hit != 'true' }}
+      env:
+        PYTHON: ${{ steps.setup-python.outputs.python-path }}
       run: julia --color=yes instantiate.jl
     - name: Save Julia packages
       uses: actions/cache/save@v4
@@ -71,22 +81,6 @@ jobs:
         key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Run notebooks
       run: julia --color=yes -p ${{ env.LITERATE_PROC }} --heap-size-hint=4G run.jl
-    - name: Cache virtualenv
-      uses: actions/cache@v4
-      id: cache-venv
-      with:
-        key: ${{ runner.os }}-venv-${{ steps.setup-python.outputs.python-version }}-${{ hashFiles('requirements.txt') }}
-        path: ${{ env.VENV }}
-    - name: Install Python dependencies
-      if: ${{ steps.cache-venv.outputs.cache-hit != 'true' }}
-      run: |
-        python -m venv ${{ env.VENV }}
-        source ${{ env.VENV }}/bin/activate
-        python -m pip install -r requirements.txt
-    - name: Add venv to PATH
-      run: |
-        echo "${{ env.VENV }}/bin" >> $GITHUB_PATH
-        echo "VIRTUAL_ENV=${{ env.VENV }}" >> $GITHUB_ENV
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
     - name: Build website
