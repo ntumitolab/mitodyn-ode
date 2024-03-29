@@ -58,6 +58,9 @@ LocalPreferences.toml
 # PythonCall
 .CondaPkg
 
+# Cache files
+.cache
+
 # Generated files
 *.ipynb
 *.tif
