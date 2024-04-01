@@ -1,7 +1,5 @@
 #===
-# Figure 5
-
-Calcium oscillation
+# Figure 6: Calcium oscillation
 ===#
 using DifferentialEquations
 using ModelingToolkit
@@ -83,7 +81,7 @@ prob2 = ODEProblem(sysosci, [], tend, [GlcConst => 10mM, kATPCa=>10Hz/mM, kATP=>
 sol2 = solve(prob2, alg, saveat=ts)
 plot_fig5(sol2) |> PNG
 
-# kATPCa : 90 -> 1
-prob3 = ODEProblem(sysosci, [], tend, [GlcConst => 10mM, kATPCa=>1Hz/mM, kATP=>0.06Hz])
-sol3 = solve(prob3, alg, saveat=ts)
-plot_fig5(sol3) |> PNG
+# kATPCa : 90 -> 0.1
+prob4 = ODEProblem(sysosci, [], tend, [GlcConst => 10mM, kATPCa=>0.1Hz/mM, kATP=>0.06Hz])
+sol4 = solve(prob4, alg, saveat=ts)
+plot_fig5(sol4) |> PNG
