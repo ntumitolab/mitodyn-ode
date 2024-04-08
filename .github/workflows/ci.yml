@@ -16,8 +16,8 @@ env:
   LITERATE_PROC: '2'
   ALLOWERRORS: 'false'
   CACHE_NUM: '1'
-  JULIA_CI: 'true'
   JULIA_CONDAPKG_BACKEND: 'Null'
+  JULIA_CI: 'true'
   NBCACHE: '.cache'
 
 jobs:
@@ -70,7 +70,14 @@ jobs:
       if: ${{ !contains(runner.name, 'GitHub Actions') || steps.cache-julia.outputs.cache-hit != 'true' }}
       env:
         PYTHON: ${{ steps.setup-python.outputs.python-path }}
-      run: julia --color=yes instantiate.jl
+      shell: julia --color=yes {0}
+      run: |
+        using Pkg, Dates
+        Pkg.add(["IJulia", "Literate", "PrettyTables"])
+        Pkg.activate(".")
+        Pkg.instantiate()
+        Pkg.precompile()
+        Pkg.gc(collect_delay=Day(0))
     - name: Save Julia packages
       uses: actions/cache/save@v4
       if: ${{ contains(runner.name, 'GitHub Actions') && steps.cache-julia.outputs.cache-hit != 'true' }}
