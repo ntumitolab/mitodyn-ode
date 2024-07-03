@@ -2,7 +2,7 @@
 
 julia_version = "1.10.4"
 manifest_format = "2.0"
-project_hash = "a477af35ccb31f75e8f492f8a26c187f9f2f9161"
+project_hash = "f97f8c361759319ad17c65569f00fe59d1a1afb5"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "7a6b285f217ba92b5b474b783b4c2e8cf8218aaa"
@@ -414,11 +414,6 @@ version = "0.5.7"
     Tracker = "9f7883ad-71c0-57eb-9f7f-b5c9e6d3789c"
     Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
-[[deps.DisplayAs]]
-git-tree-sha1 = "43c017d5dd3a48d56486055973f443f8a39bb6d9"
-uuid = "0b91fe84-8a4c-11e9-3e1d-67c38462b6d6"
-version = "0.1.6"
-
 [[deps.Distances]]
 deps = ["LinearAlgebra", "Statistics", "StatsAPI"]
 git-tree-sha1 = "66c4c81f259586e8f002eacebc177e1fb06363b0"
@@ -785,9 +780,9 @@ version = "0.4.6"
 
 [[deps.Latexify]]
 deps = ["Format", "InteractiveUtils", "LaTeXStrings", "MacroTools", "Markdown", "OrderedCollections", "Requires"]
-git-tree-sha1 = "e0b5cd21dc1b44ec6e64f351976f961e6f31d6c4"
+git-tree-sha1 = "5b0d630f3020b82c0775a51d05895852f8506f50"
 uuid = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
-version = "0.16.3"
+version = "0.16.4"
 
     [deps.Latexify.extensions]
     DataFramesExt = "DataFrames"
@@ -805,9 +800,9 @@ version = "0.1.17"
 
 [[deps.LazyArrays]]
 deps = ["ArrayLayouts", "FillArrays", "LinearAlgebra", "MacroTools", "SparseArrays"]
-git-tree-sha1 = "fb43bbe51db62510b032b85e157ea87d77b2fa07"
+git-tree-sha1 = "8e8b794ab7f3789e408d691e9e22c2129f0adcc9"
 uuid = "5078a376-72f3-5289-bfd5-ec5146d43c02"
-version = "2.1.0"
+version = "2.1.2"
 
     [deps.LazyArrays.extensions]
     LazyArraysBandedMatricesExt = "BandedMatrices"
@@ -1234,9 +1229,9 @@ version = "0.9.20"
 
 [[deps.PythonPlot]]
 deps = ["Colors", "CondaPkg", "LaTeXStrings", "PythonCall", "Sockets", "Test", "VersionParsing"]
-git-tree-sha1 = "88b305afa25e1bc4379f182152273dfc55a814b4"
+git-tree-sha1 = "8e618ce3da0ef7e368d4236b2cd96952b5656cfc"
 uuid = "274fc56d-3b97-40fa-a1cd-1b4a50311bf9"
-version = "1.0.3"
+version = "1.0.4"
 
 [[deps.QuadGK]]
 deps = ["DataStructures", "LinearAlgebra"]
