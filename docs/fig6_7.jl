@@ -3,7 +3,6 @@
 ===#
 using DifferentialEquations
 using ModelingToolkit
-using DisplayAs: PNG
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 import PythonPlot as plt
@@ -24,8 +23,7 @@ prob_rotenone = SteadyStateProblem(sys, [], [rETC=>0.1])
 prob_oligomycin = SteadyStateProblem(sys, [], [rF1=>0.1])
 
 function prob_func_glc(prob, i, repeat)
-    prob.ps[GlcConst] = glc[i]
-    prob
+    remake(prob, p=[GlcConst => glc[i]])
 end
 
 # DM cells
@@ -33,8 +31,8 @@ alg = DynamicSS(TRBDF2())
 prob_func=prob_func_glc
 trajectories = length(glc)
 
-sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
-solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories);
+sols = solve(EnsembleProblem(prob; prob_func, safetycopy=false), alg; trajectories)
+solsDM = solve(EnsembleProblem(prob_dm; prob_func, safetycopy=false), alg; trajectories);
 
 #---
 function plot_fig6(sols, solsDM, glc; figsize=(10, 8), labels=["Baseline", "Diabetic"])
@@ -106,18 +104,17 @@ function plot_fig6(sols, solsDM, glc; figsize=(10, 8), labels=["Baseline", "Diab
 end
 
 #---
-fig6 = plot_fig6(sols, solsDM, glc);
-fig6 |> PNG
+fig6 = plot_fig6(sols, solsDM, glc)
 
 # Export figure
 exportTIF(fig6, "Fig7-DM-steadystates.tif")
 
 # ## Figure 7
-sols = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
-solsDM = solve(EnsembleProblem(prob_dm; prob_func), alg; trajectories)
-solsFCCP = solve(EnsembleProblem(prob_fccp; prob_func), alg; trajectories)
-solsRot = solve(EnsembleProblem(prob_oligomycin; prob_func), alg; trajectories)
-solsOligo = solve(EnsembleProblem(prob_rotenone; prob_func), alg; trajectories);
+sols = solve(EnsembleProblem(prob; prob_func, safetycopy=false), alg; trajectories)
+solsDM = solve(EnsembleProblem(prob_dm; prob_func, safetycopy=false), alg; trajectories)
+solsFCCP = solve(EnsembleProblem(prob_fccp; prob_func, safetycopy=false), alg; trajectories)
+solsRot = solve(EnsembleProblem(prob_oligomycin; prob_func, safetycopy=false), alg; trajectories)
+solsOligo = solve(EnsembleProblem(prob_rotenone; prob_func, safetycopy=false), alg; trajectories);
 
 #---
 function plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc; figsize=(12, 6))
@@ -170,8 +167,7 @@ end
 
 #---
 
-fig7 = plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc);
-fig7 |> PNG
+fig7 = plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc)
 
 # Export figure
 exportTIF(fig7, "Fig8.tif")

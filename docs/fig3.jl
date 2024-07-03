@@ -5,7 +5,6 @@ Steady-state solutions across a range of glucose levels.
 ===#
 using DifferentialEquations
 using ModelingToolkit
-using DisplayAs: PNG
 using MitochondrialDynamics
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
@@ -14,7 +13,7 @@ plt.matplotlib.rcParams["font.size"] = 14
 @named sys = make_model()
 @unpack GlcConst, G3P, Pyr, ATP_c, ADP_c, NADH_c, NADH_m, Ca_m, ΔΨm, x1, x2, x3 = sys
 prob = SteadyStateProblem(sys, [])
-alg = DynamicSS(Rodas5())
+alg = DynamicSS(TRBDF2())
 sol = solve(prob, alg)
 #---
 sol[G3P]
@@ -50,16 +49,15 @@ prob_ffa = SteadyStateProblem(sys, [], [sys.kFFA => sol[0.10 * sys.J_DH / sys.NA
 glc = range(3.0, 30.0, step=0.3)
 
 prob_func = (prob, i, repeat) -> begin
-    prob.ps[GlcConst] = glc[i]
-    prob
+    remake(prob, p=[GlcConst => glc[i]])
 end
 
 trajectories = length(glc)
 
 # Run the simulations
-sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
-sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; trajectories)
-sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories);
+sim = solve(EnsembleProblem(prob; prob_func, safetycopy=false), alg; trajectories)
+sim_gal = solve(EnsembleProblem(prob_gal; prob_func, safetycopy=false), alg; trajectories)
+sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func, safetycopy=false), alg; trajectories);
 
 # ## Steady states for a range of glucose
 function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
@@ -126,19 +124,16 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
 end
 
 #---
-fig = plot_steady_state(glc, sim, sys, title="");
-fig |> PNG
+fig = plot_steady_state(glc, sim, sys, title="")
 
 # Default parameters
 exportTIF(fig, "Fig3-steady-state.tif")
 
 # Adding free fatty acids
-fig = plot_steady_state(glc, sim_ffa, sys, title="FFA model");
-fig |> PNG
+fig = plot_steady_state(glc, sim_ffa, sys, title="FFA model")
 
 # Using galactose instead of glucose as the hydrocarbon source
-fig = plot_steady_state(glc, sim_gal, sys, title="Galactose model");
-fig |> PNG
+fig = plot_steady_state(glc, sim_gal, sys, title="Galactose model")
 
 # ## Comparing default, FFA, and galactose models
 function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="", labels=["Baseline", "Gal", "FFA"])
@@ -197,8 +192,7 @@ function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="
     return fig
 end
 
-figFFAGal = plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys);
-figFFAGal |> PNG
+figFFAGal = plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys)
 
 # Export figure
 exportTIF(figFFAGal, "Fig-Base-Gal-FFA.tif")

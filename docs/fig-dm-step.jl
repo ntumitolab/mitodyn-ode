@@ -6,7 +6,6 @@ Step responses to both glucose stimulation and chemical agents (I)
 ===#
 using DifferentialEquations
 using ModelingToolkit
-using DisplayAs: PNG
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
 import PythonPlot as plt
@@ -148,8 +147,7 @@ function plot_figs2(sol, solDM; figsize=(14, 10), labels=["Baseline", "Diabetic"
 end
 
 #---
-figs3 = plot_figs2(sols3, solDMs3);
-figs3 |> PNG
+figs3 = plot_figs2(sols3, solDMs3)
 
 # TIFF file
 exportTIF(figs3, "FigDM-Glucose-Oligomycin-FCCP.tif")
@@ -162,8 +160,7 @@ sols5 = solve(prob5, alg; callback=cbs, saveat=ts)
 sols5DM = solve(prob_dm5, alg; callback=cbs, saveat=ts)
 
 jo2_mul = t -> 10 - 9 * (t>=60minute)
-figs5 = plot_figs2(sols5, sols5DM; jo2_mul, laststep="Rot");
-figs5 |> PNG
+figs5 = plot_figs2(sols5, sols5DM; jo2_mul, laststep="Rot")
 
 #---
 exportTIF(figs5, "FigDM-Glucose-Oligomycin-RotAA.tif")

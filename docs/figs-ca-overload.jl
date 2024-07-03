@@ -6,7 +6,6 @@ Steady-state solutions across a range of glucose levels.
 using DifferentialEquations
 using ModelingToolkit
 using MitochondrialDynamics
-using DisplayAs: PNG
 using MitochondrialDynamics: μM
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
@@ -29,15 +28,14 @@ prob_ca10 = SteadyStateProblem(sys, [], [RestingCa=>0.9μM, ActivatedCa=>2.5μM]
 # Test on a range of glucose
 glc = 3.5:0.5:30.0
 prob_func = (prob, i, repeat) -> begin
-    prob.ps[GlcConst] = glc[i]
-    prob
+    remake(prob, p=[GlcConst => glc[i]])
 end
 
 trajectories=length(glc)
 
-sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
-sim_ca5 = solve(EnsembleProblem(prob_ca5; prob_func), alg; trajectories)
-sim_ca10 = solve(EnsembleProblem(prob_ca10; prob_func), alg; trajectories);
+sim = solve(EnsembleProblem(prob; prob_func, safetycopy=false), alg; trajectories)
+sim_ca5 = solve(EnsembleProblem(prob_ca5; prob_func, safetycopy=false), alg; trajectories)
+sim_ca10 = solve(EnsembleProblem(prob_ca10; prob_func, safetycopy=false), alg; trajectories);
 
 # ## Steady states for a range of glucose
 
@@ -105,16 +103,12 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
 end
 
 # Default model
-fig_glc_default = plot_steady_state(glc, sim, sys, title="Calcium 1X");
-fig_glc_default |> PNG
+fig_glc_default = plot_steady_state(glc, sim, sys, title="Calcium 1X")
 
 # High calcium (5X)
-fig_ca5 = plot_steady_state(glc, sim_ca5, sys, title="Calcium 5X");
-fig_ca5 |> PNG
-
+fig_ca5 = plot_steady_state(glc, sim_ca5, sys, title="Calcium 5X")
 # High calcium (10X)
-fig_ca10 = plot_steady_state(glc, sim_ca10, sys, title="Calcium 10X");
-fig_ca10 |> PNG
+fig_ca10 = plot_steady_state(glc, sim_ca10, sys, title="Calcium 10X")
 
 # ## Comparing default and high calcium models
 function plot_comparision(glc, sim, sim_ca5, sim_ca10, sys;
@@ -176,8 +170,7 @@ function plot_comparision(glc, sim, sim_ca5, sim_ca10, sys;
     return fig
 end
 
-figcomp = plot_comparision(glc, sim, sim_ca5, sim_ca10, sys);
-figcomp |> PNG
+figcomp = plot_comparision(glc, sim, sim_ca5, sim_ca10, sys)
 
 # Export figure
 ## exportTIF(figcomp, "S1_HighCa.tif")
@@ -198,8 +191,7 @@ function plot_dpsi_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", label
     return fig
 end
 
-fig = plot_dpsi_k(sim, sim_ca5, sim_ca10, sys);
-fig |> PNG
+fig = plot_dpsi_k(sim, sim_ca5, sim_ca10, sys)
 
 #---
 ## exportTIF(fig, "S1_HighCa_dpsi_k.tif")
@@ -220,8 +212,7 @@ function plot_ca_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=
     return fig
 end
 
-fig = plot_ca_k(sim, sim_ca5, sim_ca10, sys);
-fig |> PNG
+fig = plot_ca_k(sim, sim_ca5, sim_ca10, sys)
 
 #---
 exportTIF(fig, "S1_HighCa_ca_k.tif")
@@ -244,8 +235,7 @@ function plot_atp_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels
     return fig
 end
 
-fig = plot_atp_k(sim, sim_ca5, sim_ca10, sys);
-fig |> PNG
+fig = plot_atp_k(sim, sim_ca5, sim_ca10, sys)
 
 #---
 exportTIF(fig, "S1_HighCa_atp_k.tif")

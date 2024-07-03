@@ -5,7 +5,6 @@ Steady-state solutions for a range of glucose concentrations and OXPHOS capaciti
 ===#
 using DifferentialEquations
 using ModelingToolkit
-using DisplayAs: PNG
 using MitochondrialDynamics
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
@@ -105,8 +104,7 @@ end
 
 #---
 
-fig = plot_fig3(figsize=(13, 10));
-fig |> PNG
+fig = plot_fig3(figsize=(13, 10))
 
 # Export figure
 exportTIF(fig, "Fig2-2Dsteadystate.tif")

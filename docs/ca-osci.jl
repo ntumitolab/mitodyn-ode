@@ -3,7 +3,6 @@
 ===#
 using DifferentialEquations
 using ModelingToolkit
-using DisplayAs: PNG
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute, hil
 import PythonPlot as plt
@@ -69,8 +68,7 @@ end
 
 #---
 
-fig5 = plot_fig5(sol);
-fig5 |> PNG
+fig5 = plot_fig5(sol)
 
 # Export figure
 exportTIF(fig5, "Fig6-ca-oscillation.tif")
@@ -79,9 +77,9 @@ exportTIF(fig5, "Fig6-ca-oscillation.tif")
 # kATPCa : 90 -> 10
 prob2 = ODEProblem(sysosci, [], tend, [GlcConst => 10mM, kATPCa=>10Hz/mM, kATP=>0.055Hz])
 sol2 = solve(prob2, alg, saveat=ts)
-plot_fig5(sol2) |> PNG
+plot_fig5(sol2)
 
 # kATPCa : 90 -> 0.1
 prob4 = ODEProblem(sysosci, [], tend, [GlcConst => 10mM, kATPCa=>0.1Hz/mM, kATP=>0.06Hz])
 sol4 = solve(prob4, alg, saveat=ts)
-plot_fig5(sol4) |> PNG
+plot_fig5(sol4)
