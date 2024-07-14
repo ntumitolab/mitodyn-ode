@@ -4,9 +4,9 @@
 format: jb-book
 root: index
 chapters:
-  - file: fig2
-  - file: fig3
+  - file: fig2-2dss
+  - file: fig3-1dss
   - file: ca-osci
-  - file: fig6_7
+  - file: fig6-7-dm
   - file: figs-ca-overload
   - file: fig-dm-step
