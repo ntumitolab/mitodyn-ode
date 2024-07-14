@@ -15,26 +15,6 @@ plt.matplotlib.rcParams["font.size"] = 14
 prob = SteadyStateProblem(sys, [])
 alg = DynamicSS(TRBDF2())
 sol = solve(prob, alg)
-#---
-sol[G3P]
-#---
-sol[Pyr]
-#---
-sol[ATP_c/ADP_c]
-#---
-sol[NADH_c]
-#---
-sol[NADH_m]
-#---
-sol[Ca_m]
-#---
-sol[ΔΨm]
-#---
-sol[x1]
-#---
-sol[x2]
-#---
-sol[x3]
 
 # Galactose model: glycolysis produces zero net ATP
 # By increasing the ATP consumed in the first part of glycolysis from 2 to 4
@@ -86,33 +66,42 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     fig, axs = plt.subplots(numrows, numcols; figsize)
 
     axs[0, 0].plot(glc5, g3p)
-    axs[0, 0].set(title="(A) G3P (μM)", ylim=(0.0, 10.0))
+    axs[0, 0].set(ylim=(0.0, 10.0), ylabel="G3P (μM)")
+    axs[0, 0].set_title("a", loc="left")
     axs[0, 1].plot(glc5, pyr)
-    axs[0, 1].set(title="(B) Pyruvate (μM)")
-    axs[0, 2].plot(glc5, ca_c, label="cyto")
-    axs[0, 2].plot(glc5, ca_m, label="mito")
+    axs[0, 1].set(ylabel="Pyruvate (μM)")
+    axs[0, 1].set_title("b", loc="left")
+    axs[0, 2].plot(glc5, ca_c, label="Ca (cyto)")
+    axs[0, 2].plot(glc5, ca_m, label="Ca (mito)")
     axs[0, 2].legend()
-    axs[0, 2].set(title="(C) Calcium (μM)", ylim=(0.0, 1.5))
+    axs[0, 2].set(ylim=(0.0, 1.5), ylabel="Calcium (μM)")
+    axs[0, 2].set_title("c", loc="left")
     axs[1, 0].plot(glc5, nad_ratio_c, label="cyto")
     axs[1, 0].plot(glc5, nad_ratio_m, label="mito")
     axs[1, 0].legend()
-    axs[1, 0].set(title="(D) NADH:NAD")
+    axs[1, 0].set(ylabel="NADH:NAD ratio")
+    axs[1, 0].set_title("d", loc="left")
     axs[1, 1].plot(glc5, atp_c, label="ATP")
     axs[1, 1].plot(glc5, adp_c, label="ADP")
     axs[1, 1].plot(glc5, amp_c, label="AMP")
     axs[1, 1].legend()
-    axs[1, 1].set(title="(E) Adenylates (μM)")
+    axs[1, 1].set(ylabel="Adenylates (μM)")
+    axs[1, 1].set_title("e", loc="left")
     axs[1, 2].plot(glc5, td)
-    axs[1, 2].set(title="(F) ATP:ADP")
-    axs[2, 0].plot(glc5, dpsi, label="cyto")
-    axs[2, 0].set(title="(G) ΔΨ (mV)", xlabel="Glucose (X)")
+    axs[1, 2].set(ylabel="ATP:ADP ratio")
+    axs[1, 2].set_title("f", loc="left")
+    axs[2, 0].plot(glc5, dpsi)
+    axs[2, 0].set(xlabel="Glucose (X)", ylabel="ΔΨ (mV)")
+    axs[2, 0].set_title("g", loc="left")
     axs[2, 1].plot(glc5, x1, label="X1")
     axs[2, 1].plot(glc5, x2, label="X2")
     axs[2, 1].plot(glc5, x3, label="X3")
     axs[2, 1].legend()
-    axs[2, 1].set(title="(H) Mitochondrial nodes", xlabel="Glucose (X)")
+    axs[2, 1].set(xlabel="Glucose (X)", ylabel="Mitochondrial nodes (A.U.)")
+    axs[2, 1].set_title("h", loc="left")
     axs[2, 2].plot(glc5, deg)
-    axs[2, 2].set(title="(I) Average Node Degree", xlabel="Glucose (X)")
+    axs[2, 2].set(xlabel="Glucose (X)", ylabel="<k> (A.U.)")
+    axs[2, 2].set_title("i", loc="left")
 
     for i in 0:numrows-1, j in 0:numcols-1
         axs[i, j].set_xticks(1:6)
@@ -145,43 +134,48 @@ function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="
     numrow = 3
     fig, axs = plt.subplots(numrow, numcol; figsize)
 
-    axs[0, 0].set(title="(A) Cytosolic NADH:NAD")
+    axs[0, 0].set(ylabel="Cytosolic NADH:NAD")
+    axs[0, 0].set_title("a", loc="left")
     k = NADH_c / NAD_c
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = axs[0, 0].plot(glc5, yy)
     axs[0, 0].legend(lines, labels)
 
-    axs[0, 1].set(title="(B) Mitochondrial NADH:NAD")
+    axs[0, 1].set(ylabel="Mitochondrial NADH:NAD")
+    axs[0, 1].set_title("b", loc="left")
     k = NADH_m / NAD_m
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = axs[0, 1].plot(glc5, yy)
     axs[0, 1].legend(lines, labels)
 
-    axs[1, 0].set(title="(C) ATP:ADP")
+    axs[1, 0].set(ylabel="ATP:ADP ratio")
+    axs[1, 0].set_title("c", loc="left")
     k = ATP_c / ADP_c
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = axs[1, 0].plot(glc5, yy)
     axs[1, 0].legend(lines, labels)
 
-    axs[1, 1].set(title="(D) ΔΨm (mV)")
+    axs[1, 1].set(ylabel="ΔΨm (mV)")
+    axs[1, 1].set_title("d", loc="left")
     k = ΔΨm * 1000
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = axs[1, 1].plot(glc5, yy)
     axs[1, 1].legend(lines, labels)
 
-    axs[2, 0].set(title="(E) Average node degree")
+    axs[2, 0].set(ylabel="Average node degree <k>")
+    axs[2, 0].set_title("e", loc="left")
     k = degavg
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = axs[2, 0].plot(glc5, yy)
     axs[2, 0].legend(lines, labels)
     axs[2, 0].set(xlabel="Glucose (X)")
 
-    axs[2, 1].set(title="(F) Oxygen consumption")
     k = J_O2 * 1000
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = axs[2, 1].plot(glc5, yy)
     axs[2, 1].legend(lines, labels)
-    axs[2, 1].set(xlabel="Glucose (X)", ylabel="μM/s")
+    axs[2, 1].set(xlabel="Glucose (X)", ylabel="Oxygen consumption (μM/s)")
+    axs[2, 1].set_title("f", loc="left")
 
     for i in 0:numrow-1, j in 0:numcol-1
         axs[i, j].set_xticks(1:6)

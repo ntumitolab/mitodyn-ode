@@ -59,6 +59,12 @@ function plot_fig3(;
 
     fig, axes = plt.subplots(3, 3; figsize)
 
+    subtitle = [
+        "a" "b" "c";
+        "d" "e" "f";
+        "g" "h" "i";
+    ]
+
     for col in 1:3
         f = fs[col]
         cm = cmaps[col]
@@ -84,6 +90,7 @@ function plot_fig3(;
             )
 
             ax.set(ylabel=ylabel, xlabel="Glucose (X)")
+            ax.set_title(subtitle[row, col], loc="left")
 
             ## Arrow annotation: https://matplotlib.org/stable/tutorials/text/annotations.html#plotting-guide-annotation
             if row == 1

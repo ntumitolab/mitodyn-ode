@@ -40,20 +40,20 @@ function plot_fig5(sol, figsize=(10, 10))
 
     ax[0].plot(tsm, sol[Ca_c * 1000], label="Cyto. Ca (μM)")
     ax[0].plot(tsm, sol[Ca_m * 1000], label="Mito. Ca (μM)")
-    ax[0].set_title("A", loc="left")
+    ax[0].set_title("a", loc="left")
 
     ax[1].plot(tsm, sol[ATP_c / ADP_c], label="ATP:ADP")
-    ax[1].set_title("B", loc="left")
+    ax[1].set_title("b", loc="left")
 
     ax[2].plot(tsm, sol[ΔΨm * 1000], label="ΔΨm (mV)")
-    ax[2].set_title("C", loc="left")
+    ax[2].set_title("c", loc="left")
 
     ax[3].plot(tsm, sol[degavg], label="Average node degree")
-    ax[3].set_title("D", loc="left")
+    ax[3].set_title("d", loc="left")
 
     ax[4].plot(tsm, sol[J_ANT], label="ATP export (mM/s)")
     ax[4].plot(tsm, sol[J_HL], label="H leak (mM/s)")
-    ax[4].set_title("E", loc="left")
+    ax[4].set_title("e", loc="left")
     ax[4].set(xlabel="Time (minute)")
 
     for i in 0:4
