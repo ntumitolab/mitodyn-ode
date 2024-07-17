@@ -100,7 +100,7 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     axs[2, 1].set(xlabel="Glucose (X)", ylabel="Mitochondrial nodes (A.U.)")
     axs[2, 1].set_title("h", loc="left")
     axs[2, 2].plot(glc5, deg)
-    axs[2, 2].set(xlabel="Glucose (X)", ylabel="<k> (A.U.)")
+    axs[2, 2].set(xlabel="Glucose (X)", ylabel="Avg. node degree (A.U.)")
     axs[2, 2].set_title("i", loc="left")
 
     for i in 0:numrows-1, j in 0:numcols-1
