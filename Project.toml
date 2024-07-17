@@ -1,7 +1,7 @@
 name = "MitochondrialDynamics"
 uuid = "1a231dcf-63c2-466e-8f46-4027ba595b90"
 authors = ["Wen-Wei Tseng <sosiristseng@gmail.com>"]
-version = "0.5.0"
+version = "0.6.0"
 
 [deps]
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
@@ -10,3 +10,11 @@ ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
 NaNMath = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
 PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
 PythonPlot = "274fc56d-3b97-40fa-a1cd-1b4a50311bf9"
+
+[preferences.BoundaryValueDiffEq]
+PrecompileMIRK = false
+PrecompileMIRKNLLS = false
+PrecompileMultipleShooting = false
+PrecompileMultipleShootingNLLS = false
+PrecompileShooting = false
+PrecompileShootingNLLS = false
