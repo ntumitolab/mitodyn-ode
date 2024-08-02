@@ -25,11 +25,9 @@ rhl = range(0.1, 5.0, 51)
 
 # 2D steady states
 
-function solve_fig3(glc, r, k, prob)
-    newprob = remake(prob, p=copy(prob.p))
-    newprob.ps[GlcConst] = glc
-    newprob.ps[k] = r
-    return solve(newprob, DynamicSS(Rodas5()))
+function solve_fig3(glc, r, k, prob, alg=DynamicSS(Rodas5()))
+    newprob = remake(prob, p = [GlcConst=> glc, k => r])
+    return solve(newprob, alg)
 end
 
 solsf1 = [solve_fig3(glc, r, rF1, prob) for r in rf1, glc in rGlcF1];
