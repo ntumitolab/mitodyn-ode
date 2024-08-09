@@ -24,7 +24,6 @@ retc = range(0.1, 2.0, 51)
 rhl = range(0.1, 5.0, 51)
 
 # 2D steady states
-
 function solve_fig3(glc, r, k, prob, alg=DynamicSS(Rodas5()))
     newprob = remake(prob, p = [GlcConst=> glc, k => r])
     return solve(newprob, alg)

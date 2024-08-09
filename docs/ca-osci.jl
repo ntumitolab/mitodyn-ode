@@ -48,7 +48,7 @@ function plot_fig5(sol, figsize=(10, 10))
     ax[2].plot(tsm, sol[ΔΨm * 1000], label="ΔΨm (mV)")
     ax[2].set_title("c", loc="left")
 
-    ax[3].plot(tsm, sol[degavg], label="Average node degree (ratio)")
+    ax[3].plot(tsm, sol[degavg], label="Average node degree (a.u.)")
     ax[3].set_title("d", loc="left")
 
     ax[4].plot(tsm, sol[J_ANT], label="ATP export (mM/s)")

@@ -97,10 +97,10 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     axs[2, 1].plot(glc5, x2, label="X2")
     axs[2, 1].plot(glc5, x3, label="X3")
     axs[2, 1].legend()
-    axs[2, 1].set(xlabel="Glucose (X)", ylabel="Mitochondrial nodes (A.U.)")
+    axs[2, 1].set(xlabel="Glucose (X)", ylabel="Mitochondrial nodes (a.u.)")
     axs[2, 1].set_title("h", loc="left")
     axs[2, 2].plot(glc5, deg)
-    axs[2, 2].set(xlabel="Glucose (X)", ylabel="Avg. node degree (ratio)")
+    axs[2, 2].set(xlabel="Glucose (X)", ylabel="Avg. node degree (a.u.)")
     axs[2, 2].set_title("i", loc="left")
 
     for i in 0:numrows-1, j in 0:numcols-1
@@ -162,7 +162,7 @@ function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="
     lines = axs[1, 1].plot(glc5, yy)
     axs[1, 1].legend(lines, labels)
 
-    axs[2, 0].set(ylabel="Average node degree (ratio)")
+    axs[2, 0].set(ylabel="Average node degree (a.u.)")
     axs[2, 0].set_title("e", loc="left")
     k = degavg
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
