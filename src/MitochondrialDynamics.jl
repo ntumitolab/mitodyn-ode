@@ -9,7 +9,8 @@ include("utils.jl")
 
 "Average cytosolic calcium level based on the ATP:ADP ratio"
 function cac_atp(; ca_base = 0.09μM, ca_act = 0.25μM, n=4, katp=25)
-    @variables t Ca_c(t) ATP_c(t) ADP_c(t)
+    @independent_variables t
+    @variables Ca_c(t) ATP_c(t) ADP_c(t)
     @parameters (RestingCa=ca_base, ActivatedCa=ca_act, NCac=n, KatpCac=katp)
     caceq = Ca_c ~ RestingCa + ActivatedCa * hil(ATP_c, KatpCac * ADP_c, NCac)
     return caceq
@@ -17,7 +18,8 @@ end
 
 "Constant glucose equation"
 function const_glc(glc=5mM)
-    @variables t Glc(t)
+    @independent_variables t
+    @variables Glc(t)
     @parameters GlcConst=glc
     return Glc ~ GlcConst
 end
@@ -37,7 +39,7 @@ function make_model(;
         V_MTX = 0.0144   # Relative mitochondrial matrix volume
     end
 
-    @variables t
+    @independent_variables t
     D = Differential(t)
 
     # Adjustable parameters
