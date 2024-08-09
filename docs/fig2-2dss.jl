@@ -44,7 +44,7 @@ function plot_fig3(;
         "ETC capacity (X)",
         "Proton leak rate (X)"
     ],
-    cbarlabels=["<k>", "ΔΨ", "ATP/ADP"],
+    cbarlabels=["<k> (ratio)", "ΔΨ (mV)", "ATP:ADP (ratio)"],
     xxs=(rGlcF1, rGlcETC, rGlcHL),
     xscale=5.0,
     yys=(rf1, retc, rhl),

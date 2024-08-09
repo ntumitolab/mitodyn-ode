@@ -58,13 +58,13 @@ function plot_fig6(sols, solsDM, glc; figsize=(10, 8), labels=["Baseline", "Diab
     ax[0, 2].plot(glc5, extract(sols, NADH_c/NAD_c), label=labels[1])
     ax[0, 2].plot(glc5, extract(solsDM, NADH_c/NAD_c), label=labels[2])
     ax[0, 2].set_title("l", loc="left")
-    ax[0, 2].set(ylabel="NADH:NAD (cyto)")
+    ax[0, 2].set(ylabel="Cyto. NADH:NAD (ratio)")
 
     @unpack NADH_m, NAD_m = sys
     ax[1, 0].plot(glc5, extract(sols, NADH_m/NAD_m), label=labels[1])
     ax[1, 0].plot(glc5, extract(solsDM, NADH_m/NAD_m), label=labels[2])
     ax[1, 0].set_title("m", loc="left")
-    ax[1, 0].set(ylabel="NADH:NAD (mito)")
+    ax[1, 0].set(ylabel="Mito. NADH:NAD (ratio)")
 
     @unpack Ca_c = sys
     ax[1, 1].plot(glc5, extract(sols, Ca_c * 1000), label=labels[1])
@@ -88,13 +88,13 @@ function plot_fig6(sols, solsDM, glc; figsize=(10, 8), labels=["Baseline", "Diab
     ax[2, 1].plot(glc5, extract(sols, ATP_c/ADP_c), label=labels[1])
     ax[2, 1].plot(glc5, extract(solsDM, ATP_c/ADP_c), label=labels[2])
     ax[2, 1].set_title("q", loc="left")
-    ax[2, 1].set(xlabel="Glucose (X)", ylabel="ATP:ADP")
+    ax[2, 1].set(xlabel="Glucose (X)", ylabel="ATP:ADP (ratio)")
 
     @unpack degavg = sys
     ax[2, 2].plot(glc5, extract(sols, degavg), label=labels[1])
     ax[2, 2].plot(glc5, extract(solsDM, degavg), label=labels[2])
     ax[2, 2].set_title("r", loc="left")
-    ax[2, 2].set(xlabel="Glucose (X)", ylabel="Avg. node degree (<k>)")
+    ax[2, 2].set(xlabel="Glucose (X)", ylabel="Avg. node degree (ratio)")
 
     for i in 0:numrows-1, j in 0:numcols-1
         ax[i, j].grid()
@@ -148,7 +148,7 @@ function plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc; figsize=(12,
     ax[0].plot(glc5, ff_rot, "g--", label="Rotenone")
     ax[0].plot(glc5, ff_oligo, "c--", label="Oligomycin")
     ax[0].plot(glc5, ff_fccp, "k--", label="Uncoupler")
-    ax[0].set(xlabel="Glucose (X)", ylabel="Fusion rate / Fission rate", xlim=(0.0, 6.0), ylim=(0.0, 2.5))
+    ax[0].set(xlabel="Glucose (X)", ylabel="Fusion rate / Fission rate (ratio)", xlim=(0.0, 6.0), ylim=(0.0, 2.5))
     ax[0].set_title("a", loc="left")
     ax[0].grid()
     ax[0].legend()

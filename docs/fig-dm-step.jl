@@ -124,7 +124,7 @@ function plot_figs2(sol, solDM; figsize=(14, 10), labels=["Baseline", "Diabetic"
 
     ax[2, 0].plot(tsm, td, label=labels[1])
     ax[2, 0].plot(tsm, tdDM, label=labels[2])
-    ax[2, 0].set(ylabel="ATP:ADP ratio", xlabel="Time (min)")
+    ax[2, 0].set(ylabel="ATP:ADP (ratio)", xlabel="Time (min)")
     ax[2, 0].set_title("p", loc="left")
 
     ax[2, 1].plot(tsm, dpsi, label=labels[1])
@@ -134,7 +134,7 @@ function plot_figs2(sol, solDM; figsize=(14, 10), labels=["Baseline", "Diabetic"
 
     ax[2, 2].plot(tsm, k, label=labels[1])
     ax[2, 2].plot(tsm, kDM, label=labels[2])
-    ax[2, 2].set(ylabel="Average Node Degree", xlabel="Time (min)")
+    ax[2, 2].set(ylabel="Average Node Degree (ratio)", xlabel="Time (min)")
     ax[2, 2].set_title("r", loc="left")
 
     for i in 0:numrows-1, j in 0:numcols-1

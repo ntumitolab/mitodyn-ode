@@ -79,7 +79,7 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     axs[1, 0].plot(glc5, nad_ratio_c, label="cyto")
     axs[1, 0].plot(glc5, nad_ratio_m, label="mito")
     axs[1, 0].legend()
-    axs[1, 0].set(ylabel="NADH:NAD ratio")
+    axs[1, 0].set(ylabel="NADH:NAD (ratio)")
     axs[1, 0].set_title("d", loc="left")
     axs[1, 1].plot(glc5, atp_c, label="ATP")
     axs[1, 1].plot(glc5, adp_c, label="ADP")
@@ -88,7 +88,7 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     axs[1, 1].set(ylabel="Adenylates (μM)")
     axs[1, 1].set_title("e", loc="left")
     axs[1, 2].plot(glc5, td)
-    axs[1, 2].set(ylabel="ATP:ADP ratio")
+    axs[1, 2].set(ylabel="ATP:ADP (ratio)")
     axs[1, 2].set_title("f", loc="left")
     axs[2, 0].plot(glc5, dpsi)
     axs[2, 0].set(xlabel="Glucose (X)", ylabel="ΔΨ (mV)")
@@ -100,7 +100,7 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     axs[2, 1].set(xlabel="Glucose (X)", ylabel="Mitochondrial nodes (A.U.)")
     axs[2, 1].set_title("h", loc="left")
     axs[2, 2].plot(glc5, deg)
-    axs[2, 2].set(xlabel="Glucose (X)", ylabel="Avg. node degree (A.U.)")
+    axs[2, 2].set(xlabel="Glucose (X)", ylabel="Avg. node degree (ratio)")
     axs[2, 2].set_title("i", loc="left")
 
     for i in 0:numrows-1, j in 0:numcols-1
@@ -134,21 +134,21 @@ function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="
     numrow = 3
     fig, axs = plt.subplots(numrow, numcol; figsize)
 
-    axs[0, 0].set(ylabel="Cytosolic NADH:NAD")
+    axs[0, 0].set(ylabel="Cytosolic NADH:NAD (ratio)")
     axs[0, 0].set_title("a", loc="left")
     k = NADH_c / NAD_c
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = axs[0, 0].plot(glc5, yy)
     axs[0, 0].legend(lines, labels)
 
-    axs[0, 1].set(ylabel="Mitochondrial NADH:NAD")
+    axs[0, 1].set(ylabel="Mitochondrial NADH:NAD (ratio)")
     axs[0, 1].set_title("b", loc="left")
     k = NADH_m / NAD_m
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
     lines = axs[0, 1].plot(glc5, yy)
     axs[0, 1].legend(lines, labels)
 
-    axs[1, 0].set(ylabel="ATP:ADP ratio")
+    axs[1, 0].set(ylabel="ATP:ADP (ratio)")
     axs[1, 0].set_title("c", loc="left")
     k = ATP_c / ADP_c
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
@@ -162,7 +162,7 @@ function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="
     lines = axs[1, 1].plot(glc5, yy)
     axs[1, 1].legend(lines, labels)
 
-    axs[2, 0].set(ylabel="Average node degree <k>")
+    axs[2, 0].set(ylabel="Average node degree (ratio)")
     axs[2, 0].set_title("e", loc="left")
     k = degavg
     yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]

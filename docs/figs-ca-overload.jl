@@ -79,7 +79,7 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     ax[1, 0].plot(glc5, nad_ratio_c, label="cyto")
     ax[1, 0].plot(glc5, nad_ratio_m, label="mito")
     ax[1, 0].legend()
-    ax[1, 0].set(ylabel="NADH:NAD")
+    ax[1, 0].set(ylabel="NADH:NAD (ratio)")
     ax[1, 0].set_title("d", loc="left")
     ax[1, 1].plot(glc5, atp_c, label="ATP")
     ax[1, 1].plot(glc5, adp_c, label="ADP")
@@ -88,7 +88,7 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     ax[1, 1].set(ylabel="Adenylates (μM)")
     ax[1, 1].set_title("e", loc="left")
     ax[1, 2].plot(glc5, td)
-    ax[1, 2].set(ylabel="ATP:ADP")
+    ax[1, 2].set(ylabel="ATP:ADP (ratio)")
     ax[1, 2].set_title("f", loc="left")
     ax[2, 0].plot(glc5, dpsi, label="cyto")
     ax[2, 0].set(ylabel="ΔΨ (mV)", xlabel="Glucose (X)")
@@ -96,10 +96,10 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     ax[2, 1].plot(glc5, x1, label="X1")
     ax[2, 1].plot(glc5, x2, label="X2")
     ax[2, 1].plot(glc5, x3, label="X3")
-    ax[2, 1].set(ylabel="Mitochondrial nodes", xlabel="Glucose (X)")
+    ax[2, 1].set(ylabel="Mitochondrial nodes (a.u.)", xlabel="Glucose (X)")
     ax[2, 1].set_title("h", loc="left")
     ax[2, 2].plot(glc5, deg)
-    ax[2, 2].set(ylabel="Avg. Node Degree", xlabel="Glucose (X)")
+    ax[2, 2].set(ylabel="Avg. Node Degree (ratio)", xlabel="Glucose (X)")
     ax[2, 2].set_title("i", loc="left")
 
     for i in 0:numrows-1, j in 0:numcols-1
@@ -131,19 +131,19 @@ function plot_comparision(glc, sim, sim_ca5, sim_ca10, sys;
     numcols = 2
     fig, ax = plt.subplots(numrows, numcols; figsize)
 
-    ax[0, 0].set(title="(A) Cytosolic NADH:NAD")
+    ax[0, 0].set(title="(A) Cyto. NADH:NAD (ratio)")
     k = NADH_c/NAD_c
     yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
     lines = ax[0, 0].plot(glc5, yy)
     ax[0, 0].legend(lines, labels)
 
-    ax[0, 1].set(title="(B) Mitochondrial NADH:NAD")
+    ax[0, 1].set(title="(B) Mito. NADH:NAD (ratio)")
     k = NADH_m/NAD_m
     yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
     lines = ax[0, 1].plot(glc5, yy)
     ax[0, 1].legend(lines, labels)
 
-    ax[1, 0].set(title="(C) ATP:ADP")
+    ax[1, 0].set(title="(C) ATP:ADP (ratio)")
     k = ATP_c/ADP_c
     yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
     lines = ax[1, 0].plot(glc5, yy)
@@ -155,14 +155,14 @@ function plot_comparision(glc, sim, sim_ca5, sim_ca10, sys;
     lines = ax[1, 1].plot(glc5, yy)
     ax[1, 1].legend(lines, labels)
 
-    ax[2, 0].set(title="(E) Average node degree")
+    ax[2, 0].set(title="(E) Avg. node degree (ratio)")
     k = degavg
     yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
     lines = ax[2, 0].plot(glc5, yy)
     ax[2, 0].legend(lines, labels, loc="lower right")
     ax[2, 0].set(xlabel="Glucose (X)")
 
-    ax[2, 1].set(title="(F) Oxygen consumption")
+    ax[2, 1].set(title="(F) Oxygen consumption (mM/s)")
     k = J_O2
     yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
     lines = ax[2, 1].plot(glc5, yy)
