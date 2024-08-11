@@ -38,27 +38,34 @@ function plot_fig5(sol, figsize=(10, 10))
     @unpack Ca_c, Ca_m, ATP_c, ADP_c, ΔΨm, degavg, J_ANT, J_HL = sys
     fig, ax = plt.subplots(5, 1; figsize)
 
-    ax[0].plot(tsm, sol[Ca_c * 1000], label="Cyto. Ca (μM)")
-    ax[0].plot(tsm, sol[Ca_m * 1000], label="Mito. Ca (μM)")
+    ax[0].plot(tsm, sol[Ca_c * 1000], label="Cyto")
+    ax[0].plot(tsm, sol[Ca_m * 1000], label="Mito")
     ax[0].set_title("a", loc="left")
+    ax[0].set_ylabel("Calcium (μM)", fontsize=12)
+    ax[0].legend(loc="center left")
 
-    ax[1].plot(tsm, sol[ATP_c / ADP_c], label="ATP:ADP (ratio)")
+    ax[1].plot(tsm, sol[ATP_c / ADP_c])
     ax[1].set_title("b", loc="left")
+    ax[1].set_ylabel("ATP:ADP (ratio)", fontsize=12)
 
-    ax[2].plot(tsm, sol[ΔΨm * 1000], label="ΔΨm (mV)")
+    ax[2].plot(tsm, sol[ΔΨm * 1000])
     ax[2].set_title("c", loc="left")
+    ax[2].set_ylabel("ΔΨm (mV)", fontsize=12)
 
-    ax[3].plot(tsm, sol[degavg], label="Average node degree (a.u.)")
+    ax[3].plot(tsm, sol[degavg], label="Average node degree")
     ax[3].set_title("d", loc="left")
+    ax[3].set_ylabel("a.u.")
+    ax[3].legend(loc="center left")
 
-    ax[4].plot(tsm, sol[J_ANT], label="ATP export (mM/s)")
-    ax[4].plot(tsm, sol[J_HL], label="H leak (mM/s)")
+    ax[4].plot(tsm, sol[J_ANT], label="ATP export")
+    ax[4].plot(tsm, sol[J_HL], label="H leak")
     ax[4].set_title("e", loc="left")
+    ax[4].set_ylabel("Rate (mM/s)")
     ax[4].set(xlabel="Time (minute)")
+    ax[4].legend(loc="center left")
 
     for i in 0:4
         ax[i].grid()
-        ax[i].legend(loc="center left")
         ax[i].set_xlim(tsm[begin], tsm[end])
     end
 
