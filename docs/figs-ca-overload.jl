@@ -18,7 +18,6 @@ sol = solve(prob, alg)
 
 # High calcium model
 @unpack RestingCa, ActivatedCa = sys
-
 prob_ca5 = SteadyStateProblem(sys, [], [RestingCa=>0.45μM, ActivatedCa=>1.25μM])
 prob_ca10 = SteadyStateProblem(sys, [], [RestingCa=>0.9μM, ActivatedCa=>2.5μM])
 
@@ -99,7 +98,7 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     ax[2, 1].set(ylabel="Mitochondrial nodes (a.u.)", xlabel="Glucose (X)")
     ax[2, 1].set_title("h", loc="left")
     ax[2, 2].plot(glc5, deg)
-    ax[2, 2].set(ylabel="Avg. Node Degree (ratio)", xlabel="Glucose (X)")
+    ax[2, 2].set(ylabel="Avg. Node Degree (a.u.)", xlabel="Glucose (X)")
     ax[2, 2].set_title("i", loc="left")
 
     for i in 0:numrows-1, j in 0:numcols-1
@@ -131,43 +130,49 @@ function plot_comparision(glc, sim, sim_ca5, sim_ca10, sys;
     numcols = 2
     fig, ax = plt.subplots(numrows, numcols; figsize)
 
-    ax[0, 0].set(title="(A) Cyto. NADH:NAD (ratio)")
+    ax[0, 0].set_title("a", loc="left")
+    ax[0, 0].set_ylabel("Cyto. NADH:NAD (ratio)")
     k = NADH_c/NAD_c
     yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
     lines = ax[0, 0].plot(glc5, yy)
     ax[0, 0].legend(lines, labels)
 
-    ax[0, 1].set(title="(B) Mito. NADH:NAD (ratio)")
+    ax[0, 1].set_title("b", loc="left")
+    ax[0, 1].set_ylabel("Mito. NADH:NAD (ratio)")
     k = NADH_m/NAD_m
     yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
     lines = ax[0, 1].plot(glc5, yy)
     ax[0, 1].legend(lines, labels)
 
-    ax[1, 0].set(title="(C) ATP:ADP (ratio)")
+    ax[1, 0].set_title("c", loc="left")
+    ax[1, 0].set_ylabel("ATP:ADP (ratio)")
     k = ATP_c/ADP_c
     yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
     lines = ax[1, 0].plot(glc5, yy)
     ax[1, 0].legend(lines, labels)
 
-    ax[1, 1].set(title="(D) ΔΨm (mV)")
+    ax[1, 1].set_title("d", loc="left")
+    ax[1, 1].set_ylabel("ΔΨm (mV)")
     k = ΔΨm * 1000
     yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
     lines = ax[1, 1].plot(glc5, yy)
     ax[1, 1].legend(lines, labels)
 
-    ax[2, 0].set(title="(E) Avg. node degree (ratio)")
+    ax[2, 0].set_title("e", loc="left")
+    ax[2, 0].set_ylabel("Avg. node degree (ratio)")
     k = degavg
     yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
     lines = ax[2, 0].plot(glc5, yy)
     ax[2, 0].legend(lines, labels, loc="lower right")
     ax[2, 0].set(xlabel="Glucose (X)")
 
-    ax[2, 1].set(title="(F) Oxygen consumption (mM/s)")
+    ax[2, 1].set_title("f", loc="left")
+    ax[2, 1].set_ylabel("VO2 (mM/s)")
     k = J_O2
     yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
     lines = ax[2, 1].plot(glc5, yy)
     ax[2, 1].legend(lines, labels)
-    ax[2, 1].set(xlabel="Glucose (X)", ylabel="mM/s")
+    ax[2, 1].set(xlabel="Glucose (X)")
 
     for i in 0:numrows-1, j in 0:numcols-1
         ax[i, j].set_xticks(1:6)
@@ -182,7 +187,7 @@ end
 figcomp = plot_comparision(glc, sim, sim_ca5, sim_ca10, sys)
 
 # Export figure
-## exportTIF(figcomp, "S1_HighCa.tif")
+exportTIF(figcomp, "S1_HighCa.tif")
 
 # ## MMP vs <k>
 function plot_dpsi_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=["Ca 1X", "Ca 5X", "Ca 10X"])
