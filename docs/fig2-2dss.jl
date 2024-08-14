@@ -15,7 +15,6 @@ plt.matplotlib.rcParams["font.size"] = 14
 prob = SteadyStateProblem(sys, [])
 
 # Range for two parameters
-
 rGlcF1 = range(3.0, 30.0, 51)
 rGlcETC = range(3.0, 30.0, 51)
 rGlcHL = range(4.0, 30.0, 51)
@@ -43,7 +42,7 @@ function plot_fig3(;
         "ETC capacity (X)",
         "Proton leak rate (X)"
     ],
-    cbarlabels=["<k> (ratio)", "ΔΨ (mV)", "ATP:ADP (ratio)"],
+    cbarlabels=["<k> (ratio)", "ΔΨ (mV)", "T:D (ratio)"],
     xxs=(rGlcF1, rGlcETC, rGlcHL),
     xscale=5.0,
     yys=(rf1, retc, rhl),
