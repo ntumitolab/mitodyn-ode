@@ -33,7 +33,6 @@ solsetc = [solve_fig3(glc, r, rETC, prob) for r in retc, glc in rGlcETC];
 solshl = [solve_fig3(glc, r, rHL, prob) for r in rhl, glc in rGlcHL];
 
 #---
-
 function plot_fig3(;
     figsize=(10, 10),
     cmaps=["bwr", "magma", "viridis"],
@@ -42,7 +41,7 @@ function plot_fig3(;
         "ETC capacity (X)",
         "Proton leak rate (X)"
     ],
-    cbarlabels=["<k> (ratio)", "ΔΨ (mV)", "T:D (ratio)"],
+    cbarlabels=["<k> (a.u.)", "ΔΨ (mV)", "T:D (ratio)"],
     xxs=(rGlcF1, rGlcETC, rGlcHL),
     xscale=5.0,
     yys=(rf1, retc, rhl),
@@ -106,7 +105,6 @@ function plot_fig3(;
 end
 
 #---
-
 fig = plot_fig3(figsize=(13, 10))
 
 # Export figure
