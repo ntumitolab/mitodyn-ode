@@ -3,7 +3,8 @@
 
 Steady-state solutions across a range of glucose levels.
 ===#
-using DifferentialEquations
+using OrdinaryDiffEq
+using SteadyStateDiffEq
 using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: μM

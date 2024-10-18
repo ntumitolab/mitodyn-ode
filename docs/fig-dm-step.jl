@@ -4,7 +4,9 @@
 
 Step responses to both glucose stimulation and chemical agents (I)
 ===#
-using DifferentialEquations
+using OrdinaryDiffEq
+using SteadyStateDiffEq
+using DiffEqCallbacks
 using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute

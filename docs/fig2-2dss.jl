@@ -3,7 +3,8 @@
 
 Steady-state solutions for a range of glucose concentrations and OXPHOS capacities by chemicals.
 ===#
-using DifferentialEquations
+using OrdinaryDiffEq
+using SteadyStateDiffEq
 using ModelingToolkit
 using MitochondrialDynamics
 import PythonPlot as plt

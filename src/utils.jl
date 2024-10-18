@@ -1,6 +1,3 @@
-using PythonCall
-import NaNMath as nm
-
 ## Units and physical constants
 const second = float(1)    # second
 const minute = 60second    # minute
