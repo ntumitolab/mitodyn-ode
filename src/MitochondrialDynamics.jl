@@ -1,6 +1,8 @@
 module MitochondrialDynamics
 
 using ModelingToolkit
+using ModelingToolkit: t_nounits as t, D_nounits as D
+using PythonCall  # For export TIF
 import NaNMath as nm
 
 export make_model, indexof, extract, exportTIF
@@ -9,7 +11,6 @@ include("utils.jl")
 
 "Average cytosolic calcium level based on the ATP:ADP ratio"
 function cac_atp(; ca_base = 0.09μM, ca_act = 0.25μM, n=4, katp=25)
-    @independent_variables t
     @variables Ca_c(t) ATP_c(t) ADP_c(t)
     @parameters (RestingCa=ca_base, ActivatedCa=ca_act, NCac=n, KatpCac=katp)
     caceq = Ca_c ~ RestingCa + ActivatedCa * hil(ATP_c, KatpCac * ADP_c, NCac)
@@ -18,7 +19,6 @@ end
 
 "Constant glucose equation"
 function const_glc(glc=5mM)
-    @independent_variables t
     @variables Glc(t)
     @parameters GlcConst=glc
     return Glc ~ GlcConst
@@ -28,6 +28,7 @@ function make_model(;
     name,
     caceq=cac_atp(),
     glceq=const_glc(5mM),
+    simplify=true,
     kwargs...
 )
     @constants begin
@@ -38,9 +39,6 @@ function make_model(;
         V_MT = 0.06      # Relative mitochondrial volume
         V_MTX = 0.0144   # Relative mitochondrial matrix volume
     end
-
-    @independent_variables t
-    D = Differential(t)
 
     # Adjustable parameters
     @parameters (rETC = 1, rHL = 1, rF1 = 1, rPDH = 1)
@@ -176,7 +174,10 @@ function make_model(;
         kwargs...
     )
 
-    return structural_simplify(sys)
+    if simplify
+        sys = structural_simplify(sys)
+    end
+    return sys
 end
 
 end # Module

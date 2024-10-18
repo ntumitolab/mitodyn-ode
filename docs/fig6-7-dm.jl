@@ -1,7 +1,8 @@
 #===
 # Figure 6 and 7
 ===#
-using DifferentialEquations
+using OrdinaryDiffEq
+using SteadyStateDiffEq
 using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
