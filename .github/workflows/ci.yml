@@ -19,7 +19,6 @@ env:
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CI: 'true'
   NBCACHE: '.cache'
-  UV_SYSTEM_PYTHON: 1
 
 jobs:
   CI:
@@ -32,16 +31,13 @@ jobs:
       id: setup-python
       with:
         python-version: '3.x'
-    - name: Install uv
-      run: curl -LsSf https://astral.sh/uv/install.sh | sh
     - name: Install Python dependencies
-      run: uv pip install -r requirements.txt
+      run: |
+        pip install uv
+        uv pip install --system -r requirements.txt
     - name: Read Julia version
-      uses: SebRollen/toml-action@v1.2.0
       id: read_toml
-      with:
-        file: 'Manifest.toml'
-        field: 'julia_version'
+      run: echo value=$(python -c 'import tomllib; from pathlib import Path; print(tomllib.loads(Path("Manifest.toml").read_text())["julia_version"])') >> "$GITHUB_OUTPUT"
     - name: Get environment hash
       id: hash
       run: |
@@ -79,6 +75,12 @@ jobs:
         Pkg.activate(".")
         Pkg.instantiate()
         Pkg.precompile()
+    - name: Clean Julia package directory
+      if: ${{ runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
+      shell: julia --color=yes {0}
+      run: |
+        using Pkg, Dates
+        Pkg.gc(collect_delay=Day(0))
     - name: Save Julia packages
       uses: actions/cache/save@v4
       if: ${{ runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
@@ -87,10 +89,7 @@ jobs:
         key: ${{ steps.cache-julia.outputs.cache-primary-key }}
     - name: Run notebooks
       if: ${{ steps.cache-nb.outputs.cache-hit != 'true' }}
-      run: |
-        mkdir -p ${{ env.NBCACHE }}/docs
-        cp --verbose -rf data/ ${{ env.NBCACHE }}/docs/ || true
-        julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} run.jl
+      run: julia --project=@. --color=yes -p ${{ env.LITERATE_PROC }} run.jl
     - name: Copy back built notebooks
       run: cp --verbose -rf ${{ env.NBCACHE }}/docs/* docs/
     - name: Build website
