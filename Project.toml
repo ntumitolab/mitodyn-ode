@@ -4,10 +4,7 @@ authors = ["Wen-Wei Tseng <sosiristseng@gmail.com>"]
 version = "0.7.0"
 
 [deps]
-BoundaryValueDiffEq = "764a87c0-6b3e-53db-9096-fe964310641d"
-CondaPkg = "992eb4ea-22a4-4c89-a5bb-47a3300528ab"
 DifferentialEquations = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
-Latexify = "23fbe1c1-3f47-55db-b15f-69d7ec21a316"
 ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
 NaNMath = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
 PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
@@ -23,3 +20,4 @@ PrecompileShootingNLLS = false
 
 [preferences.CondaPkg]
 backend = "Null"
+offline = true
