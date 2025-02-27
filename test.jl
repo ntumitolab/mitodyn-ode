@@ -1,8 +1,7 @@
-using ComponentArrays
+using LabelledArrays
 using OrdinaryDiffEq
 using SimpleUnPack: @unpack
-
-tspan = (0.0, 20.0)
+import PythonPlot as plt
 
 function lorenz!(D, u, p, t; f=0.0)
     @unpack σ, ρ, β = p
@@ -14,13 +13,18 @@ function lorenz!(D, u, p, t; f=0.0)
     return nothing
 end
 
-lorenz_p = ComponentVector(σ=10.0, ρ=28.0, β=8/3)
-lorenz_ic = ComponentVector(x=1.0, y=0.0, z=0.0)
-lorenz_prob = ODEProblem(lorenz!, lorenz_ic, tspan, lorenz_p)
+tspan = (0.0, 100.0)
+lorenz_p = LVector(σ=10.0, ρ=28.0, β=8/3)
+lorenz_ic = LVector(x=1.0, y=0.0, z=0.0)
+keys(lorenz_ic)
+lorenz_prob = ODEProblem(ODEFunction(lorenz!; syms=keys(lorenz_ic)), lorenz_ic, tspan, lorenz_p)
 
 lorenz_sol = solve(lorenz_prob)
 
-idxmap = Dict(keys(lorenz_ic) .=> 1:length(lorenz_ic))
-lorenz_sol(range(tspan[begin], tspan[end], 101), idxs=idxmap[:y])
-
-show(err)
+ts = 0.0:0.01:100.0
+xs = lorenz_sol(ts, idxs=:x).u
+ys = lorenz_sol(ts, idxs=:y).u
+zs = lorenz_sol(ts, idxs=:z).u
+plt.figure()
+plt.plot3D(xs, ys, zs)
+plt.gcf()
