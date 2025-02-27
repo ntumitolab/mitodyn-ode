@@ -1,21 +1,53 @@
 module MitochondrialDynamics
 
-using ModelingToolkit
-using ModelingToolkit: t_nounits as t, D_nounits as D
+using LabelledArrays
+using SimpleUnPack
 using PythonCall  # For export TIF
 import NaNMath as nm
 
-export make_model, indexof, extract, exportTIF
+export make_model, build_prob, indexof, extract, exportTIF
 
 include("utils.jl")
 
 "Average cytosolic calcium level based on the ATP:ADP ratio"
-function cac_atp(; ca_base = 0.09μM, ca_act = 0.25μM, n=4, katp=25)
-    @variables Ca_c(t) ATP_c(t) ADP_c(t)
-    @parameters (RestingCa=ca_base, ActivatedCa=ca_act, NCac=n, KatpCac=katp)
-    caceq = Ca_c ~ RestingCa + ActivatedCa * hil(ATP_c, KatpCac * ADP_c, NCac)
-    return caceq
+function cac_atp(atp, adp, ca_base = 0.09μM, ca_act = 0.25μM, katp=25)
+    return ca_base + ca_act * hil(atp, adp * katp, 4)
 end
+
+function cac_atp(u::LArray, p, t)
+    @unpack RestingCa, ActivatedCa, KatpCac, kEqAK = p
+    @unpack aec = u
+    atp = aec2atp(aec, kEqAK)
+    adp = aec2adp(aec, kEqAK)
+    return cac_atp(atp, adp, RestingCa, ActivatedCa, KatpCac)
+end
+
+"Build parameters"
+function build_params()
+    LVector(
+        C_MIT=1.812μM/mV, # Mitochondrial membrane capacitance
+        F_M = 3E-4,       # Fraction of free Ca in mitochondria
+        F_I = 0.01,       # Fraction of free Ca in cytosol
+        V_I = 0.53,       # Relative cytoplasmic volume
+        V_MT = 0.06,      # Relative mitochondrial volume
+        V_MTX = 0.0144,   # Relative mitochondrial matrix volume
+        rETC = 1.0,
+        rHL = 1.0,
+        rF1 = 1.0,
+        rPDH = 1.0,
+        Glc = 5mM,
+
+    )
+end
+
+"Glucokinase (GK) rate"
+jGK(atp, glc, vmax, katp, kglc, nglc) = vmax * hil(atp, katp) * hil(glc, kglc, nglc)
+function jGK(atp::Number, p, t)
+    @unpack VmaxGK, KatpGK, KglcGK, nGK, Glc = p
+    return jGK(atp, Glc, VmaxGK, KatpGK, KglcGK, nGK)
+end
+jGK(u::LArray, p, t) = jGK(aec2atp(u.aec, p.kEqAK), p, t)
+
 
 "Constant glucose equation"
 function const_glc(glc=5mM)
@@ -38,6 +70,7 @@ function make_model(;
         V_I = 0.53       # Relative cytoplasmic volume
         V_MT = 0.06      # Relative mitochondrial volume
         V_MTX = 0.0144   # Relative mitochondrial matrix volume
+        ATPstiochGK=2
     end
 
     # Adjustable parameters
