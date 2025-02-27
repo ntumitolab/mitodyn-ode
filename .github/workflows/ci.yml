@@ -12,10 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  NBCONVERT_JOBS: '2'
-  LITERATE_PROC: '2'
-  JULIA_NUM_THREADS: '2'
-  OPENBLAS_NUM_THREADS: '1'
+  NBCONVERT_JOBS: '4'
+  LITERATE_PROC: '4'
   ALLOWERRORS: 'false'
   NBCACHE: '.cache'
   JULIA_CONDAPKG_BACKEND: 'Null'
@@ -23,7 +21,7 @@ env:
 
 jobs:
   CI:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -32,10 +30,11 @@ jobs:
       id: setup-python
       with:
         python-version: '3.x'
+        check-latest: true
+    - name: Setup uv
+      run: curl -LsSf https://astral.sh/uv/install.sh | sh
     - name: Install Python dependencies
-      run: |
-        pip install uv
-        uv pip install --system -r requirements.txt
+      run: uv pip install --system -r requirements.txt
     - name: Read Julia version
       id: read_toml
       run: echo value=$(python -c 'import tomllib; from pathlib import Path; print(tomllib.loads(Path("Manifest.toml").read_text())["julia_version"])') >> "$GITHUB_OUTPUT"
@@ -72,7 +71,7 @@ jobs:
       shell: julia --color=yes {0}
       run: |
         using Pkg
-        Pkg.add(["IJulia", "Literate", "Tables", "MarkdownTables", "JSON"])
+        Pkg.add(["Literate", "Tables", "MarkdownTables", "JSON"])
         Pkg.activate(".")
         Pkg.instantiate()
         Pkg.precompile()
