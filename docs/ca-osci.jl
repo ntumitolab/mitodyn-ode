@@ -10,7 +10,7 @@ plt.matplotlib.rcParams["font.size"] = 14
 
 #---
 @named sys = make_model()
-@unpack Ca_c, GlcConst, kATPCa, kATP = sys
+@unpack Ca_c, Glc, kATPCa, kATP = sys
 alg = TRBDF2()
 
 # Calcium oscillation function
@@ -25,10 +25,14 @@ end
 
 @named sysosci = make_model(; caceq=cac_wave(amplitude=0.8))
 
+equations(sysosci)
+
+observed(sysosci)
+
 #---
 tend = 4000.0
 ts = range(tend-480, tend; length=201)
-prob = ODEProblem(sysosci, [], tend, [GlcConst => 10mM])
+prob = ODEProblem(sysosci, [], tend, [Glc => 10mM])
 sol = solve(prob, alg, saveat=ts)
 
 #---
@@ -82,11 +86,11 @@ exportTIF(fig5, "Fig6-ca-oscillation.tif")
 
 # Tuning ca-dependent ATP consumption rate (kATPCa)
 # kATPCa : 90 -> 10
-prob2 = ODEProblem(sysosci, [], tend, [GlcConst => 10mM, kATPCa=>10Hz/mM, kATP=>0.055Hz])
+prob2 = ODEProblem(sysosci, [], tend, [Glc => 10mM, kATPCa=>10Hz/mM, kATP=>0.055Hz])
 sol2 = solve(prob2, alg, saveat=ts)
 plot_fig5(sol2)
 
 # kATPCa : 90 -> 0.1
-prob4 = ODEProblem(sysosci, [], tend, [GlcConst => 10mM, kATPCa=>0.1Hz/mM, kATP=>0.06Hz])
+prob4 = ODEProblem(sysosci, [], tend, [Glc => 10mM, kATPCa=>0.1Hz/mM, kATP=>0.06Hz])
 sol4 = solve(prob4, alg, saveat=ts)
 plot_fig5(sol4)

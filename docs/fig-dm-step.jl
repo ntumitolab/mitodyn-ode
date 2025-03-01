@@ -15,7 +15,7 @@ plt.matplotlib.rcParams["font.size"] = 14
 
 #---
 @named sys = make_model()
-@unpack GlcConst, rPDH, rETC, rHL, rF1 = sys
+@unpack Glc, rPDH, rETC, rHL, rF1 = sys
 
 tend = 80minute
 ts = range(0, tend, 401)
@@ -29,7 +29,7 @@ sssol_dm = solve(ssprob_dm, DynamicSS(Rodas5()))
 
 # Define events
 function add_glucose!(i)
-    i.ps[GlcConst] = 20mM
+    i.ps[Glc] = 20mM
 end
 
 add_glucose_cb = PresetTimeCallback(20minute, add_glucose!)

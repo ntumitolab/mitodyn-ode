@@ -17,17 +17,9 @@ function cac_atp(; ca_base = 0.09μM, ca_act = 0.25μM, n=4, katp=25)
     return caceq
 end
 
-"Constant glucose equation"
-function const_glc(glc=5mM)
-    @variables Glc(t)
-    @parameters GlcConst=glc
-    return Glc ~ GlcConst
-end
-
 function make_model(;
     name,
     caceq=cac_atp(),
-    glceq=const_glc(5mM),
     simplify=true,
     kwargs...
 )
@@ -48,7 +40,8 @@ function make_model(;
     @parameters (kfAK=1000Hz/mM, kEqAK=0.931)
 
     # Glucokinase (GK)
-    @variables Glc(t) J_GK(t)
+    @variables J_GK(t)
+    @parameters Glc(t) = 5mM
     @parameters (VmaxGK=0.011mM*Hz, KatpGK=0.5mM, KglcGK=7mM, nGK=1.7, ATPstiochGK=2)
 
     # Glyceraldehydes 3-phosphate dehydrogenase (GPD)
@@ -62,12 +55,12 @@ function make_model(;
     # Pyruvate dehydrogenase (PDH)
     @variables J_PDH(t) J_DH(t) NAD_m(t) NADH_m(t) Ca_m(t) J_FFA(t)
     @parameters (VmaxPDH=300μM*Hz, KpyrPDH=47.5μM, KnadPDH=81, U1PDH=1.5, U2PDH=1.1, KcaPDH=0.05μM, kFFA=0Hz)
-    pdheq = let
+    jpdh = let
         c = (hil(KcaPDH, Ca_m))^2
         fpCa = hil(1, U2PDH * (1 + U1PDH * c))
         fNAD = hil(NAD_m, NADH_m * KnadPDH)
         fPyr = hil(Pyr, KpyrPDH)
-        J_PDH ~ VmaxPDH * rPDH * fpCa * fNAD * fPyr
+        VmaxPDH * rPDH * fpCa * fNAD * fPyr
     end
 
     # Electron transport chain (ETC)
@@ -85,23 +78,23 @@ function make_model(;
     # Mitochondrial calcium uniporter (MCU)
     @variables J_MCU(t) Ca_c(t)
     @parameters PcaMCU=4Hz
-    mcueq = let
+    jmcu = let
         zvfrt = 2 * iVT * ΔΨm
         em1 = expm1(zvfrt)
-        J_MCU ~ PcaMCU * (zvfrt / em1) * (0.341 * Ca_c * (em1 + 1) - 0.2 * Ca_m)
+        PcaMCU * (zvfrt / em1) * (0.341 * Ca_c * (em1 + 1) - 0.2 * Ca_m)
     end
 
     # Mitochondrial sodium-calcium exchanger (NCLX)
     @variables J_NCLX(t)
     @parameters (Na_c=10mM, Na_m=5mM, VmaxNCLX=75μM*Hz, KnaNCLX=8.2mM, KcaNCLX=8μM)
-    nclxeq = let
+    jnclx = let
         A = (Na_c / KnaNCLX)^2
         P = (Na_m / KnaNCLX)^2
         B = Ca_m / KcaNCLX
         Q = Ca_c / KcaNCLX
         AB = A * B
         PQ = P * Q
-        J_NCLX ~ VmaxNCLX * (AB - PQ) / (1 + A + B + P + Q + AB + PQ)
+        VmaxNCLX * (AB - PQ) / (1 + A + B + P + Q + AB + PQ)
     end
 
     # NADH shuttle
@@ -119,11 +112,10 @@ function make_model(;
 
     eqs = [
         caceq,
-        glceq,
         J_GK ~ VmaxGK * hil(ATP_c, KatpGK) * hil(Glc, KglcGK, nGK),
         J_GPD ~ VmaxGPD * hil(ADP_c, KadpGPD) * hil(NAD_c, NADH_c * KnadGPD) * hil(G3P, Kg3pGPD),
         J_LDH ~ VmaxLDH * hil(Pyr, KpyrLDH) * hil(NADH_c, NAD_c * KnadhLDH),
-        pdheq,
+        J_PDH ~ jpdh,
         J_FFA ~ kFFA * NAD_m,
         J_DH ~ 4.6 * J_PDH + J_FFA,
         J_HR ~ VmaxETC * rETC * hil(NADH_m, KnadhETC) * (1 + KaETC * ΔΨm) / (1 + KbETC * ΔΨm),
@@ -131,8 +123,8 @@ function make_model(;
         J_HL ~ pHleak * rHL * exp(kvHleak * ΔΨm),
         J_HF ~ VmaxF1 * rF1 * hil(FmgadpF1 * ADP_c, KadpF1, nadpF1) * hil(ΔΨm, KvF1, nvF1) * (1 - exp(-Ca_m / KcaF1)),
         J_ANT ~ J_HF / 3,
-        mcueq,
-        nclxeq,
+        J_MCU ~ jmcu,
+        J_NCLX ~ jnclx,
         J_NADHT ~ VmaxNADHT * hil(NADH_c, NAD_c * Ktn_c) * hil(NAD_m, NADH_m * Ktn_m),
         tiptip ~ kfuse1 * J_ANT / J_HL * x1 * x1 - kfiss1 * x2,
         tipside ~ kfuse2 * J_ANT / J_HL * x1 * x2 - kfiss2 * x3,
@@ -153,7 +145,7 @@ function make_model(;
         D(ΔΨm) ~ inv(C_MIT) * (J_HR - J_HF - J_HL - J_ANT - 2 * J_MCU),
         D(G3P) ~ inv(V_I) * (2J_GK - J_GPD) - kG3P * G3P,
         D(Pyr) ~ inv(V_I + V_MTX) * (J_GPD - J_PDH - J_LDH) - kPyr * Pyr,
-        D(AEC) ~ (inv(V_I) * (-ATPstiochGK * J_GK + 2 * J_GPD + J_ANT) - ATP_c * (kATP + kATPCa * Ca_c))/ΣAc,
+        D(AEC) ~ inv(V_I) * inv(ΣAc) * ((-ATPstiochGK * J_GK + 2 * J_GPD + J_ANT) - ATP_c * (kATP + kATPCa * Ca_c)),
         # D(x[1]) ~ # Conserved
         D(x2) ~ tiptip - tipside,
         D(x3) ~ tipside,

@@ -12,7 +12,7 @@ plt.matplotlib.rcParams["font.size"] = 14
 
 #---
 @named sys = make_model()
-@unpack GlcConst, rETC, rHL, rF1, rPDH = sys
+@unpack Glc, rETC, rHL, rF1, rPDH = sys
 prob = SteadyStateProblem(sys, [])
 
 # Range for two parameters
@@ -25,7 +25,7 @@ rhl = range(0.1, 5.0, 51)
 
 # 2D steady states
 function solve_fig3(glc, r, k, prob, alg=DynamicSS(Rodas5()))
-    newprob = remake(prob, p = [GlcConst=> glc, k => r])
+    newprob = remake(prob, p = [Glc=> glc, k => r])
     return solve(newprob, alg)
 end
 
