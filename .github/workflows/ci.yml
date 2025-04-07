@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  LITERATE_PROC: '2'
+  LITERATE_PROC: '3'
   JULIA_NUM_THREADS: '2'
   ALLOWERRORS: 'false'
   NBCACHE: '.cache'
@@ -74,7 +74,7 @@ jobs:
       shell: julia --color=yes {0}
       run: |
         using Pkg
-        Pkg.add(["Literate", "Tables", "MarkdownTables", "JSON"])
+        Pkg.add(["Literate", "JSON"])
         Pkg.activate(".")
         Pkg.instantiate()
         Pkg.precompile()
