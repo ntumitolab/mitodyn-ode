@@ -17,6 +17,10 @@ prob = SteadyStateProblem(sys, [])
 alg = DynamicSS(TRBDF2())
 sol = solve(prob, alg)
 
+for i in unknowns(sys)
+    println("$i = $(sol[i])")
+end
+
 # Galactose model: glycolysis produces zero net ATP
 # By increasing the ATP consumed in the first part of glycolysis from 2 to 4
 prob_gal = SteadyStateProblem(sys, [sys.ATPstiochGK => 4])
