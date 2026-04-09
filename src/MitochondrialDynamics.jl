@@ -41,7 +41,7 @@ function make_model(;
 
     # Adenylate kinase (AdK)
     @variables J_ADK(t)
-    @variables ATP_c(t)=4.0mM ADP_c(t) AMP_c(t)=0mM
+    @variables AEC(t) ATP_c(t)=4.0mM ADP_c(t) AMP_c(t)=0.06mM
     @parameters kfAK=1000Hz/mM kEqAK=0.931
 
     # Glucokinase (GK)
@@ -58,7 +58,7 @@ function make_model(;
     @parameters VmaxLDH=1.2mM*Hz KpyrLDH=47.5μM KnadhLDH=1
 
     # Pyruvate dehydrogenase (PDH)
-    @variables J_PDH(t) J_DH(t) NAD_m(t) NADH_m(t)=57μM Ca_m(t)=0.2 J_FFA(t)
+    @variables J_PDH(t) J_DH(t) NAD_m(t) NADH_m(t)=57μM Ca_m(t)=0.2μM J_FFA(t)
     @parameters VmaxPDH=300μM*Hz KpyrPDH=47.5μM KnadPDH=81 U1PDH=1.5 U2PDH=1.1 KcaPDH=0.05μM kFFA=0Hz
     jpdh = let
         c = (hil(KcaPDH, Ca_m))^2
