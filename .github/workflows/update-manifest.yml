@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Setup Julia
         uses: julia-actions/setup-julia@v2
         with:
@@ -37,14 +37,14 @@ jobs:
       # Authenticate with a custom GitHub APP
       # https://github.com/peter-evans/create-pull-request/blob/main/docs/concepts-guidelines.md#authenticating-with-github-app-generated-tokens
       - name: Generate token for PR
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         id: generate-token
         with:
           app-id: ${{ env.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Create Pull Request
         id: cpr
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           title: Julia Dependency Update
           token: ${{ steps.generate-token.outputs.token }}

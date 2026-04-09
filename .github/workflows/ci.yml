@@ -25,7 +25,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
     - name: Setup Python
       uses: actions/setup-python@v6
       id: setup-python
@@ -46,7 +46,7 @@ jobs:
         echo "value=${{ hashFiles('Project.toml', 'Manifest.toml', 'src/**') }}" >> "$GITHUB_OUTPUT"
         echo "ver=${{ runner.os }}-julia-${{ steps.julia-version.outputs.resolved }}" >> "$GITHUB_OUTPUT"
     - name: Cache executed notebooks
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       id: cache-nb
       with:
         path: |
@@ -60,7 +60,7 @@ jobs:
       with:
         version: ${{ steps.julia-version.outputs.resolved }}
     - name: Restore Julia packages
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       if: ${{ runner.environment == 'github-hosted' }}
       id: cache-julia
       with:
@@ -84,7 +84,7 @@ jobs:
         using Pkg, Dates
         Pkg.gc(collect_delay=Day(0))
     - name: Save Julia packages
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       if: ${{ runner.environment == 'github-hosted' && steps.cache-julia.outputs.cache-hit != 'true' }}
       with:
         path: ~/.julia
@@ -113,7 +113,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
     - name: Setup Julia
       uses: julia-actions/setup-julia@v2
     - name: Convert literate files to Jupyter notebooks
@@ -171,4 +171,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
