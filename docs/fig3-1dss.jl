@@ -19,11 +19,11 @@ sol = solve(prob, alg)
 
 # Galactose model: glycolysis produces zero net ATP
 # By increasing the ATP consumed in the first part of glycolysis from 2 to 4
-prob_gal = SteadyStateProblem(sys, [], [sys.ATPstiochGK => 4])
+prob_gal = SteadyStateProblem(sys, [sys.ATPstiochGK => 4])
 
 # FFA model: Additional flux reducing mitochondrial NAD/NADH couple
 # A 10% increase w.r.t baseline CAC flux
-prob_ffa = SteadyStateProblem(sys, [], [sys.kFFA => sol[0.10 * sys.J_DH / sys.NAD_m]])
+prob_ffa = SteadyStateProblem(sys, [sys.kFFA => sol[0.10 * sys.J_DH / sys.NAD_m]])
 
 # Simulating on a range of glucose
 # Test on a range of glucose (3 mM to 30 mM)

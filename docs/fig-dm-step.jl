@@ -22,10 +22,10 @@ ts = range(0, tend, 401)
 tspan = (ts[begin], ts[end])
 alg = TRBDF2()
 prob = ODEProblem(sys, [], tspan)
-prob_dm = ODEProblem(sys, [], tspan, [rPDH=>0.5, rETC=>0.75, rHL=>1.4, rF1=>0.5])
+prob_dm = ODEProblem(sys, [rPDH=>0.5, rETC=>0.75, rHL=>1.4, rF1=>0.5], tspan)
 
 ssprob_dm = SteadyStateProblem(prob_dm)
-sssol_dm = solve(ssprob_dm, DynamicSS(Rodas5()))
+sssol_dm = solve(ssprob_dm, DynamicSS(alg))
 
 # Define events
 function add_glucose!(i)
