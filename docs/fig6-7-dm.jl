@@ -18,10 +18,10 @@ prob = SteadyStateProblem(sys, [])
 @unpack Glc, rETC, rHL, rF1, rPDH = sys
 
 # ## Fig 6
-prob_dm = SteadyStateProblem(sys, [], [rPDH=>0.5, rETC=>0.75, rHL=>1.4, rF1=>0.5])
-prob_fccp = SteadyStateProblem(sys, [], [rHL=>5.0])
-prob_rotenone = SteadyStateProblem(sys, [], [rETC=>0.1])
-prob_oligomycin = SteadyStateProblem(sys, [], [rF1=>0.1])
+prob_dm = SteadyStateProblem(sys, [rPDH=>0.5, rETC=>0.75, rHL=>1.4, rF1=>0.5])
+prob_fccp = SteadyStateProblem(sys, [rHL=>5.0])
+prob_rotenone = SteadyStateProblem(sys, [rETC=>0.1])
+prob_oligomycin = SteadyStateProblem(sys, [rF1=>0.1])
 
 function prob_func_glc(prob, i, repeat)
     remake(prob, p=[Glc => glc[i]])
