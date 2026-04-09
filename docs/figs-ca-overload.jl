@@ -14,13 +14,13 @@ plt.matplotlib.rcParams["font.size"] = 14
 # Default model
 @named sys = make_model()
 prob = SteadyStateProblem(sys, [])
-alg = DynamicSS(Rodas5())
+alg = DynamicSS(TRBDF2())
 sol = solve(prob, alg)
 
 # High calcium model
 @unpack RestingCa, ActivatedCa = sys
-prob_ca5 = SteadyStateProblem(sys, [], [RestingCa=>0.45μM, ActivatedCa=>1.25μM])
-prob_ca10 = SteadyStateProblem(sys, [], [RestingCa=>0.9μM, ActivatedCa=>2.5μM])
+prob_ca5 = SteadyStateProblem(sys, [RestingCa=>0.45μM, ActivatedCa=>1.25μM])
+prob_ca10 = SteadyStateProblem(sys, [RestingCa=>0.9μM, ActivatedCa=>2.5μM])
 
 # Simulating on a range of glucose
 @unpack Glc = sys
