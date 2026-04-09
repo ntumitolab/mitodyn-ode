@@ -23,17 +23,14 @@ prob_fccp = SteadyStateProblem(sys, [rHL=>5.0])
 prob_rotenone = SteadyStateProblem(sys, [rETC=>0.1])
 prob_oligomycin = SteadyStateProblem(sys, [rF1=>0.1])
 
-function prob_func_glc(prob, i, repeat)
-    remake(prob, p=[Glc => glc[i]])
-end
+prob_func_glc = (prob, i, repeat) -> remake(prob, p=[Glc => glc[i]])
 
 # DM cells
-alg = DynamicSS(TRBDF2())
-prob_func=prob_func_glc
+alg = DynamicSS(KenCarp47())
 trajectories = length(glc)
 
-sols = solve(EnsembleProblem(prob; prob_func, safetycopy=false), alg; trajectories)
-solsDM = solve(EnsembleProblem(prob_dm; prob_func, safetycopy=false), alg; trajectories);
+sols = solve(EnsembleProblem(prob; prob_func=prob_func_glc, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8)
+solsDM = solve(EnsembleProblem(prob_dm; prob_func=prob_func_glc, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8);
 
 #---
 function plot_fig6(sols, solsDM, glc; figsize=(10, 8), labels=["Baseline", "Diabetic"])
@@ -113,11 +110,11 @@ fig6 = plot_fig6(sols, solsDM, glc)
 exportTIF(fig6, "Fig7-DM-steadystates.tif")
 
 # ## Figure 7
-sols = solve(EnsembleProblem(prob; prob_func, safetycopy=false), alg; trajectories)
-solsDM = solve(EnsembleProblem(prob_dm; prob_func, safetycopy=false), alg; trajectories)
-solsFCCP = solve(EnsembleProblem(prob_fccp; prob_func, safetycopy=false), alg; trajectories)
-solsRot = solve(EnsembleProblem(prob_oligomycin; prob_func, safetycopy=false), alg; trajectories)
-solsOligo = solve(EnsembleProblem(prob_rotenone; prob_func, safetycopy=false), alg; trajectories);
+sols = solve(EnsembleProblem(prob; prob_func=prob_func_glc, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8)
+solsDM = solve(EnsembleProblem(prob_dm; prob_func=prob_func_glc, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8)
+solsFCCP = solve(EnsembleProblem(prob_fccp; prob_func=prob_func_glc, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8)
+solsRot = solve(EnsembleProblem(prob_oligomycin; prob_func=prob_func_glc, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8)
+solsOligo = solve(EnsembleProblem(prob_rotenone; prob_func=prob_func_glc, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8);
 
 #---
 function plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc; figsize=(12, 6))
