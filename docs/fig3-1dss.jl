@@ -17,6 +17,10 @@ prob = SteadyStateProblem(sys, [])
 alg = DynamicSS(TRBDF2())
 sol = solve(prob, alg)
 
+for i in unknowns(sys)
+    println("$i = $(sol[i])")
+end
+
 # Galactose model: glycolysis produces zero net ATP
 # By increasing the ATP consumed in the first part of glycolysis from 2 to 4
 prob_gal = SteadyStateProblem(sys, [sys.ATPstiochGK => 4])
@@ -36,9 +40,9 @@ end
 trajectories = length(glc)
 
 # Run the simulations
-sim = solve(EnsembleProblem(prob; prob_func, safetycopy=false), alg; trajectories)
-sim_gal = solve(EnsembleProblem(prob_gal; prob_func, safetycopy=false), alg; trajectories)
-sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func, safetycopy=false), alg; trajectories);
+sim = solve(EnsembleProblem(prob; prob_func, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8)
+sim_gal = solve(EnsembleProblem(prob_gal; prob_func, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8)
+sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8);
 
 # ## Steady states for a range of glucose
 function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
