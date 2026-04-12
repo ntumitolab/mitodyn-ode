@@ -14,7 +14,7 @@ plt.matplotlib.rcParams["font.size"] = 14
 @named sys = make_model()
 @unpack Glc, G3P, Pyr, ATP_c, ADP_c, NADH_c, NADH_m, Ca_m, ΔΨm, x1, x2, x3 = sys
 prob = SteadyStateProblem(sys, [])
-alg = DynamicSS(TRBDF2())
+alg = DynamicSS(KenCarp47())
 sol = solve(prob, alg)
 
 for i in unknowns(sys)
@@ -40,9 +40,9 @@ end
 trajectories = length(glc)
 
 # Run the simulations
-sim = solve(EnsembleProblem(prob; prob_func, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8)
-sim_gal = solve(EnsembleProblem(prob_gal; prob_func, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8)
-sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8);
+@time sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
+@time sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; trajectories)
+@time sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories);
 
 # ## Steady states for a range of glucose
 function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
