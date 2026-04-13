@@ -2,7 +2,7 @@ module MitochondrialDynamics
 
 using ModelingToolkit
 import NaNMath as nm
-
+using PythonCall # For pydict() and exportTIF()
 export make_model, indexof, extract, exportTIF
 
 include("utils.jl")
