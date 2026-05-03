@@ -31,7 +31,7 @@ hil(x, k, n) = hil(nm.pow(x, n), nm.pow(k, n))
 indexof(sym, syms) = findfirst(isequal(sym), syms)
 
 """Extract values from ensemble simulations by a symbol"""
-extract(sim, k) = map(s->s[k], sim)
+extract(sim, k) = map(s->s.u[k], sim)
 
 """Export publication-ready TIFF file from a figure"""
 exportTIF(fig, name; dpi=300) = fig.savefig(name, dpi=dpi, pil_kwargs=pydict(Dict("compression" => "tiff_lzw")))

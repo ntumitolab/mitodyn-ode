@@ -12,11 +12,11 @@ import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
 # baseline model
-@named sys = make_model()
+@time @named sys = make_model()
 @unpack Glc, G3P, Pyr, ATP_c, ADP_c, NADH_c, NADH_m, Ca_m, ΔΨm, x1, x2, x3 = sys
-prob = SteadyStateProblem(sys, [])
+@time prob = SteadyStateProblem(sys, [])
 alg = DynamicSS(KenCarp47())
-sol = solve(prob, alg)
+@time sol = solve(prob, alg)
 
 for i in unknowns(sys)
     println("$i = $(sol[i])")
