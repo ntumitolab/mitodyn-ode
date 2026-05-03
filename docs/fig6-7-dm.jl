@@ -24,7 +24,7 @@ prob_fccp = SteadyStateProblem(sys, [rHL=>5.0])
 prob_rotenone = SteadyStateProblem(sys, [rETC=>0.1])
 prob_oligomycin = SteadyStateProblem(sys, [rF1=>0.1])
 
-prob_func_glc = (prob, i, repeat) -> remake(prob, p=[Glc => glc[i]])
+prob_func_glc = (prob, ctx) -> remake(prob, p=[Glc => glc[ctx.sim_id]])
 
 # DM cells
 alg = DynamicSS(KenCarp47())

@@ -34,8 +34,8 @@ prob_ffa = SteadyStateProblem(sys, [sys.kFFA => sol[0.10 * sys.J_DH / sys.NAD_m]
 # Test on a range of glucose (3 mM to 30 mM)
 glc = range(3.0, 30.0, step=0.3)
 
-prob_func = (prob, i, repeat) -> begin
-    remake(prob, p=[Glc=> glc[i]])
+prob_func = (prob, ctx) -> begin
+    remake(prob, p=[Glc=> glc[ctx.sim_id]])
 end
 
 trajectories = length(glc)

@@ -28,8 +28,8 @@ prob_ca10 = SteadyStateProblem(sys, [RestingCa=>0.9μM, ActivatedCa=>2.5μM])
 
 # Test on a range of glucose
 glc = 3.5:0.5:30.0
-prob_func = (prob, i, repeat) -> begin
-    remake(prob, p=[Glc => glc[i]])
+prob_func = (prob, ctx) -> begin
+    remake(prob, p=[Glc => glc[ctx.sim_id]])
 end
 
 trajectories=length(glc)
