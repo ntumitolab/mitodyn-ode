@@ -12,8 +12,8 @@ plt.matplotlib.rcParams["font.size"] = 14
 
 #---
 glc = 4.0:0.5:30.0
-@named sys = make_model()
-prob = SteadyStateProblem(sys, [])
+@time "Build system" @named sys = make_model()
+@time "Build problem" prob = SteadyStateProblem(sys, [])
 
 # Change parameters
 @unpack Glc, rETC, rHL, rF1, rPDH = sys
@@ -30,8 +30,15 @@ prob_func_glc = (prob, ctx) -> remake(prob, p=[Glc => glc[ctx.sim_id]])
 alg = DynamicSS(KenCarp47())
 trajectories = length(glc)
 
-sols = solve(EnsembleProblem(prob; prob_func=prob_func_glc, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8)
-solsDM = solve(EnsembleProblem(prob_dm; prob_func=prob_func_glc, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8);
+@time "Solve baseline" sols = map(glc) do g
+    _prob = remake(prob, p=[Glc => g])
+    solve(_prob, alg)
+end
+
+@time "Solve diabetic" solsDM = map(glc) do g
+    _prob = remake(prob_dm, p=[Glc => g])
+    solve(_prob, alg)
+end
 
 #---
 function plot_fig6(sols, solsDM, glc; figsize=(10, 8), labels=["Baseline", "Diabetic"])
@@ -111,11 +118,30 @@ fig6 = plot_fig6(sols, solsDM, glc)
 exportTIF(fig6, "Fig7-DM-steadystates.tif")
 
 # ## Figure 7
-sols = solve(EnsembleProblem(prob; prob_func=prob_func_glc, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8)
-solsDM = solve(EnsembleProblem(prob_dm; prob_func=prob_func_glc, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8)
-solsFCCP = solve(EnsembleProblem(prob_fccp; prob_func=prob_func_glc, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8)
-solsRot = solve(EnsembleProblem(prob_oligomycin; prob_func=prob_func_glc, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8)
-solsOligo = solve(EnsembleProblem(prob_rotenone; prob_func=prob_func_glc, safetycopy=false), alg; trajectories, abstol=1e-8, reltol=1e-8);
+@time "Solve baseline" sols = map(glc) do g
+    _prob = remake(prob, p=[Glc => g])
+    solve(_prob, alg)
+end
+
+@time "Solve diabetic" solsDM = map(glc) do g
+    _prob = remake(prob_dm, p=[Glc => g])
+    solve(_prob, alg)
+end
+
+@time "Solve FCCP" solsFCCP = map(glc) do g
+    _prob = remake(prob_fccp, p=[Glc => g])
+    solve(_prob, alg)
+end
+
+@time "Solve Rotenone" solsRot = map(glc) do g
+    _prob = remake(prob_oligomycin, p=[Glc => g])
+    solve(_prob, alg)
+end
+
+@time "Solve Oligomycin" solsOligo = map(glc) do g
+    _prob = remake(prob_rotenone, p=[Glc => g])
+    solve(_prob, alg)
+end
 
 #---
 function plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc; figsize=(12, 6))

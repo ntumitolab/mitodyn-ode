@@ -15,18 +15,18 @@ import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
 #---
-@named sys = make_model()
+@time "Build system" @named sys = make_model()
 @unpack Glc, rPDH, rETC, rHL, rF1 = sys
 
 tend = 80minute
 ts = range(0, tend, 401)
 tspan = (ts[begin], ts[end])
 alg = TRBDF2()
-prob = ODEProblem(sys, [], tspan)
-prob_dm = ODEProblem(sys, [rPDH=>0.5, rETC=>0.75, rHL=>1.4, rF1=>0.5], tspan)
+@time "Build problem" prob = ODEProblem(sys, [], tspan)
+@time "Build diabetic problem" prob_dm = ODEProblem(sys, [rPDH=>0.5, rETC=>0.75, rHL=>1.4, rF1=>0.5], tspan)
 
-ssprob_dm = SteadyStateProblem(prob_dm)
-sssol_dm = solve(ssprob_dm, DynamicSS(alg))
+@time "Build steady-state problem" ssprob_dm = SteadyStateProblem(prob_dm)
+@time "Solve steady-state" sssol_dm = solve(ssprob_dm, DynamicSS(alg))
 
 # Define events
 function add_glucose!(i)
