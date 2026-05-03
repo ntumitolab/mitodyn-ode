@@ -2,6 +2,7 @@
 # Figure 6: Calcium oscillation
 ===#
 using OrdinaryDiffEq
+using OrdinaryDiffEqSDIRK
 using ModelingToolkit
 using MitochondrialDynamics
 using MitochondrialDynamics: second, μM, mV, mM, Hz, minute, hil
@@ -9,7 +10,7 @@ import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
 #---
-@named sys = make_model()
+@time "Build system" @named sys = make_model()
 @unpack Ca_c, Glc, kATPCa, kATP = sys
 alg = TRBDF2()
 
@@ -23,17 +24,13 @@ function cac_wave(; ca_base = 0.09μM, ca_act = 0.25μM, n=4, katp=25, amplitude
     return caceq
 end
 
-@named sysosci = make_model(; caceq=cac_wave(amplitude=0.8))
-
-equations(sysosci)
-
-observed(sysosci)
+@time "Build oscillating system" @named sysosci = make_model(; caceq=cac_wave(amplitude=0.8))
 
 #---
 tend = 4000.0
 ts = range(tend-480, tend; length=201)
-prob = ODEProblem(sysosci, [], tend, [Glc => 10mM])
-sol = solve(prob, alg, saveat=ts)
+@time "Build oscillating problem" prob = ODEProblem(sysosci, [], tend, [Glc => 10mM])
+@time "Solve oscillating problem" sol = solve(prob, alg, saveat=ts)
 
 #---
 function plot_fig5(sol, figsize=(10, 10))
@@ -87,10 +84,10 @@ exportTIF(fig5, "Fig6-ca-oscillation.tif")
 # Tuning ca-dependent ATP consumption rate (kATPCa)
 # kATPCa : 90 -> 10
 prob2 = ODEProblem(sysosci, [], tend, [Glc => 10mM, kATPCa=>10Hz/mM, kATP=>0.055Hz])
-sol2 = solve(prob2, alg, saveat=ts)
+@time "Solve tuned problem 2" sol2 = solve(prob2, alg, saveat=ts)
 plot_fig5(sol2)
 
 # kATPCa : 90 -> 0.1
 prob4 = ODEProblem(sysosci, [], tend, [Glc => 10mM, kATPCa=>0.1Hz/mM, kATP=>0.06Hz])
-sol4 = solve(prob4, alg, saveat=ts)
+@time "Solve tuned problem 4" sol4 = solve(prob4, alg, saveat=ts)
 plot_fig5(sol4)

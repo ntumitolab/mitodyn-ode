@@ -4,6 +4,7 @@
 Steady-state solutions across a range of glucose levels.
 ===#
 using OrdinaryDiffEq
+using OrdinaryDiffEqSDIRK
 using SteadyStateDiffEq
 using ModelingToolkit
 using MitochondrialDynamics
@@ -11,11 +12,11 @@ import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
 # baseline model
-@named sys = make_model()
+@time @named sys = make_model()
 @unpack Glc, G3P, Pyr, ATP_c, ADP_c, NADH_c, NADH_m, Ca_m, ΔΨm, x1, x2, x3 = sys
-prob = SteadyStateProblem(sys, [])
-alg = DynamicSS(KenCarp47())
-sol = solve(prob, alg)
+@time prob = SteadyStateProblem(sys, [])
+alg = DynamicSS(TRBDF2())
+@time sol = solve(prob, alg)
 
 for i in unknowns(sys)
     println("$i = $(sol[i])")
@@ -33,16 +34,28 @@ prob_ffa = SteadyStateProblem(sys, [sys.kFFA => sol[0.10 * sys.J_DH / sys.NAD_m]
 # Test on a range of glucose (3 mM to 30 mM)
 glc = range(3.0, 30.0, step=0.3)
 
-prob_func = (prob, i, repeat) -> begin
-    remake(prob, p=[Glc=> glc[i]])
+prob_func = (prob, ctx) -> begin
+    remake(prob, p=[Glc=> glc[ctx.sim_id]])
 end
 
 trajectories = length(glc)
 
 # Run the simulations
-@time sim = solve(EnsembleProblem(prob; prob_func), alg; trajectories)
-@time sim_gal = solve(EnsembleProblem(prob_gal; prob_func), alg; trajectories)
-@time sim_ffa = solve(EnsembleProblem(prob_ffa; prob_func), alg; trajectories);
+@time sim = map(glc) do g
+    _prob = remake(prob, p=[Glc => g])
+    solve(_prob, alg)
+end;
+
+@time sim_gal = map(glc) do g
+    _prob = remake(prob_gal, p=[Glc => g])
+    solve(_prob, alg)
+end;
+
+@time sim_ffa = map(glc) do g
+    _prob = remake(prob_ffa, p=[Glc => g])
+    solve(_prob, alg)
+end;
+
 
 # ## Steady states for a range of glucose
 function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")

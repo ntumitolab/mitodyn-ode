@@ -4,6 +4,7 @@
 Steady-state solutions for a range of glucose concentrations and OXPHOS capacities by chemicals.
 ===#
 using OrdinaryDiffEq
+using OrdinaryDiffEqSDIRK
 using SteadyStateDiffEq
 using ModelingToolkit
 using MitochondrialDynamics
@@ -11,9 +12,9 @@ import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
 #---
-@named sys = make_model()
+@time "Build system" @named sys = make_model()
 @unpack Glc, rETC, rHL, rF1, rPDH = sys
-prob = SteadyStateProblem(sys, [])
+@time "Build problem" prob = SteadyStateProblem(sys, [])
 
 # Range for two parameters
 rGlcF1 = range(3.0, 30.0, 51)
@@ -29,9 +30,9 @@ function solve_fig3(glc, r, k, prob, alg=DynamicSS(TRBDF2()))
     return solve(newprob, alg)
 end
 
-solsf1 = [solve_fig3(glc, r, rF1, prob) for r in rf1, glc in rGlcF1];
-solsetc = [solve_fig3(glc, r, rETC, prob) for r in retc, glc in rGlcETC];
-solshl = [solve_fig3(glc, r, rHL, prob) for r in rhl, glc in rGlcHL];
+@time "Solve F1" solsf1 = [solve_fig3(glc, r, rF1, prob) for r in rf1, glc in rGlcF1];
+@time "Solve ETC" solsetc = [solve_fig3(glc, r, rETC, prob) for r in retc, glc in rGlcETC];
+@time "Solve HL" solshl = [solve_fig3(glc, r, rHL, prob) for r in rhl, glc in rGlcHL];
 
 #---
 function plot_fig3(;

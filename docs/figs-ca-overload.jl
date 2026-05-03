@@ -4,6 +4,7 @@
 Steady-state solutions across a range of glucose levels.
 ===#
 using OrdinaryDiffEq
+using OrdinaryDiffEqSDIRK
 using SteadyStateDiffEq
 using ModelingToolkit
 using MitochondrialDynamics
@@ -12,10 +13,10 @@ import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
 # Default model
-@named sys = make_model()
-prob = SteadyStateProblem(sys, [])
+@time "Build system" @named sys = make_model()
+@time "Build problem" prob = SteadyStateProblem(sys, [])
 alg = DynamicSS(TRBDF2())
-sol = solve(prob, alg)
+@time "Solve problem" sol = solve(prob, alg)
 
 # High calcium model
 @unpack RestingCa, ActivatedCa = sys
@@ -27,15 +28,26 @@ prob_ca10 = SteadyStateProblem(sys, [RestingCa=>0.9μM, ActivatedCa=>2.5μM])
 
 # Test on a range of glucose
 glc = 3.5:0.5:30.0
-prob_func = (prob, i, repeat) -> begin
-    remake(prob, p=[Glc => glc[i]])
+prob_func = (prob, ctx) -> begin
+    remake(prob, p=[Glc => glc[ctx.sim_id]])
 end
 
 trajectories=length(glc)
 
-sim = solve(EnsembleProblem(prob; prob_func, safetycopy=false), alg; trajectories)
-sim_ca5 = solve(EnsembleProblem(prob_ca5; prob_func, safetycopy=false), alg; trajectories)
-sim_ca10 = solve(EnsembleProblem(prob_ca10; prob_func, safetycopy=false), alg; trajectories);
+@time sim = map(glc) do g
+    _prob = remake(prob, p=[Glc => g])
+    solve(_prob, alg)
+end;
+
+@time sim_ca5 = map(glc) do g
+    _prob = remake(prob_ca5, p=[Glc => g])
+    solve(_prob, alg)
+end;
+
+@time sim_ca10 = map(glc) do g
+    _prob = remake(prob_ca10, p=[Glc => g])
+    solve(_prob, alg)
+end;
 
 # ## Steady states for a range of glucose
 
@@ -113,7 +125,6 @@ end
 
 # Default model
 fig_glc_default = plot_steady_state(glc, sim, sys, title="Calcium 1X")
-
 # High calcium (5X)
 fig_ca5 = plot_steady_state(glc, sim_ca5, sys, title="Calcium 5X")
 # High calcium (10X)
