@@ -2,6 +2,7 @@
 # Figure 6 and 7
 ===#
 using OrdinaryDiffEq
+using OrdinaryDiffEqSDIRK
 using SteadyStateDiffEq
 using ModelingToolkit
 using MitochondrialDynamics

@@ -4,6 +4,7 @@
 Steady-state solutions for a range of glucose concentrations and OXPHOS capacities by chemicals.
 ===#
 using OrdinaryDiffEq
+using OrdinaryDiffEqSDIRK
 using SteadyStateDiffEq
 using ModelingToolkit
 using MitochondrialDynamics

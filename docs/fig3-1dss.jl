@@ -4,6 +4,7 @@
 Steady-state solutions across a range of glucose levels.
 ===#
 using OrdinaryDiffEq
+using OrdinaryDiffEqSDIRK
 using SteadyStateDiffEq
 using ModelingToolkit
 using MitochondrialDynamics

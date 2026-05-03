@@ -5,6 +5,7 @@
 Step responses to both glucose stimulation and chemical agents (I)
 ===#
 using OrdinaryDiffEq
+using OrdinaryDiffEqSDIRK
 using SteadyStateDiffEq
 using DiffEqCallbacks
 using ModelingToolkit
