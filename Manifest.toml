@@ -2,7 +2,7 @@
 
 julia_version = "1.12.6"
 manifest_format = "2.0"
-project_hash = "affaa03d73fe0a28464d8bad9d15284662c6b440"
+project_hash = "1df9c9eb3bd0136a5e3391115c2a5ff505411947"
 
 [[deps.ADTypes]]
 git-tree-sha1 = "bbc22a9a08a0ef6460041086d8a7b27940ed4ffd"
@@ -971,7 +971,7 @@ uuid = "0b3b1443-0f03-428d-bdfb-f27f9c1191ea"
 version = "0.1.15"
 
 [[deps.MitochondrialDynamics]]
-deps = ["DiffEqCallbacks", "JSON", "Literate", "MarkdownTables", "ModelingToolkit", "NaNMath", "OrdinaryDiffEq", "OrdinaryDiffEqSDIRK", "PythonCall", "PythonPlot", "SHA", "SteadyStateDiffEq", "Tables"]
+deps = ["DiffEqCallbacks", "DifferentialEquations", "JSON", "Literate", "MarkdownTables", "ModelingToolkit", "NaNMath", "OrdinaryDiffEq", "OrdinaryDiffEqSDIRK", "PythonCall", "PythonPlot", "SHA", "SteadyStateDiffEq", "Tables"]
 path = "."
 uuid = "1a231dcf-63c2-466e-8f46-4027ba595b90"
 version = "0.7.0"
