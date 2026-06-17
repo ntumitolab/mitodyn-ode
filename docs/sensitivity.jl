@@ -37,3 +37,4 @@ ks = keys(sensitivities) |> collect
 vs = values(sensitivities) |> collect
 
 t = Tables.table([ks vs]; header=["Parameter", "Relative Sensitivity"])
+MarkdownTables.markdown_table(t)
