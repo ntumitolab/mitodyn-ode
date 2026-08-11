@@ -12,7 +12,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CACHE_NUM: '2'
+  CACHE_NUM: '1'
   LITERATE_PROC: '6'
   JULIA_CI: 'true'
   JULIA_NUM_THREADS: '2'
