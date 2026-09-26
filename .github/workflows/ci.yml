@@ -13,32 +13,22 @@ concurrency:
 
 env:
   CACHE_NUM: '1'
-  LITERATE_PROC: '4'
+  LITERATE_PROC: '6'
   JULIA_CI: 'true'
-  JULIA_NUM_THREADS: '1'
+  JULIA_NUM_THREADS: '2'
+  JULIA_CPU_TARGET: 'sysimage'
   OPENBLAS_NUM_THREADS: '1'
   NBCACHE: '.cache'
-  JULIA_CONDAPKG_OFFLINE: 'true'
-  JULIA_CONDAPKG_BACKEND: 'Null'
 
 jobs:
   CI:
-    runs-on: ubuntu-24.04-arm
+    runs-on: self-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v7
-    - name: Setup Python
-      uses: actions/setup-python@v7
-      id: setup-python
-      with:
-        python-version: 3.x
-        cache: 'pip'
-    - name: Install Python deps
-      run: pip install -r requirements.txt
     - name: Read Julia version
       id: julia-version
-      run:
-        echo "resolved=$(python -c 'import tomllib; from pathlib import Path; print(tomllib.loads(Path("Manifest.toml").read_text())["julia_version"])')" >> "$GITHUB_OUTPUT"
+      run: echo "resolved=$(awk -F '"' '/^[[:space:]]*julia_version/ {print $2}' Manifest.toml)" >> "$GITHUB_OUTPUT"
     - name: Get environment hashes
       id: hash
       run: |
