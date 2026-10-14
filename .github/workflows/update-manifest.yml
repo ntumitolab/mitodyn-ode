@@ -2,8 +2,8 @@ name: Update Julia manifest
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: '0 0 * * 0' # Every week
+  # schedule:
+  #   - cron: '0 0 * * 0' # Every week
   push:
     branches:
       - main
