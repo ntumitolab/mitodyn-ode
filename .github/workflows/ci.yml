@@ -20,6 +20,7 @@ env:
   PY_VER: '3.14'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CONDAPKG_OFFLINE: 'true'
+  JULIA_HEAP_SIZE_HINT: "50%"
 
 jobs:
   setup:
