@@ -19,15 +19,15 @@ glc = 4.0:0.5:30.0
 @unpack Glc, rETC, rHL, rF1, rPDH = sys
 
 # ## Fig 6
-prob_dm = SteadyStateProblem(sys, [rPDH=>0.5, rETC=>0.75, rHL=>1.4, rF1=>0.5])
-prob_fccp = SteadyStateProblem(sys, [rHL=>5.0])
-prob_rotenone = SteadyStateProblem(sys, [rETC=>0.1])
-prob_oligomycin = SteadyStateProblem(sys, [rF1=>0.1])
+prob_dm = remake(prob, p=[rPDH=>0.5, rETC=>0.75, rHL=>1.4, rF1=>0.5])
+prob_fccp = remake(prob, p=[rHL=>5.0])
+prob_rotenone = remake(prob, p=[rETC=>0.1])
+prob_oligomycin = remake(prob, p=[rF1=>0.1])
 
 prob_func_glc = (prob, ctx) -> remake(prob, p=[Glc => glc[ctx.sim_id]])
 
 # DM cells
-alg = DynamicSS(KenCarp47())
+alg = DynamicSS(FBDF())
 trajectories = length(glc)
 
 @time "Solve baseline" sols = map(glc) do g
