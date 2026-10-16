@@ -10,7 +10,4 @@ PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
 PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
 
 [compat]
-ModelingToolkit = "11.45.4"
-NaNMath = "1.1.4"
 PrecompileTools = "1"
-PythonCall = "0.9.37"

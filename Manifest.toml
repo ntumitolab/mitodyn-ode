@@ -2,7 +2,7 @@
 
 julia_version = "1.13.1"
 manifest_format = "2.1"
-project_hash = "fb513b00f12e27ebe8603810a37d7b511e7f7e7b"
+project_hash = "9bca3c6d3b5392fecbda6f10adbccfa67b0d235a"
 
 [[deps.ADTypes]]
 deps = ["PrecompileTools"]
@@ -424,13 +424,6 @@ registries = "General"
 uuid = "b552c78f-8df3-52c6-915a-8e097449b14b"
 version = "1.16.0"
 
-[[deps.DifferentialEquations]]
-deps = ["OrdinaryDiffEq", "PrecompileTools", "Reexport", "SciMLBase"]
-git-tree-sha1 = "d167917674ca92bbf51b56a3e00d019792695110"
-registries = "General"
-uuid = "0c46a032-eb83-5123-abaf-570d42b7fbaa"
-version = "8.1.1"
-
 [[deps.DifferentiationInterface]]
 deps = ["ADTypes", "LinearAlgebra"]
 git-tree-sha1 = "0693d8b0a4608ff289d228ab4c598df5894845cd"
@@ -814,10 +807,10 @@ version = "1.8.0"
 
 [[deps.JSON]]
 deps = ["Dates", "Logging", "Parsers", "PrecompileTools", "StructUtils", "UUIDs", "Unicode"]
-git-tree-sha1 = "4657a834b01ce00f2b94546095c4350617b9af2c"
+git-tree-sha1 = "9939eb6f799a963b3392ac4a1d49d3fc0646eb80"
 registries = "General"
 uuid = "682c06a0-de6a-54ab-a142-c8b1cf79cde6"
-version = "1.10.0"
+version = "1.11.0"
 
     [deps.JSON.extensions]
     JSONArrowExt = ["ArrowTypes"]
@@ -1944,13 +1937,6 @@ weakdeps = ["SparseArrays"]
 
     [deps.Statistics.extensions]
     SparseArraysExt = ["SparseArrays"]
-
-[[deps.SteadyStateDiffEq]]
-deps = ["ConcreteStructs", "DiffEqBase", "DiffEqCallbacks", "ForwardDiff", "LinearAlgebra", "LinearSolve", "NonlinearSolveBase", "PrecompileTools", "SciMLBase", "SciMLPublic", "SymbolicIndexingInterface"]
-git-tree-sha1 = "9cbe31ef861749f188553bee1b8d22449b53885c"
-registries = "General"
-uuid = "9672c7b4-1e72-59bd-8a11-6ac3964bc41f"
-version = "2.18.0"
 
 [[deps.StringManipulation]]
 deps = ["PrecompileTools", "StyledStrings"]
