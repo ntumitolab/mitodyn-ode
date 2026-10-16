@@ -1,6 +1,6 @@
 # # Sensitiviy analysis
 # Influence of parameters on the average degree of mitochondrial node
-using DifferentialEquations
+using OrdinaryDiffEq
 using OrdinaryDiffEqSDIRK
 using SteadyStateDiffEq
 using ModelingToolkit
