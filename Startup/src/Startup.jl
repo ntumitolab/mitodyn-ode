@@ -1,4 +1,4 @@
-module MitochondrialDynamics
+module Startup
 
 using ModelingToolkit
 import NaNMath as nm

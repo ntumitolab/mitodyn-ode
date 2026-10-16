@@ -9,8 +9,8 @@ using OrdinaryDiffEqSDIRK
 using SteadyStateDiffEq
 using DiffEqCallbacks
 using ModelingToolkit
-using MitochondrialDynamics
-using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
+using Startup
+using Startup: second, μM, mV, mM, Hz, minute
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 

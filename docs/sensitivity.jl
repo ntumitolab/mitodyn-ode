@@ -4,7 +4,7 @@ using DifferentialEquations
 using OrdinaryDiffEqSDIRK
 using SteadyStateDiffEq
 using ModelingToolkit
-using MitochondrialDynamics
+using Startup
 using Tables
 using MarkdownTables
 

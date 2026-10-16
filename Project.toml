@@ -1,7 +1,5 @@
-name = "MitochondrialDynamics"
-uuid = "1a231dcf-63c2-466e-8f46-4027ba595b90"
-version = "0.7.0"
-authors = ["Wen-Wei Tseng <sosiristseng@gmail.com>"]
+[workspace]
+projects = ["Startup"]
 
 [deps]
 DiffEqCallbacks = "459566f4-90b8-5000-8ac3-15dfb0a30def"
@@ -13,6 +11,10 @@ OrdinaryDiffEqSDIRK = "2d112036-d095-4a1e-ab9a-08536f3ecdbf"
 PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
 PythonPlot = "274fc56d-3b97-40fa-a1cd-1b4a50311bf9"
 SteadyStateDiffEq = "9672c7b4-1e72-59bd-8a11-6ac3964bc41f"
+Startup = "ec0733a6-3166-4be9-8ea3-7416dbe7715d"
 
 [compat]
 julia = "1.13"
+
+[sources]
+Startup = {path = "Startup"}

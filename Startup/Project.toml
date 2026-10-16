@@ -1,0 +1,16 @@
+name = "Startup"
+uuid = "ec0733a6-3166-4be9-8ea3-7416dbe7715d"
+version = "0.1.0"
+authors = ["Wen Wei Tseng <sosiristseng@gmail.com>"]
+
+[deps]
+ModelingToolkit = "961ee093-0014-501f-94e3-6117800e7a78"
+NaNMath = "77ba4419-2d1f-58cd-9bb1-8ffee604a2e3"
+PrecompileTools = "aea7be01-6a6a-4083-8856-8a6e6704d82a"
+PythonCall = "6099a3de-0909-46bc-b1f4-468b9a2dfc0d"
+
+[compat]
+ModelingToolkit = "11.45.4"
+NaNMath = "1.1.4"
+PrecompileTools = "1"
+PythonCall = "0.9.37"
