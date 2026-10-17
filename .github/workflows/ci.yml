@@ -20,6 +20,7 @@ env:
   PY_VER: '3.14'
   JULIA_CONDAPKG_BACKEND: 'Null'
   JULIA_CONDAPKG_OFFLINE: 'true'
+  JULIA_HEAP_SIZE_HINT: "50%"
 
 jobs:
   setup:
@@ -61,12 +62,9 @@ jobs:
         restore-keys: |
           ${{ steps.hash.outputs.jl }}-
     - name: Install Julia packages
-      shell: julia --color=yes {0}
+      shell: julia --color=yes --project=@. {0}
       run: |
         using Pkg
-        Pkg.add(["JSON", "Literate", "MarkdownTables", "SHA", "Tables"])
-        Pkg.activate(".")
-        Pkg.resolve()
         Pkg.instantiate()
         Pkg.precompile()
         get(ENV, "RUNNER_ENVIRONMENT", "") == "github-hosted" && Pkg.gc()

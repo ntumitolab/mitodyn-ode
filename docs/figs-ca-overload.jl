@@ -7,8 +7,8 @@ using OrdinaryDiffEq
 using OrdinaryDiffEqSDIRK
 using SteadyStateDiffEq
 using ModelingToolkit
-using MitochondrialDynamics
-using MitochondrialDynamics: μM
+using Startup
+using Startup: μM
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 

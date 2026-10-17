@@ -1,5 +1,7 @@
-module MitochondrialDynamics
+module Startup
 
+# See the documentation at https://julialang.github.io/PrecompileTools.jl/stable/
+using PrecompileTools
 using ModelingToolkit
 import NaNMath as nm
 using PythonCall # For pydict() and exportTIF()
