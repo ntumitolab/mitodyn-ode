@@ -537,10 +537,10 @@ uuid = "4e289a0a-7415-4d19-859d-a7e5c4648b56"
 version = "1.0.7"
 
 [[deps.EnzymeCore]]
-git-tree-sha1 = "156ede9181d50b3b21b74d98a7edb08bc7bbdbf1"
+git-tree-sha1 = "c7059e6780f9191e2b05961353986dd9270ffc10"
 registries = "General"
 uuid = "f151be2c-9106-41f4-ab19-57ee4f262869"
-version = "0.8.23"
+version = "0.8.25"
 
     [deps.EnzymeCore.extensions]
     AdaptExt = "Adapt"
@@ -564,16 +564,18 @@ version = "0.10.14"
 
 [[deps.FastBroadcast]]
 deps = ["ArrayInterface", "LinearAlgebra", "PrecompileTools"]
-git-tree-sha1 = "c8f8eefadaa330d982bbf5e395c34e53a13ab668"
+git-tree-sha1 = "b90aee4f191474eeda3dfa0cb588635f80820cf1"
 registries = "General"
 uuid = "7034ab61-46d4-4ed7-9d0f-46aef9175898"
-version = "1.4.0"
+version = "1.5.0"
 
     [deps.FastBroadcast.extensions]
     FastBroadcastPolyesterExt = "Polyester"
     FastBroadcastStaticExt = "Static"
+    FixedSizeArraysExt = "FixedSizeArrays"
 
     [deps.FastBroadcast.weakdeps]
+    FixedSizeArrays = "3821ddf9-e5b5-40d5-8e25-6813ab96b5e2"
     Polyester = "f517fe37-dbe3-4b94-8317-1923a5111588"
     Static = "aedffcd0-7271-4cad-89d0-dc628f76c6d3"
 
@@ -795,10 +797,10 @@ version = "0.7.15"
     Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 
 [[deps.InverseFunctions]]
-git-tree-sha1 = "a779299d77cd080bf77b97535acecd73e1c5e5cb"
+git-tree-sha1 = "5cc6ad3e2bfc75a11eed92632ee341d37f4a4536"
 registries = "General"
 uuid = "3587e190-3f89-42d0-90ee-14403ec27112"
-version = "0.1.17"
+version = "0.1.18"
 weakdeps = ["Dates", "Test"]
 
     [deps.InverseFunctions.extensions]
@@ -1134,10 +1136,10 @@ version = "1.11.0"
 
 [[deps.ModelingToolkit]]
 deps = ["ADTypes", "BipartiteGraphs", "BlockArrays", "Combinatorics", "CommonSolve", "ConstructionBase", "DataStructures", "DiffEqBase", "DifferentiationInterface", "DocStringExtensions", "FillArrays", "ForwardDiff", "Graphs", "InteractiveUtils", "Libdl", "LinearAlgebra", "ModelingToolkitBase", "ModelingToolkitTearing", "Moshi", "OffsetArrays", "OrderedCollections", "PreallocationTools", "PrecompileTools", "REPL", "Reexport", "RuntimeGeneratedFunctions", "SCCNonlinearSolve", "SciMLBase", "SciMLPublic", "SciMLStructures", "Serialization", "Setfield", "SimpleNonlinearSolve", "SparseArrays", "StateSelection", "StaticArrays", "SymbolicIndexingInterface", "SymbolicUtils", "Symbolics", "TermInterface", "UnPack"]
-git-tree-sha1 = "7f1695504f04ed227af200757a3707132b5aa83a"
+git-tree-sha1 = "b7638efa7fccf8ed55f39c407900a89dddc52ac9"
 registries = "General"
 uuid = "961ee093-0014-501f-94e3-6117800e7a78"
-version = "11.45.4"
+version = "11.45.5"
 
     [deps.ModelingToolkit.extensions]
     MTKFMIExt = "FMIImport"
@@ -1157,10 +1159,10 @@ version = "11.45.4"
 
 [[deps.ModelingToolkitBase]]
 deps = ["ADTypes", "AbstractTrees", "ArrayInterface", "BandedMatrices", "BipartiteGraphs", "BlockArrays", "Combinatorics", "CommonSolve", "Compat", "ConstructionBase", "DataStructures", "DiffEqBase", "DiffEqCallbacks", "DiffRules", "DifferentiationInterface", "DocStringExtensions", "DomainSets", "EnumX", "EnzymeCore", "ExprTools", "FillArrays", "ForwardDiff", "FunctionWrappers", "FunctionWrappersWrappers", "Graphs", "ImplicitDiscreteSolve", "InteractiveUtils", "IntervalSets", "JumpProcesses", "Libdl", "LinearAlgebra", "Moshi", "NaNMath", "NonlinearSolveBase", "OffsetArrays", "OrderedCollections", "PreallocationTools", "PrecompileTools", "Printf", "REPL", "Random", "ReadOnlyDicts", "RecursiveArrayTools", "Reexport", "RuntimeGeneratedFunctions", "SCCNonlinearSolve", "SciMLBase", "SciMLPublic", "SciMLStructures", "Serialization", "Setfield", "SimpleNonlinearSolve", "SparseArrays", "SpecialFunctions", "StaticArrays", "StaticArraysCore", "SymbolicIndexingInterface", "SymbolicUtils", "Symbolics", "TaskLocalValues", "TermInterface", "UnPack"]
-git-tree-sha1 = "50014cd426f4b0e00be25db28bb4a8e909534a9a"
+git-tree-sha1 = "fb3d853862acc2b3c6f951af9347fb6da678124f"
 registries = "General"
 uuid = "7771a370-6774-4173-bd38-47e70ca0b839"
-version = "1.77.4"
+version = "1.77.5"
 
     [deps.ModelingToolkitBase.extensions]
     MTKBifurcationKitExt = "BifurcationKit"
@@ -1941,10 +1943,10 @@ version = "1.11.1"
 
 [[deps.StaticArrays]]
 deps = ["LinearAlgebra", "PrecompileTools", "Random", "StaticArraysCore"]
-git-tree-sha1 = "de349d5585559b692f518b6d3fc7c179d64b2364"
+git-tree-sha1 = "8a8a52f887f38d44014e24ee46b8a7311c625f6d"
 registries = "General"
 uuid = "90137ffa-7385-5640-81b9-e52037218182"
-version = "1.9.23"
+version = "1.9.24"
 
     [deps.StaticArrays.extensions]
     StaticArraysChainRulesCoreExt = "ChainRulesCore"
@@ -2035,10 +2037,10 @@ version = "1.2.2"
 
 [[deps.SymbolicUtils]]
 deps = ["AbstractTrees", "ArrayInterface", "Combinatorics", "ConstructionBase", "DataStructures", "DocStringExtensions", "DynamicPolynomials", "EnumX", "ExproniconLite", "Graphs", "LinearAlgebra", "MacroTools", "Moshi", "MultivariatePolynomials", "MutableArithmetics", "NaNMath", "OrderedCollections", "PrecompileTools", "ReadOnlyArrays", "SciMLPublic", "Setfield", "SparseArrays", "SpecialFunctions", "StaticArraysCore", "SymbolicIndexingInterface", "TaskLocalValues", "TermInterface", "WeakCacheSets"]
-git-tree-sha1 = "f2c772377876c81d13ca2a79539abc0c2a8de260"
+git-tree-sha1 = "02f69315de3d03791f93aeb147c7c53d5449e8b5"
 registries = "General"
 uuid = "d1185830-fcd6-423d-90d6-eec64667417b"
-version = "4.51.0"
+version = "4.53.0"
 
     [deps.SymbolicUtils.extensions]
     SymbolicUtilsChainRulesCoreExt = "ChainRulesCore"
@@ -2054,10 +2056,10 @@ version = "4.51.0"
 
 [[deps.Symbolics]]
 deps = ["ADTypes", "AbstractPlutoDingetjes", "ArrayInterface", "Bijections", "CommonWorldInvalidations", "ConstructionBase", "DataStructures", "DiffRules", "DocStringExtensions", "DomainSets", "DynamicPolynomials", "IntervalSets", "Libdl", "LinearAlgebra", "LogExpFunctions", "MacroTools", "Markdown", "Moshi", "MultivariatePolynomials", "MutableArithmetics", "NaNMath", "PrecompileTools", "Preferences", "Primes", "RecipesBase", "RuntimeGeneratedFunctions", "SciMLPublic", "Setfield", "SparseArrays", "SpecialFunctions", "StaticArraysCore", "SymbolicIndexingInterface", "SymbolicLimits", "SymbolicUtils", "TermInterface"]
-git-tree-sha1 = "d9a12dff2ff5b6c07e3479f4ed77b483c2c711d0"
+git-tree-sha1 = "c6e59ec4c474c07392dde84762679b74a0b69085"
 registries = "General"
 uuid = "0c5d862f-8b57-4792-8d23-62f2024744c7"
-version = "7.46.0"
+version = "7.47.0"
 
     [deps.Symbolics.extensions]
     SymbolicsD3TreesExt = "D3Trees"
