@@ -12,7 +12,7 @@ using MarkdownTables
 @time "Build system" @named sys = make_model()
 @time "Build problem" prob = SteadyStateProblem(sys, [])
 
-params = parameters(sys)
+sts = unknowns(sys)
 sol0 = solve(prob, DynamicSS(FBDF()); reltol=1e-8, abstol=1e-8)
 ## Average degree of mitochondrial node
 @unpack degavg = sys
