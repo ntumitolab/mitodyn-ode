@@ -167,4 +167,12 @@ function make_model(;
     return simplify ? mtkcompile(sys) : sys
 end
 
+# Precompile the model-construction workload
+@setup_workload begin
+    @compile_workload begin
+        _sys = make_model(name=:sys)
+        ODEProblem(_sys, [], (0.0, 1.0))
+    end
+end
+
 end # Module
