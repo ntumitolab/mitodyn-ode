@@ -29,17 +29,22 @@ function make_model(;
     @constants begin
         C_MIT = 1.812μM / mV # Mitochondrial membrane capacitance
         F_M = 3E-4       # Fraction of free Ca in mitochondria
-        F_I = 0.01       # Fraction of free Ca in cytosol
+        F_I = 0.01       # Fraction of free Ca in cytosol (unused?)
         V_I = 0.53       # Relative cytoplasmic volume
-        V_MT = 0.06      # Relative mitochondrial volume
+        V_MT = 0.06      # Relative mitochondrial volume (unused?)
         V_MTX = 0.0144   # Relative mitochondrial matrix volume
+        iV_MTX = inv(V_MTX)
+        iC_MIT = inv(C_MIT)
+        iV_I = inv(V_I)
+        iV_I_MTX = inv(V_I + V_MTX)
     end
+
 
     # Adjustable parameters
     @parameters (rETC=1, rHL=1, rF1=1, rPDH=1)
 
     # Adenylate kinase (AdK)
-    @variables AEC(t) = 0.9 ATP_c(t) ADP_c(t) AMP_c(t)
+    @variables ATP_c(t) = 4mM ADP_c(t) AMP_c(t) = 0mM J_ADK(t)
     @parameters (kfAK=1000Hz / mM, kEqAK=0.931)
 
     # Glucokinase (GK)
@@ -113,8 +118,12 @@ function make_model(;
     @variables x1(t) x2(t) = 0.24 x3(t) = 0.06 degavg(t) tiptip(t) tipside(t)
     @parameters (kfiss1=inv(10minute), kfuse1=inv(10minute), kfiss2=1.5 * inv(10minute), kfuse2=0.5 * inv(10minute))
 
+    dATP = iV_I * (J_ANT - ATPstiochGK * J_GK + 2J_GPD + J_ADK) - ATP_c * (kATP + kATPCa * Ca_c)
+    dAMP = iV_I * J_ADK
+
     eqs = [
         caceq,
+        J_ADK ~ kfAK * (ADP_c^2 - ATP_c * AMP_c / kEqAK),
         J_GK ~ VmaxGK * hil(ATP_c, KatpGK) * hil(Glc, KglcGK, nGK),
         J_GPD ~ VmaxGPD * hil(ADP_c, KadpGPD) * hil(NAD_c, NADH_c * KnadGPD) * hil(G3P, Kg3pGPD),
         J_LDH ~ VmaxLDH * hil(Pyr, KpyrLDH) * hil(NADH_c, NAD_c * KnadhLDH),
@@ -133,23 +142,23 @@ function make_model(;
         tipside ~ kfuse2 * J_ANT / J_HL * x1 * x2 - kfiss2 * x3,
         degavg ~ (x1 + 2x2 + 3x3) / (x1 + x2 + x3),
         # Conservation relationships
-        ATP_c ~ ΣAc * aec2atp(AEC, kEqAK),
-        ADP_c ~ ΣAc * aec2adp(AEC, kEqAK),
-        AMP_c ~ ΣAc - ATP_c - ADP_c,
+        ΣAc ~ AMP_c + ATP_c + ADP_c,
         Σn_c ~ NADH_c + NAD_c,
         Σn_m ~ NADH_m + NAD_m,
         1 ~ x1 + 2x2 + 3x3,
         # State variables
-        D(NADH_m) ~ inv(V_MTX) * (J_DH + J_NADHT - J_O2) - kNADHm * NADH_m,
+        D(NADH_m) ~ iV_MTX * (J_DH + J_NADHT - J_O2) - kNADHm * NADH_m,
         # D(NAD_m) ~ # Conserved
-        D(NADH_c) ~ inv(V_I) * (J_GPD - J_NADHT - J_LDH) - kNADHc * NADH_c,
+        D(NADH_c) ~ iV_I * (J_GPD - J_NADHT - J_LDH) - kNADHc * NADH_c,
         # D(NAD_c) ~ # Conserved
-        D(Ca_m) ~ inv(V_MTX) * F_M * (J_MCU - J_NCLX),
-        D(ΔΨm) ~ inv(C_MIT) * (J_HR - J_HF - J_HL - J_ANT - 2 * J_MCU),
-        D(G3P) ~ inv(V_I) * (2J_GK - J_GPD) - kG3P * G3P,
-        D(Pyr) ~ inv(V_I + V_MTX) * (J_GPD - J_PDH - J_LDH) - kPyr * Pyr,
-        D(AEC) ~ (inv(V_I) * (-ATPstiochGK * J_GK + 2 * J_GPD + J_ANT) - ATP_c * (kATP + kATPCa * Ca_c)) / ΣAc,
-        # D(x[1]) ~ # Conserved
+        D(Ca_m) ~ iV_MTX * F_M * (J_MCU - J_NCLX),
+        D(ΔΨm) ~ iC_MIT * (J_HR - J_HF - J_HL - J_ANT - 2 * J_MCU),
+        D(G3P) ~ iV_I * (2J_GK - J_GPD) - kG3P * G3P,
+        D(Pyr) ~ iV_I_MTX * (J_GPD - J_PDH - J_LDH) - kPyr * Pyr,
+        D(ATP_c) ~ dATP,
+        D(AMP_c) ~ dAMP,
+        # D(AMP_c) ~ # Conserved by ΣAc (dAMP = J_ADK / V_I)
+        # D(x1) ~ # Conserved
         D(x2) ~ tiptip - tipside,
         D(x3) ~ tipside,
     ]
