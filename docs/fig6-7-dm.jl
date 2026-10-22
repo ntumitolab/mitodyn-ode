@@ -2,32 +2,36 @@
 # Figure 6 and 7
 ===#
 using OrdinaryDiffEq
-using OrdinaryDiffEqSDIRK
-using SteadyStateDiffEq
 using ModelingToolkit
-using MitochondrialDynamics
-using MitochondrialDynamics: second, μM, mV, mM, Hz, minute
+using Startup
+using Startup: second, μM, mV, mM, Hz, minute
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
+
+# `sol[k]` is a time series for an ODE solution; steady states are its last value.
+extract_ss(sim, k) = map(s -> last(s[k]), sim)
 
 #---
 glc = 4.0:0.5:30.0
 @time "Build system" @named sys = make_model()
-@time "Build problem" prob = SteadyStateProblem(sys, [])
+# Integrate the physical ODE to steady state. `SteadyStateProblem` is lowered
+# to an SCC nonlinear problem whose block-wise pseudo-transient flow is
+# unstable for the fission/fusion block and gives nonphysical concentrations.
+@time "Build problem" prob = ODEProblem(sys, [], (0.0, 1e5))
 
 # Change parameters
 @unpack Glc, rETC, rHL, rF1, rPDH = sys
 
 # ## Fig 6
-prob_dm = SteadyStateProblem(sys, [rPDH=>0.5, rETC=>0.75, rHL=>1.4, rF1=>0.5])
-prob_fccp = SteadyStateProblem(sys, [rHL=>5.0])
-prob_rotenone = SteadyStateProblem(sys, [rETC=>0.1])
-prob_oligomycin = SteadyStateProblem(sys, [rF1=>0.1])
+prob_dm = remake(prob, p=[rPDH=>0.5, rETC=>0.75, rHL=>1.4, rF1=>0.5])
+prob_fccp = remake(prob, p=[rHL=>5.0])
+prob_rotenone = remake(prob, p=[rETC=>0.1])
+prob_oligomycin = remake(prob, p=[rF1=>0.1])
 
 prob_func_glc = (prob, ctx) -> remake(prob, p=[Glc => glc[ctx.sim_id]])
 
 # DM cells
-alg = DynamicSS(KenCarp47())
+alg = FBDF()
 trajectories = length(glc)
 
 @time "Solve baseline" sols = map(glc) do g
@@ -49,56 +53,56 @@ function plot_fig6(sols, solsDM, glc; figsize=(10, 8), labels=["Baseline", "Diab
     fig, ax = plt.subplots(numrows, numcols; figsize)
 
     @unpack G3P = sys
-    ax[0, 0].plot(glc5, extract(sols, G3P * 1000), label=labels[1])
-    ax[0, 0].plot(glc5, extract(solsDM, G3P * 1000), label=labels[2])
+    ax[0, 0].plot(glc5, extract_ss(sols, G3P * 1000), label=labels[1])
+    ax[0, 0].plot(glc5, extract_ss(solsDM, G3P * 1000), label=labels[2])
     ax[0, 0].set_title("j", loc="left")
     ax[0, 0].set(ylabel="G3P (μM)")
 
     @unpack Pyr = sys
-    ax[0, 1].plot(glc5, extract(sols, Pyr * 1000), label=labels[1])
-    ax[0, 1].plot(glc5, extract(solsDM, Pyr * 1000), label=labels[2])
+    ax[0, 1].plot(glc5, extract_ss(sols, Pyr * 1000), label=labels[1])
+    ax[0, 1].plot(glc5, extract_ss(solsDM, Pyr * 1000), label=labels[2])
     ax[0, 1].set_title("k", loc="left")
     ax[0, 1].set(ylabel="Pyruvate (μM)")
 
     @unpack NADH_c, NAD_c = sys
-    ax[0, 2].plot(glc5, extract(sols, NADH_c/NAD_c), label=labels[1])
-    ax[0, 2].plot(glc5, extract(solsDM, NADH_c/NAD_c), label=labels[2])
+    ax[0, 2].plot(glc5, extract_ss(sols, NADH_c/NAD_c), label=labels[1])
+    ax[0, 2].plot(glc5, extract_ss(solsDM, NADH_c/NAD_c), label=labels[2])
     ax[0, 2].set_title("l", loc="left")
     ax[0, 2].set(ylabel="Cyto. NADH:NAD (ratio)")
 
     @unpack NADH_m, NAD_m = sys
-    ax[1, 0].plot(glc5, extract(sols, NADH_m/NAD_m), label=labels[1])
-    ax[1, 0].plot(glc5, extract(solsDM, NADH_m/NAD_m), label=labels[2])
+    ax[1, 0].plot(glc5, extract_ss(sols, NADH_m/NAD_m), label=labels[1])
+    ax[1, 0].plot(glc5, extract_ss(solsDM, NADH_m/NAD_m), label=labels[2])
     ax[1, 0].set_title("m", loc="left")
     ax[1, 0].set(ylabel="Mito. NADH:NAD (ratio)")
 
     @unpack Ca_c = sys
-    ax[1, 1].plot(glc5, extract(sols, Ca_c * 1000), label=labels[1])
-    ax[1, 1].plot(glc5, extract(solsDM, Ca_c * 1000), label=labels[2])
+    ax[1, 1].plot(glc5, extract_ss(sols, Ca_c * 1000), label=labels[1])
+    ax[1, 1].plot(glc5, extract_ss(solsDM, Ca_c * 1000), label=labels[2])
     ax[1, 1].set_title("n", loc="left")
     ax[1, 1].set(ylabel="Cyto. calcium (μM)")
 
     @unpack Ca_m = sys
-    ax[1, 2].plot(glc5, extract(sols, Ca_m * 1000), label=labels[1])
-    ax[1, 2].plot(glc5, extract(solsDM, Ca_m * 1000), label=labels[2])
+    ax[1, 2].plot(glc5, extract_ss(sols, Ca_m * 1000), label=labels[1])
+    ax[1, 2].plot(glc5, extract_ss(solsDM, Ca_m * 1000), label=labels[2])
     ax[1, 2].set_title("o", loc="left")
     ax[1, 2].set(ylabel="Mito. calcium (μM)")
 
     @unpack ΔΨm = sys
-    ax[2, 0].plot(glc5, extract(sols, ΔΨm * 1000), label=labels[1])
-    ax[2, 0].plot(glc5, extract(solsDM, ΔΨm * 1000), label=labels[2])
+    ax[2, 0].plot(glc5, extract_ss(sols, ΔΨm * 1000), label=labels[1])
+    ax[2, 0].plot(glc5, extract_ss(solsDM, ΔΨm * 1000), label=labels[2])
     ax[2, 0].set_title("p", loc="left")
     ax[2, 0].set(xlabel="Glucose (X)", ylabel="ΔΨ (mV)")
 
     @unpack ATP_c, ADP_c = sys
-    ax[2, 1].plot(glc5, extract(sols, ATP_c/ADP_c), label=labels[1])
-    ax[2, 1].plot(glc5, extract(solsDM, ATP_c/ADP_c), label=labels[2])
+    ax[2, 1].plot(glc5, extract_ss(sols, ATP_c/ADP_c), label=labels[1])
+    ax[2, 1].plot(glc5, extract_ss(solsDM, ATP_c/ADP_c), label=labels[2])
     ax[2, 1].set_title("q", loc="left")
     ax[2, 1].set(xlabel="Glucose (X)", ylabel="ATP:ADP (ratio)")
 
     @unpack degavg = sys
-    ax[2, 2].plot(glc5, extract(sols, degavg), label=labels[1])
-    ax[2, 2].plot(glc5, extract(solsDM, degavg), label=labels[2])
+    ax[2, 2].plot(glc5, extract_ss(sols, degavg), label=labels[1])
+    ax[2, 2].plot(glc5, extract_ss(solsDM, degavg), label=labels[2])
     ax[2, 2].set_title("r", loc="left")
     ax[2, 2].set(xlabel="Glucose (X)", ylabel="Avg. node degree (ratio)")
 
@@ -148,20 +152,20 @@ function plot_fig7(sols, solsDM, solsFCCP, solsRot, solsOligo, glc; figsize=(12,
     sys = sols[begin].prob.f.sys
     @unpack J_HL, J_ANT = sys
     ## Gather ATP synthesis rate (fusion) and proton leak rate (fission)
-    jHL_baseline = extract(sols, J_HL)
-    jANT_baseline = extract(sols, J_ANT)
+    jHL_baseline = extract_ss(sols, J_HL)
+    jANT_baseline = extract_ss(sols, J_ANT)
     ff_baseline = jANT_baseline ./ jHL_baseline
-    jHL_dm = extract(solsDM, J_HL)
-    jANT_dm = extract(solsDM, J_ANT)
+    jHL_dm = extract_ss(solsDM, J_HL)
+    jANT_dm = extract_ss(solsDM, J_ANT)
     ff_dm = jANT_dm ./ jHL_dm
-    jHL_fccp = extract(solsFCCP, J_HL)
-    jANT_fccp = extract(solsFCCP, J_ANT)
+    jHL_fccp = extract_ss(solsFCCP, J_HL)
+    jANT_fccp = extract_ss(solsFCCP, J_ANT)
     ff_fccp = jANT_fccp ./ jHL_fccp
-    jHL_rot = extract(solsRot, J_HL)
-    jANT_rot = extract(solsRot, J_ANT)
+    jHL_rot = extract_ss(solsRot, J_HL)
+    jANT_rot = extract_ss(solsRot, J_ANT)
     ff_rot = jANT_rot ./ jHL_rot
-    jHL_oligo = extract(solsOligo, J_HL)
-    jANT_oligo = extract(solsOligo, J_ANT)
+    jHL_oligo = extract_ss(solsOligo, J_HL)
+    jANT_oligo = extract_ss(solsOligo, J_ANT)
     ff_oligo = jANT_oligo ./ jHL_oligo
 
     glc5 = glc ./ 5

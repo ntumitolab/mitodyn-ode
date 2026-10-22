@@ -5,16 +5,18 @@ Steady-state solutions for a range of glucose concentrations and OXPHOS capaciti
 ===#
 using OrdinaryDiffEq
 using OrdinaryDiffEqSDIRK
-using SteadyStateDiffEq
 using ModelingToolkit
-using MitochondrialDynamics
+using Startup
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
 #---
 @time "Build system" @named sys = make_model()
 @unpack Glc, rETC, rHL, rF1, rPDH = sys
-@time "Build problem" prob = SteadyStateProblem(sys, [])
+# Integrate the physical ODE to steady state. `SteadyStateProblem` is lowered
+# to an SCC nonlinear problem whose block-wise pseudo-transient flow is
+# unstable for the fission/fusion block and gives nonphysical concentrations.
+@time "Build problem" prob = ODEProblem(sys, [], (0.0, 1e5))
 
 # Range for two parameters
 rGlcF1 = range(3.0, 30.0, 51)
@@ -25,7 +27,7 @@ retc = range(0.1, 2.0, 51)
 rhl = range(0.1, 5.0, 51)
 
 # 2D steady states
-function solve_fig3(glc, r, k, prob, alg=DynamicSS(TRBDF2()))
+function solve_fig3(glc, r, k, prob, alg=TRBDF2())
     newprob = remake(prob, p = [Glc=> glc, k => r])
     return solve(newprob, alg)
 end
@@ -52,7 +54,7 @@ function plot_fig3(;
 )
     ## mapping functions
     @unpack degavg, ΔΨm, ATP_c, ADP_c = sys
-    fs = (s -> s[degavg], s -> s[ΔΨm * 1000] , s -> s[ATP_c / ADP_c])
+    fs = (s -> last(s[degavg]), s -> last(s[ΔΨm * 1000]), s -> last(s[ATP_c / ADP_c]))
 
     fig, axes = plt.subplots(3, 3; figsize)
 

@@ -16,6 +16,7 @@ project:
   # https://mystmd.org/guide/table-of-contents
   toc:
     - file: index.md
+    - file: packages.md
     - pattern: "*.ipynb"
 
 site:

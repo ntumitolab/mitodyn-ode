@@ -5,30 +5,35 @@ Steady-state solutions across a range of glucose levels.
 ===#
 using OrdinaryDiffEq
 using OrdinaryDiffEqSDIRK
-using SteadyStateDiffEq
 using ModelingToolkit
-using MitochondrialDynamics
+using Startup
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
+
+# `sol[k]` is a time series for an ODE solution; steady states are its last value.
+extract_ss(sim, k) = map(s -> last(s[k]), sim)
 
 # baseline model
 @time @named sys = make_model()
 @unpack Glc, G3P, Pyr, ATP_c, ADP_c, NADH_c, NADH_m, Ca_m, ΔΨm, x1, x2, x3 = sys
-@time prob = SteadyStateProblem(sys, [])
-alg = DynamicSS(TRBDF2())
+# Integrate the physical ODE to steady state. `SteadyStateProblem` is lowered
+# to an SCC nonlinear problem whose block-wise pseudo-transient flow is
+# unstable for the fission/fusion block and gives nonphysical concentrations.
+@time prob = ODEProblem(sys, [], (0.0, 1e5))
+alg = TRBDF2()
 @time sol = solve(prob, alg)
 
 for i in unknowns(sys)
-    println("$i = $(sol[i])")
+    println("$i = $(last(sol[i]))")
 end
 
 # Galactose model: glycolysis produces zero net ATP
 # By increasing the ATP consumed in the first part of glycolysis from 2 to 4
-prob_gal = SteadyStateProblem(sys, [sys.ATPstiochGK => 4])
+prob_gal = ODEProblem(sys, [sys.ATPstiochGK => 4], (0.0, 1e5))
 
 # FFA model: Additional flux reducing mitochondrial NAD/NADH couple
 # A 10% increase w.r.t baseline CAC flux
-prob_ffa = SteadyStateProblem(sys, [sys.kFFA => sol[0.10 * sys.J_DH / sys.NAD_m]])
+prob_ffa = ODEProblem(sys, [sys.kFFA => last(sol[0.10 * sys.J_DH / sys.NAD_m])], (0.0, 1e5))
 
 # Simulating on a range of glucose
 # Test on a range of glucose (3 mM to 30 mM)
@@ -63,21 +68,21 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x1, x2, x3, degavg = sys
 
     glc5 = glc ./ 5
-    g3p = extract(sols, G3P * 1000)
-    pyr = extract(sols, Pyr * 1000)
-    ca_c = extract(sols, Ca_c * 1000)
-    ca_m = extract(sols, Ca_m * 1000)
-    nad_ratio_c = extract(sols, NADH_c / NAD_c)
-    nad_ratio_m = extract(sols, NADH_m / NAD_m)
-    atp_c = extract(sols, ATP_c * 1000)
-    adp_c = extract(sols, ADP_c * 1000)
-    amp_c = extract(sols, AMP_c * 1000)
-    td = extract(sols, ATP_c / ADP_c)
-    dpsi = extract(sols, ΔΨm * 1000)
-    x1 = extract(sols, x1)
-    x2 = extract(sols, x2)
-    x3 = extract(sols, x3)
-    deg = extract(sols, degavg)
+    g3p = extract_ss(sols, G3P * 1000)
+    pyr = extract_ss(sols, Pyr * 1000)
+    ca_c = extract_ss(sols, Ca_c * 1000)
+    ca_m = extract_ss(sols, Ca_m * 1000)
+    nad_ratio_c = extract_ss(sols, NADH_c / NAD_c)
+    nad_ratio_m = extract_ss(sols, NADH_m / NAD_m)
+    atp_c = extract_ss(sols, ATP_c * 1000)
+    adp_c = extract_ss(sols, ADP_c * 1000)
+    amp_c = extract_ss(sols, AMP_c * 1000)
+    td = extract_ss(sols, ATP_c / ADP_c)
+    dpsi = extract_ss(sols, ΔΨm * 1000)
+    x1 = extract_ss(sols, x1)
+    x2 = extract_ss(sols, x2)
+    x3 = extract_ss(sols, x3)
+    deg = extract_ss(sols, degavg)
 
     numrows = 3
     numcols = 3
@@ -155,41 +160,41 @@ function plot_ffa_gal(glc, sim, sim_gal, sim_ffa, sys; figsize=(10, 10), title="
     axs[0, 0].set(ylabel="Cytosolic NADH:NAD (ratio)")
     axs[0, 0].set_title("a", loc="left")
     k = NADH_c / NAD_c
-    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
+    yy = [extract_ss(sim, k) extract_ss(sim_gal, k) extract_ss(sim_ffa, k)]
     lines = axs[0, 0].plot(glc5, yy)
     axs[0, 0].legend(lines, labels)
 
     axs[0, 1].set(ylabel="Mitochondrial NADH:NAD (ratio)")
     axs[0, 1].set_title("b", loc="left")
     k = NADH_m / NAD_m
-    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
+    yy = [extract_ss(sim, k) extract_ss(sim_gal, k) extract_ss(sim_ffa, k)]
     lines = axs[0, 1].plot(glc5, yy)
     axs[0, 1].legend(lines, labels)
 
     axs[1, 0].set(ylabel="ATP:ADP (ratio)")
     axs[1, 0].set_title("c", loc="left")
     k = ATP_c / ADP_c
-    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
+    yy = [extract_ss(sim, k) extract_ss(sim_gal, k) extract_ss(sim_ffa, k)]
     lines = axs[1, 0].plot(glc5, yy)
     axs[1, 0].legend(lines, labels)
 
     axs[1, 1].set(ylabel="ΔΨm (mV)")
     axs[1, 1].set_title("d", loc="left")
     k = ΔΨm * 1000
-    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
+    yy = [extract_ss(sim, k) extract_ss(sim_gal, k) extract_ss(sim_ffa, k)]
     lines = axs[1, 1].plot(glc5, yy)
     axs[1, 1].legend(lines, labels)
 
     axs[2, 0].set(ylabel="Average node degree (a.u.)")
     axs[2, 0].set_title("e", loc="left")
     k = degavg
-    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
+    yy = [extract_ss(sim, k) extract_ss(sim_gal, k) extract_ss(sim_ffa, k)]
     lines = axs[2, 0].plot(glc5, yy)
     axs[2, 0].legend(lines, labels)
     axs[2, 0].set(xlabel="Glucose (X)")
 
     k = J_O2 * 1000
-    yy = [extract(sim, k) extract(sim_gal, k) extract(sim_ffa, k)]
+    yy = [extract_ss(sim, k) extract_ss(sim_gal, k) extract_ss(sim_ffa, k)]
     lines = axs[2, 1].plot(glc5, yy)
     axs[2, 1].legend(lines, labels)
     axs[2, 1].set(xlabel="Glucose (X)", ylabel="Oxygen consumption (μM/s)")
