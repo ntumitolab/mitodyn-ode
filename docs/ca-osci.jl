@@ -29,7 +29,7 @@ end
 #---
 tend = 4000.0
 ts = range(tend-480, tend; length=201)
-@time "Build oscillating problem" prob = ODEProblem(sysosci, [], tend, [Glc => 10mM])
+@time "Build oscillating problem" prob = ODEProblem(sysosci, [Glc => 10mM], tend, )
 @time "Solve oscillating problem" sol = solve(prob, alg, saveat=ts)
 
 #---

@@ -44,7 +44,7 @@ function make_model(;
     @parameters (rETC=1, rHL=1, rF1=1, rPDH=1)
 
     # Adenylate kinase (AdK)
-    @variables ATP_c(t) = 4mM ADP_c(t) AMP_c(t) = 0mM J_ADK(t)
+    @variables ATP_c(t) = 4.05mM ADP_c(t) AMP_c(t) = 0.05mM J_ADK(t)
     @parameters (kfAK=1000Hz / mM, kEqAK=0.931)
 
     # Glucokinase (GK)

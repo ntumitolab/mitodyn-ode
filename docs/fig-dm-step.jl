@@ -6,7 +6,6 @@ Step responses to both glucose stimulation and chemical agents (I)
 ===#
 using OrdinaryDiffEq
 using OrdinaryDiffEqSDIRK
-using SteadyStateDiffEq
 using DiffEqCallbacks
 using ModelingToolkit
 using Startup
@@ -25,8 +24,8 @@ alg = TRBDF2()
 @time "Build problem" prob = ODEProblem(sys, [], tspan)
 @time "Build diabetic problem" prob_dm = ODEProblem(sys, [rPDH=>0.5, rETC=>0.75, rHL=>1.4, rF1=>0.5], tspan)
 
-@time "Build steady-state problem" ssprob_dm = SteadyStateProblem(prob_dm)
-@time "Solve steady-state" sssol_dm = solve(ssprob_dm, DynamicSS(alg))
+# Integrate the diabetic ODE to steady state for the initial condition.
+@time "Solve steady-state" sssol_dm = solve(prob_dm, alg; tspan=(0.0, 1e5))
 
 # Define events
 function add_glucose!(i)
@@ -53,7 +52,7 @@ end
 
 add_fccp_cb = PresetTimeCallback(60minute, add_fccp!)
 
-prob_dm = remake(prob_dm, u0=sssol_dm.u)
+prob_dm = remake(prob_dm, u0=last(sssol_dm.u))
 cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_fccp_cb)
 sols3 = solve(prob, alg; callback=cbs, saveat=ts)
 solDMs3 = solve(prob_dm, alg; callback=cbs, saveat=ts);
@@ -157,7 +156,7 @@ exportTIF(figs3, "FigDM-Glucose-Oligomycin-FCCP.tif")
 
 ## Glucose-Oligomycin-Rotenone
 prob5 = ODEProblem(sys, [], tspan)
-prob_dm5 = ODEProblem(sys, sssol_dm.u, tspan, [rPDH=>0.5, rETC=>0.75, rHL=>1.4, rF1=>0.5])
+prob_dm5 = ODEProblem(sys, last(sssol_dm.u), tspan, [rPDH=>0.5, rETC=>0.75, rHL=>1.4, rF1=>0.5])
 cbs = CallbackSet(add_glucose_cb, add_oligomycin_cb, add_rotenone_cb)
 sols5 = solve(prob5, alg; callback=cbs, saveat=ts)
 sols5DM = solve(prob_dm5, alg; callback=cbs, saveat=ts)

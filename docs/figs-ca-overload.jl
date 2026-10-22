@@ -5,23 +5,28 @@ Steady-state solutions across a range of glucose levels.
 ===#
 using OrdinaryDiffEq
 using OrdinaryDiffEqSDIRK
-using SteadyStateDiffEq
 using ModelingToolkit
 using Startup
 using Startup: μM
 import PythonPlot as plt
 plt.matplotlib.rcParams["font.size"] = 14
 
+# `sol[k]` is a time series for an ODE solution; steady states are its last value.
+extract_ss(sim, k) = map(s -> last(s[k]), sim)
+
 # Default model
 @time "Build system" @named sys = make_model()
-@time "Build problem" prob = SteadyStateProblem(sys, [])
-alg = DynamicSS(TRBDF2())
+# Integrate the physical ODE to steady state. `SteadyStateProblem` is lowered
+# to an SCC nonlinear problem whose block-wise pseudo-transient flow is
+# unstable for the fission/fusion block and gives nonphysical concentrations.
+@time "Build problem" prob = ODEProblem(sys, [], (0.0, 1e5))
+alg = TRBDF2()
 @time "Solve problem" sol = solve(prob, alg)
 
 # High calcium model
 @unpack RestingCa, ActivatedCa = sys
-prob_ca5 = SteadyStateProblem(sys, [RestingCa=>0.45μM, ActivatedCa=>1.25μM])
-prob_ca10 = SteadyStateProblem(sys, [RestingCa=>0.9μM, ActivatedCa=>2.5μM])
+prob_ca5 = ODEProblem(sys, [RestingCa=>0.45μM, ActivatedCa=>1.25μM], (0.0, 1e5))
+prob_ca10 = ODEProblem(sys, [RestingCa=>0.9μM, ActivatedCa=>2.5μM], (0.0, 1e5))
 
 # Simulating on a range of glucose
 @unpack Glc = sys
@@ -56,21 +61,21 @@ function plot_steady_state(glc, sols, sys; figsize=(10, 10), title="")
     @unpack G3P, Pyr, Ca_c, Ca_m, NADH_c, NADH_m, NAD_c, NAD_m, ATP_c, ADP_c, AMP_c, ΔΨm, x1, x2, x3, degavg = sys
 
     glc5 = glc ./ 5
-    g3p = extract(sols, G3P * 1000)
-    pyr = extract(sols, Pyr * 1000)
-    ca_c = extract(sols, Ca_c * 1000)
-    ca_m = extract(sols, Ca_m * 1000)
-    nad_ratio_c = extract(sols, NADH_c/NAD_c)
-    nad_ratio_m = extract(sols, NADH_m/NAD_m)
-    atp_c = extract(sols, ATP_c * 1000)
-    adp_c = extract(sols, ADP_c * 1000)
-    amp_c = extract(sols, AMP_c * 1000)
-    td = extract(sols, ATP_c / ADP_c)
-    dpsi = extract(sols, ΔΨm * 1000)
-    x1 = extract(sols, x1)
-    x2 = extract(sols, x2)
-    x3 = extract(sols, x3)
-    deg = extract(sols, degavg)
+    g3p = extract_ss(sols, G3P * 1000)
+    pyr = extract_ss(sols, Pyr * 1000)
+    ca_c = extract_ss(sols, Ca_c * 1000)
+    ca_m = extract_ss(sols, Ca_m * 1000)
+    nad_ratio_c = extract_ss(sols, NADH_c/NAD_c)
+    nad_ratio_m = extract_ss(sols, NADH_m/NAD_m)
+    atp_c = extract_ss(sols, ATP_c * 1000)
+    adp_c = extract_ss(sols, ADP_c * 1000)
+    amp_c = extract_ss(sols, AMP_c * 1000)
+    td = extract_ss(sols, ATP_c / ADP_c)
+    dpsi = extract_ss(sols, ΔΨm * 1000)
+    x1 = extract_ss(sols, x1)
+    x2 = extract_ss(sols, x2)
+    x3 = extract_ss(sols, x3)
+    deg = extract_ss(sols, degavg)
 
     numrows = 3
     numcols = 3
@@ -145,35 +150,35 @@ function plot_comparision(glc, sim, sim_ca5, sim_ca10, sys;
     ax[0, 0].set_title("a", loc="left")
     ax[0, 0].set_ylabel("Cyto. NADH:NAD (ratio)")
     k = NADH_c/NAD_c
-    yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
+    yy = [extract_ss(sim, k) extract_ss(sim_ca5, k) extract_ss(sim_ca10, k)]
     lines = ax[0, 0].plot(glc5, yy)
     ax[0, 0].legend(lines, labels)
 
     ax[0, 1].set_title("b", loc="left")
     ax[0, 1].set_ylabel("Mito. NADH:NAD (ratio)")
     k = NADH_m/NAD_m
-    yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
+    yy = [extract_ss(sim, k) extract_ss(sim_ca5, k) extract_ss(sim_ca10, k)]
     lines = ax[0, 1].plot(glc5, yy)
     ax[0, 1].legend(lines, labels)
 
     ax[1, 0].set_title("c", loc="left")
     ax[1, 0].set_ylabel("ATP:ADP (ratio)")
     k = ATP_c/ADP_c
-    yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
+    yy = [extract_ss(sim, k) extract_ss(sim_ca5, k) extract_ss(sim_ca10, k)]
     lines = ax[1, 0].plot(glc5, yy)
     ax[1, 0].legend(lines, labels)
 
     ax[1, 1].set_title("d", loc="left")
     ax[1, 1].set_ylabel("ΔΨm (mV)")
     k = ΔΨm * 1000
-    yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
+    yy = [extract_ss(sim, k) extract_ss(sim_ca5, k) extract_ss(sim_ca10, k)]
     lines = ax[1, 1].plot(glc5, yy)
     ax[1, 1].legend(lines, labels)
 
     ax[2, 0].set_title("e", loc="left")
     ax[2, 0].set_ylabel("Avg. node degree (ratio)")
     k = degavg
-    yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
+    yy = [extract_ss(sim, k) extract_ss(sim_ca5, k) extract_ss(sim_ca10, k)]
     lines = ax[2, 0].plot(glc5, yy)
     ax[2, 0].legend(lines, labels, loc="lower right")
     ax[2, 0].set(xlabel="Glucose (X)")
@@ -181,7 +186,7 @@ function plot_comparision(glc, sim, sim_ca5, sim_ca10, sys;
     ax[2, 1].set_title("f", loc="left")
     ax[2, 1].set_ylabel("VO2 (mM/s)")
     k = J_O2
-    yy = [extract(sim, k) extract(sim_ca5, k) extract(sim_ca10, k)]
+    yy = [extract_ss(sim, k) extract_ss(sim_ca5, k) extract_ss(sim_ca10, k)]
     lines = ax[2, 1].plot(glc5, yy)
     ax[2, 1].legend(lines, labels)
     ax[2, 1].set(xlabel="Glucose (X)")
@@ -207,9 +212,9 @@ function plot_dpsi_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", label
 
     fig, ax = plt.subplots(1, 1; figsize)
 
-    ax.plot(extract(sim, ΔΨm * 1000), extract(sim, degavg), "v", label=labels[1])
-    ax.plot(extract(sim_ca5, ΔΨm * 1000), extract(sim_ca5, degavg), "o", label=labels[2])
-    ax.plot(extract(sim_ca10, ΔΨm * 1000), extract(sim_ca10, degavg), "x", label=labels[3])
+    ax.plot(extract_ss(sim, ΔΨm * 1000), extract_ss(sim, degavg), "v", label=labels[1])
+    ax.plot(extract_ss(sim_ca5, ΔΨm * 1000), extract_ss(sim_ca5, degavg), "o", label=labels[2])
+    ax.plot(extract_ss(sim_ca10, ΔΨm * 1000), extract_ss(sim_ca10, degavg), "x", label=labels[3])
     ax.set(xlabel="ΔΨm (mV)", ylabel="Average node degree", title=title)
     ax.legend()
     ax.grid()
@@ -229,9 +234,9 @@ function plot_ca_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels=
 
     fig, ax = plt.subplots(1, 1; figsize)
 
-    ax.plot(extract(sim, Ca_m * 1000), extract(sim, degavg), "v", label=labels[1])
-    ax.plot(extract(sim_ca5, Ca_m * 1000), extract(sim_ca5, degavg), "o", label=labels[2])
-    ax.plot(extract(sim_ca10, Ca_m * 1000), extract(sim_ca10, degavg), "x", label=labels[3])
+    ax.plot(extract_ss(sim, Ca_m * 1000), extract_ss(sim, degavg), "v", label=labels[1])
+    ax.plot(extract_ss(sim_ca5, Ca_m * 1000), extract_ss(sim_ca5, degavg), "o", label=labels[2])
+    ax.plot(extract_ss(sim_ca10, Ca_m * 1000), extract_ss(sim_ca10, degavg), "x", label=labels[3])
     ax.set(xlabel="Mitochondrial Ca (mM)", ylabel="Average node degree", title=title)
     ax.legend()
     ax.grid()
@@ -251,9 +256,9 @@ function plot_atp_k(sim, sim_ca5, sim_ca10, sys; figsize=(6,6), title="", labels
 
     fig, ax = plt.subplots(1, 1; figsize)
 
-    ax.plot(extract(sim, k), extract(sim, degavg), "v", label=labels[1])
-    ax.plot(extract(sim_ca5, k), extract(sim_ca5, degavg), "o", label=labels[2])
-    ax.plot(extract(sim_ca10, k), extract(sim_ca10, degavg), "x", label=labels[3])
+    ax.plot(extract_ss(sim, k), extract_ss(sim, degavg), "v", label=labels[1])
+    ax.plot(extract_ss(sim_ca5, k), extract_ss(sim_ca5, degavg), "o", label=labels[2])
+    ax.plot(extract_ss(sim_ca10, k), extract_ss(sim_ca10, degavg), "x", label=labels[3])
     ax.set(xlabel="ATP:ADP ratio", ylabel="Average node degree", title=title)
     ax.legend()
     ax.grid()
