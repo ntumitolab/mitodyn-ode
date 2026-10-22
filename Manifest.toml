@@ -2,7 +2,7 @@
 
 julia_version = "1.13.2"
 manifest_format = "2.1"
-project_hash = "85682581f335b70c71e794b2dcb09c914227c077"
+project_hash = "595fc3a76ae86eae712d84fd479ddd7d8da29d32"
 
 [[deps.ADTypes]]
 deps = ["PrecompileTools"]
@@ -1972,13 +1972,6 @@ weakdeps = ["SparseArrays"]
 
     [deps.Statistics.extensions]
     SparseArraysExt = ["SparseArrays"]
-
-[[deps.SteadyStateDiffEq]]
-deps = ["ConcreteStructs", "DiffEqBase", "DiffEqCallbacks", "ForwardDiff", "LinearAlgebra", "LinearSolve", "NonlinearSolveBase", "PrecompileTools", "SciMLBase", "SciMLPublic", "SymbolicIndexingInterface"]
-git-tree-sha1 = "b1f99ee4f4a870c07e4d8f01f1527dee851b5828"
-registries = "General"
-uuid = "9672c7b4-1e72-59bd-8a11-6ac3964bc41f"
-version = "2.18.1"
 
 [[deps.StringManipulation]]
 deps = ["PrecompileTools", "StyledStrings"]

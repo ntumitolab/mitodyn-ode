@@ -14,5 +14,4 @@ Direct dependencies of the root `Project.toml` (Julia 1.13.2, resolved in `Manif
 | PythonPlot | 1.0.8 | Plotting via matplotlib (PythonCall) |
 | SHA | 1.0.0 | Hashing (used in CI) |
 | Startup | 0.1.0 | Local workspace package: `make_model()`, utils |
-| SteadyStateDiffEq | 2.18.1 | Steady-state solving |
 | Tables | 1.14.0 | Tables interface for results |
