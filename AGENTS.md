@@ -7,7 +7,6 @@ Julia workspace that models mitochondrial dynamics as a ModelingToolkit ODE syst
 - `Startup/` — the inner model package. `build_model()` assembles everything.
 - `docs/` — Literate notebook sources (`*.jl`) plus `index.md` (model description) and `myst.yml` for the site TOC.
 - CI (`.github/workflows/ci.yml`) runs notebooks (by `.github/ci.jl`) and builds the site by `jupyter-book`.
-- `stash/` — **read-only archive** of superseded model variants. Never edited, executed, or built by CI. Do not "fix" it; keep it as historical reference.
 
 ## Workflow
 
